@@ -28,7 +28,9 @@ export default function PatientForm() {
     emergency_phone_number: '',
     underlying_disease: '',
     genetic_disease: '',
-    drugallergy: ''
+    drugallergy: '',
+    weight: 0,
+    height: 0,
   });
 
   const handleChange = (e) => {
@@ -60,8 +62,8 @@ export default function PatientForm() {
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         {/* Title Section */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-2">เวชระเบียน</h1>
-          <p className="text-lg text-gray-500 dark:text-gray-400">กรอกข้อมูลเวชระเบียน</p>
+          <h1 className="text-4xl font-bold mb-2">ลงทะเบียน</h1>
+          <p className="text-lg text-gray-500 dark:text-gray-400">กรอกข้อมูล</p>
         </div>
 
         <div className="grid grid-cols-3 gap-8 mb-10">
