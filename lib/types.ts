@@ -34,3 +34,28 @@ export interface Target {
   weightTarget: number
   bloodSugarMax?: number
 }
+
+export interface FormRegisterData {
+    firstName: string;
+    lastName: string;
+    gender: string;
+    nation: string;
+    occupation: string;
+    phone_number: string;
+    id: string;
+    dob: string;
+    bloodType: string;
+    email: string;
+    houseno: string;
+    road: string;
+    tambon: string;
+    ampur: string;
+    changwat: string;
+    village: string;
+    emergency_phone_number: string;
+    underlying_disease: string;
+    genetic_disease: string;
+    drugallergy: string;
+    weight: number;
+    height: number;
+}

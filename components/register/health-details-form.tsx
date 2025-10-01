@@ -1,4 +1,16 @@
-export default function HealthDetailsForm({ formData, handleChange, nextStep }) {
+import type { FormRegisterData } from "@/lib/types"
+
+export interface HealthDetailsFormProps {
+  formData: FormRegisterData;
+  // ใช้ Type จาก React สำหรับ Event handler
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> 
+  ) => void; 
+  handleSubmit: React.MouseEventHandler<HTMLButtonElement>
+}
+
+
+export default function HealthDetailsForm({ formData, handleChange, handleSubmit }:HealthDetailsFormProps) {
   return (
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         {/* Field: กรุ๊ปเลือด */}
@@ -44,7 +56,7 @@ export default function HealthDetailsForm({ formData, handleChange, nextStep }) 
       
       {/* Submit Button */}
       <div className="mt-6 flex justify-end">
-        <button type="button" onClick={nextStep} className="bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700">
+        <button type="button" onClick={handleSubmit} className="bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700">
           ยืนยัน
         </button>
       </div>

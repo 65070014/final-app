@@ -1,4 +1,13 @@
-export default function AddressDetailsForm({ formData, handleChange, nextStep }) {
+import type { FormRegisterData } from "@/lib/types"
+
+export interface AddressDetailsFormProps {
+  formData: FormRegisterData;
+  // ใช้ Type จาก React สำหรับ Event handler
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  nextStep: () => void;
+}
+
+export default function AddressDetailsForm({ formData, handleChange, nextStep }: AddressDetailsFormProps) {
   return (
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       {/* Field: บ้านเลขที่ */}

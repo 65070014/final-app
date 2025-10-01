@@ -57,9 +57,10 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
 
   const getWeightTrend = () => {
     if (weightData.length < 2) return null
-    const latest = weightData[weightData.length - 1].weight
-    const previous = weightData[weightData.length - 2].weight
-    const diff = latest - previous
+      const latest = weightData[weightData.length - 1].weight ?? 0 
+      const previous = weightData[weightData.length - 2].weight ?? 0 
+      
+      const diff = latest - previous
 
     if (Math.abs(diff) < 0.5) {
       return { trend: "คงที่", icon: Minus, color: "text-muted-foreground" }
