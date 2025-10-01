@@ -144,6 +144,7 @@ export const mockSymptoms: Record<string, Symptom[]> = {
   ],
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mockTargets: Record<string, any> = {
   "1": { systolicMax: 140, diastolicMax: 90, weightTarget: 75, bloodSugarMax: 180 },
   "2": { systolicMax: 140, diastolicMax: 90, weightTarget: 63 },

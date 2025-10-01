@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Search, AlertCircle, Clock } from "lucide-react"
+import { Search } from "lucide-react"
 import type { Patient } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -27,10 +27,10 @@ export function PatientListSidebar({ patients, selectedPatientId, onSelectPatien
     return matchesSearch
   })
 
-  const getDaysRemaining = (endDate: Date) => {
+  {/*const getDaysRemaining = (endDate: Date) => {
     const days = Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     return days
-  }
+  }*/}
 
   return (
     <div className="flex h-screen w-80 flex-col border-r border-border bg-card">
@@ -58,7 +58,7 @@ export function PatientListSidebar({ patients, selectedPatientId, onSelectPatien
       <ScrollArea className="flex-1">
         <div className="space-y-2 p-4">
           {filteredPatients.map((patient) => {
-            const daysRemaining = getDaysRemaining(patient.monitoringEndDate)
+            {/*const daysRemaining = getDaysRemaining(patient.monitoringEndDate)*/}
             const isSelected = patient.id === selectedPatientId
 
             return (
