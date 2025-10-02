@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Eye, EyeOff } from "lucide-react"
+import Link from 'next/link';
 
 export function DoctorLoginForm() {
   const [email, setEmail] = useState("")
@@ -55,8 +56,10 @@ export function DoctorLoginForm() {
           </button>
         </div>
       </div>
-
-      <Button type="submit" className="w-full mt-2">เข้าสู่ระบบ</Button>
+      <Link href="/doctor">
+        <Button type="submit" className="w-full mt-2">เข้าสู่ระบบ</Button>
+      </Link>
+      
     </form>
   )
 }
