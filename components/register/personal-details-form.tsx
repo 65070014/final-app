@@ -70,9 +70,21 @@ export default function PersonalDetailsForm({ formData, handleChange, nextStep }
       </div>
 
       {/* Field: Email */}
-      <div className="col-span-1"> {/* ใช้ col-span-full เพื่อให้กินพื้นที่เต็ม Grid */}
+      <div className="col-span-1">
         <label htmlFor="email" className="block text-sm font-medium mb-1">อีเมล</label>
         <input type="text" id="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกอีเมล" />
+      </div>
+
+      {/* Field: รหัสผ่าน */}
+      <div className="col-span-1">
+        <label htmlFor="password" className="block text-sm font-medium mb-1">รหัสผ่าน</label>
+        <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="รหัสผ่าน" />
+      </div>
+
+      {/* Field: ยืนยันรหัสผ่าน */}
+      <div className="col-span-1">
+        <label htmlFor="confirm_password" className="block text-sm font-medium mb-1">ยืนยันรหัสผ่าน</label>
+        <input type="password" id="confirm_password" name="confirm_password" value={formData.confirm_password} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="ยืนยันรหัสผ่าน" />
       </div>
       
       {/* Submit Button */}

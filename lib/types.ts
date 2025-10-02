@@ -58,4 +58,6 @@ export interface FormRegisterData {
     drugallergy: string;
     weight: number;
     height: number;
+    password: string;
+    confirm_password:string;
 }

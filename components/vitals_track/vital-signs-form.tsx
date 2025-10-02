@@ -79,7 +79,6 @@ export function VitalSignsForm({ onSubmit }: VitalSignsFormProps) {
                   mode="single"
                   selected={date}
                   onSelect={(newDate) => newDate && setDate(newDate)}
-                  initialFocus
                 />
               </PopoverContent>
             </Popover>

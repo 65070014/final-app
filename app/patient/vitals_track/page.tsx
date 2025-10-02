@@ -110,7 +110,6 @@ export default function VitalSignsPage() {
 
       <main className="container mx-auto px-4 py-6 space-y-6">
         <VitalSignsForm onSubmit={function (): void {
-          throw new Error("Function not implemented.")
         } }/>
 
         <Card className="p-6">

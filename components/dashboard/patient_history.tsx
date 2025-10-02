@@ -1,9 +1,13 @@
+"use client"
+
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useRouter } from 'next/navigation';
 import { FileText, ChevronRight, Clock } from "lucide-react"
 
 export function HistorySection() {
+  const router = useRouter();
   const recentVisits = [
     {
       date: "28 ธ.ค. 2567",
@@ -39,7 +43,7 @@ export function HistorySection() {
             </div>
             <h3 className="text-lg font-semibold text-foreground">ประวัติการรักษาล่าสุด</h3>
           </div>
-          <Button variant="ghost" size="sm" className="text-blue-500 hover:text-blue-500/80">
+          <Button onClick={() => router.push('/patient/history')} variant="ghost" size="sm" className="text-blue-500 hover:text-blue-500/80">
             ดูทั้งหมด
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>

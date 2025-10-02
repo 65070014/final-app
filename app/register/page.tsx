@@ -1,6 +1,7 @@
 "use client";
 
 import { SetStateAction, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PersonalDetailsForm from '@/components/register/personal-details-form';
 import AddressDetailsForm from '@/components/register/address-details-form';
 import HealthDetailsForm from '@/components/register/health-details-form';
@@ -8,6 +9,7 @@ import HealthDetailsForm from '@/components/register/health-details-form';
 
 export default function PatientForm() {
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -31,6 +33,8 @@ export default function PatientForm() {
     drugallergy: '',
     weight: 0,
     height: 0,
+    password: "",
+    confirm_password: "",
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,6 +57,7 @@ export default function PatientForm() {
   const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault(); 
     console.log(formData);
+    router.push('/patient'); 
   };
 
   return (

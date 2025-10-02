@@ -1,9 +1,16 @@
+"use client";
+
 import { Card } from "@/components/ui/card"
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Calendar, Clock, Pill, FileText, AlertCircle, Bell } from "lucide-react"
+import { Calendar, Clock, Pill, FileText, AlertCircle, Bell} from "lucide-react"
+import { useState } from "react";
+import {Patient_Edit_Appointment} from '@/components/appointment/patient_edit_appointment';
 
 export function ActionZone() {
+    const router = useRouter();
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* การนัดหมาย */}
@@ -29,7 +36,11 @@ export function ActionZone() {
                             </div>
                         </div>
                         <Button className="w-full bg-gray-400 text-gray-700 cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-700 disabled:opacity-100 mb-2" disabled >เข้าร่วมวิดีโอคอล</Button>
-                        <Button className="w-full bg-red-600 hover:bg-red-700">เลื่อน/ยกเลิกนัด</Button>
+                        <Button onClick={() => setIsDialogOpen(true)} className="w-full bg-red-600 hover:bg-red-700">เลื่อน/ยกเลิกนัด</Button>
+                         <Patient_Edit_Appointment
+                            open={isDialogOpen}
+                            onOpenChange={setIsDialogOpen}
+                        />
                     </div>
                 </div>
             </Card>
@@ -58,7 +69,7 @@ export function ActionZone() {
                         </AlertDescription>
                     </Alert>
 
-                    <Button variant="outline" className="w-full">
+                    <Button onClick={() => router.push('/patient/notification')} variant="outline" className="w-full">
                         ดูการแจ้งเตือนทั้งหมด
                     </Button>
                 </div>
@@ -66,21 +77,21 @@ export function ActionZone() {
 
             {/* Quick Actions */}
             <Card className="p-6 lg:col-span-2">
-                <h3 className="text-lg font-semibold text-foreground mb-4">บริการด่วน</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-4">เมนู</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/appointment')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
                         <FileText className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">จองนัดหมาย</span>
+                        <span className="text-sm">นัดหมาย</span>
+                    </Button>
+                    <Button onClick={() => router.push('/patient/appointments')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                        <Calendar className="h-6 w-6 text-blue-500" />
+                        <span className="text-sm">ตารางนัดหมายของฉัน</span>
                     </Button>
                     <Button variant="outline" className="h-20 flex-col gap-2 bg-transparent">
                         <Pill className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">รายการยา</span>
                     </Button>
-                    <Button variant="outline" className="h-20 flex-col gap-2 bg-transparent">
-                        <Calendar className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">ผลตรวจ</span>
-                    </Button>
-                    <Button variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/history')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
                         <Clock className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">ประวัติการรักษา</span>
                     </Button>
