@@ -128,7 +128,7 @@ export function Patient_Edit_Appointment({
                     selected={selectedDate}
                     onSelect={setSelectedDate}
                     disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                    className="rounded-md w-3/4"
+                    className="rounded-md"
                   />
                 </div>
               </div>
