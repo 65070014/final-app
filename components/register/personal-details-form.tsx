@@ -1,4 +1,15 @@
-export default function PersonalDetailsForm({ formData, handleChange, nextStep }) {
+import type { FormRegisterData } from "@/lib/types"
+
+export interface PersonalDetailsFormProps {
+  formData: FormRegisterData;
+  // ใช้ Type จาก React สำหรับ Event handler
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> 
+) => void; 
+  nextStep: () => void;
+}
+
+export default function PersonalDetailsForm({ formData, handleChange, nextStep }:PersonalDetailsFormProps) {
   return (
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       {/* Field: บัตรประชาชน */}

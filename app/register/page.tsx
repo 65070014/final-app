@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import PersonalDetailsForm from '@/components/register/personal-details-form';
 import AddressDetailsForm from '@/components/register/address-details-form';
 import HealthDetailsForm from '@/components/register/health-details-form';
@@ -33,7 +33,8 @@ export default function PatientForm() {
     height: 0,
   });
 
-  const handleChange = (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -43,16 +44,15 @@ export default function PatientForm() {
     setCurrentStep(prev => prev + 1);
   };
 
-  const goToStep = (stepNumber) => {
+  const goToStep = (stepNumber: SetStateAction<number>) => {
     // ฟังก์ชันใหม่สำหรับเปลี่ยน Step โดยตรง
     setCurrentStep(stepNumber);
   };
 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault(); 
     console.log(formData);
-    // Logic for submitting the form to an API
   };
 
   return (
