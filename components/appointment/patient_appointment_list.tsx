@@ -4,7 +4,7 @@ import {Patient_Edit_Appointment} from '@/components/appointment/patient_edit_ap
 import { useState } from "react";
 import { Clock, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import router from "next/router";
+import Link from "next/link";
 
 const appointmentRecords = [
     {
@@ -105,15 +105,16 @@ export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) 
                                 {(record.status === 'UPCOMING' || record.status === 'CONFIRMED') && (
                                     <>
                                         {/* ปุ่มกรอกข้อมูลสัญญาณชีพ */}
-                                        <Button
-                                            onClick={() => router.push("/patient/vitals_signs")}
-                                            variant={record.is_vitals_filled ? 'outline' : 'default'} // ถ้ายังไม่กรอกใช้สีหลัก
-                                            size="sm"
-                                            disabled={record.is_vitals_filled}
-                                        >
-                                            <Stethoscope className="h-4 w-4 mr-2" />
-                                            {record.is_vitals_filled ? 'กรอกข้อมูลแล้ว' : 'กรอกสัญญาณชีพ'}
-                                        </Button>
+                                        <Link href="/patient/vitals_signs">
+                                            <Button
+                                                variant={record.is_vitals_filled ? 'outline' : 'default'} // ถ้ายังไม่กรอกใช้สีหลัก
+                                                size="sm"
+                                                disabled={record.is_vitals_filled}
+                                            >
+                                                <Stethoscope className="h-4 w-4 mr-2" />
+                                                {record.is_vitals_filled ? 'กรอกข้อมูลแล้ว' : 'กรอกสัญญาณชีพ'}
+                                            </Button>
+                                        </Link>
 
                                         {/* ปุ่มจัดการ เลื่อน/ยกเลิก */}
                                         <Button

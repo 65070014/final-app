@@ -17,7 +17,7 @@ export default function Home() {
           </Button>
 
           {/* 2. ปุ่มสำหรับแพทย์ */}
-          <Button onClick={() => router.push('/patient/notification')}>
+          <Button onClick={() => router.push('/doctor')}>
             <span role="img" aria-label="doctor" className="text-4xl mb-2"></span>
             แพทย์
           </Button>

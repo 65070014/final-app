@@ -3,11 +3,10 @@
 import { Card } from "@/components/ui/card"
 import { Clock, AlertTriangle, Package, Calendar, Stethoscope } from "lucide-react"
 import { Button } from "../ui/button"
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
 
 
 export function AllNotify() {
-  const router = useRouter();
   const notifications = [
     {
       type: "Daily Vitals Reminder",
@@ -26,7 +25,7 @@ export function AllNotify() {
       date: "วันนี้",
       time: "10:00 น.",
       action: "กรอกข้อมูล",
-      path: "/patient/vitals-form",
+      path: "/patient/notification",
       icon: <AlertTriangle className="h-5 w-5 text-red-500" />,
     },
     {
@@ -36,7 +35,7 @@ export function AllNotify() {
       date: "1 ต.ค. 2568",
       time: "08:30 น.",
       action: "ติดตามพัสดุ",
-      path: "/patient/order-tracking/123",
+      path: "/patient/notification",
       icon: <Package className="h-5 w-5 text-blue-500" />,
     },
     {
@@ -46,7 +45,7 @@ export function AllNotify() {
       date: "30 ก.ย. 2568",
       time: "18:00 น.",
       action: "ดูรายละเอียด",
-      path: "/patient/appointments",
+      path: "/patient/notification",
       icon: <Calendar className="h-5 w-5 text-green-500" />,
     },
   ];
@@ -73,9 +72,11 @@ export function AllNotify() {
           </div>
           
           <div className="pt-2 text-right">
-              <Button onClick={() => router.push(notif.path)} variant="default" size="sm" className="w-auto">
+            <Link href ={notif.path}>
+              <Button variant="default" size="sm" className="w-auto">
                 {notif.action}
               </Button>
+            </Link>
           </div>
         </Card>
       ))}
