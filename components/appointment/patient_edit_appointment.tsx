@@ -67,7 +67,7 @@ export function Patient_Edit_Appointment({
             <div className="flex items-center gap-3 text-foreground">
               <User className="h-4 w-4 text-primary" />
               <span className="font-medium">แพทย์หญิงสุดา</span>
-            <span className="text-sm text-muted-foreground">แพทย์เวชศาสตร์ครอบครัว</span>
+              <span className="text-sm text-muted-foreground">แพทย์เวชศาสตร์ครอบครัว</span>
             </div>
             <div className="flex items-center gap-3 text-foreground">
               <Calendar className="h-4 w-4 text-primary" />
@@ -128,7 +128,7 @@ export function Patient_Edit_Appointment({
                     selected={selectedDate}
                     onSelect={setSelectedDate}
                     disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                    className="rounded-md w-3/4"
+                    className="rounded-md w-3/5"
                   />
                 </div>
               </div>

@@ -89,11 +89,11 @@ export function DoctorActions({ patient, onUpdateMonitoringDate, onCloseMonitori
       {/* SOAP Note */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">บันทึกการวิเคราะห์และแผนการรักษา (SOAP Note)</CardTitle>
+          <CardTitle className="text-base">บันทึกการวิเคราะห์และแผนการรักษา</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Textarea
-            placeholder="กรอกบันทึกการวิเคราะห์อาการ (Analysis) และแผนการรักษา (Plan)..."
+            placeholder="กรอกบันทึกการวิเคราะห์อาการ และแผนการรักษา"
             value={soapNote}
             onChange={(e) => setSoapNote(e.target.value)}
             rows={6}

@@ -70,7 +70,6 @@ export function DiagnosisSection({ diagnosisNote, setDiagnosisNote }: DiagnosisS
             onChange={(e) => updateField("treatmentNote", e.target.value)}
             className="min-h-[200px] resize-y"
           />
-          <p className="text-sm text-muted-foreground">รวมข้อมูลการวิเคราะห์อาการ แผนการรักษา คำแนะนำ และการนัดหมายครั้งต่อไป</p>
         </div>
       </CardContent>
     </Card>
