@@ -1,4 +1,4 @@
-import type { FormRegisterData } from "@/lib/types"
+import type { FormRegisterData,FormErrors } from "@/lib/types"
 
 export interface PersonalDetailsFormProps {
   formData: FormRegisterData;
@@ -7,25 +7,29 @@ export interface PersonalDetailsFormProps {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> 
 ) => void; 
   nextStep: () => void;
+  errors : FormErrors;
 }
 
-export default function PersonalDetailsForm({ formData, handleChange, nextStep }:PersonalDetailsFormProps) {
+export default function PersonalDetailsForm({ formData, handleChange, nextStep, errors }:PersonalDetailsFormProps) {
   return (
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       {/* Field: บัตรประชาชน */}
       <div className="col-span-full"> {/* ใช้ col-span-full เพื่อให้กินพื้นที่เต็ม Grid */}
-        <label htmlFor="cid" className="block text-sm font-medium mb-1">หมายเลขบัตรประชาชน</label>
-        <input type="text" id="cid" name="cid" value={formData.id} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกหมายเลขบัตรประชาชน 13 หลัก" />
+        <label htmlFor="id" className="block text-sm font-medium mb-1">หมายเลขบัตรประชาชน</label>
+        <input type="text" id="id" name="id" value={formData.id} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกหมายเลขบัตรประชาชน 13 หลัก" />
+        {errors.id && (<p className="mt-1 text-sm text-red-500">{errors.id}</p>)}
       </div>
       {/* Field: ชื่อ */}
       <div className="col-span-1">
         <label htmlFor="firstName" className="block text-sm font-medium mb-1">ชื่อ</label>
         <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรอกชื่อจริง" />
+        {errors.firstName && (<p className="mt-1 text-sm text-red-500">{errors.firstName}</p>)}
       </div>
       {/* Field: นามสกุล */}
       <div className="col-span-1">
         <label htmlFor="lastName" className="block text-sm font-medium mb-1">นามสกุล</label>
         <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรอกนามสกุล" />
+        {errors.lastName && (<p className="mt-1 text-sm text-red-500">{errors.lastName}</p>)}
       </div>
 
       {/* Field: เพศ */}
@@ -39,15 +43,17 @@ export default function PersonalDetailsForm({ formData, handleChange, nextStep }
             className="w-full p-2 border rounded-md"
           >
             <option value="">โปรดเลือก</option>
-            <option value="male">ชาย</option>
-            <option value="female">หญิง</option>
+            <option value="1">ชาย</option>
+            <option value="2">หญิง</option>
           </select>
+          {errors.gender && (<p className="mt-1 text-sm text-red-500">{errors.gender}</p>)}
     </div>
 
       {/* Field: วันเดือนปีเกิด */}
       <div className="col-span-1">
         <label htmlFor="dob" className="block text-sm font-medium mb-1">วันเดือนปีเกิด</label>
         <input type="date" id="dob" name="dob" value={formData.dob} onChange={handleChange} className="w-full p-2 border rounded-md" />
+        {errors.dob && (<p className="mt-1 text-sm text-red-500">{errors.dob}</p>)}
       </div>
       
       
@@ -55,36 +61,42 @@ export default function PersonalDetailsForm({ formData, handleChange, nextStep }
       <div className="col-span-1">
         <label htmlFor="nation" className="block text-sm font-medium mb-1">สัญชาติ</label>
         <input type="text" id="nation" name="nation" value={formData.nation} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="ระบุสัญชาติ" />
+        {errors.nation && (<p className="mt-1 text-sm text-red-500">{errors.nation}</p>)}
       </div>
 
       {/* Field: อาชีพ */}
       <div className="col-span-1">
         <label htmlFor="occupation" className="block text-sm font-medium mb-1">อาชีพ</label>
         <input type="text" id="occupation" name="occupation" value={formData.occupation} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="ระบุอาชีพ" />
+        {errors.occupation && (<p className="mt-1 text-sm text-red-500">{errors.occupation}</p>)}
       </div>
 
       {/* Field: เบอร์โทร */}
       <div className="col-span-1">
         <label htmlFor="phone_number" className="block text-sm font-medium mb-1">เบอร์โทรศัพท์</label>
         <input type="text" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="เบอร์โทรศัพท์" />
+        {errors.phone_number && (<p className="mt-1 text-sm text-red-500">{errors.phone_number}</p>)}
       </div>
 
       {/* Field: Email */}
       <div className="col-span-1">
         <label htmlFor="email" className="block text-sm font-medium mb-1">อีเมล</label>
         <input type="text" id="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกอีเมล" />
+        {errors.email && (<p className="mt-1 text-sm text-red-500">{errors.email}</p>)}
       </div>
 
       {/* Field: รหัสผ่าน */}
       <div className="col-span-1">
         <label htmlFor="password" className="block text-sm font-medium mb-1">รหัสผ่าน</label>
         <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="รหัสผ่าน" />
+        {errors.password && (<p className="mt-1 text-sm text-red-500">{errors.password}</p>)}
       </div>
 
       {/* Field: ยืนยันรหัสผ่าน */}
       <div className="col-span-1">
         <label htmlFor="confirm_password" className="block text-sm font-medium mb-1">ยืนยันรหัสผ่าน</label>
         <input type="password" id="confirm_password" name="confirm_password" value={formData.confirm_password} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="ยืนยันรหัสผ่าน" />
+        {errors.confirm_password && (<p className="mt-1 text-sm text-red-500">{errors.confirm_password}</p>)}
       </div>
       
       {/* Submit Button */}

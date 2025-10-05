@@ -35,6 +35,11 @@ export interface Target {
   bloodSugarMax?: number
 }
 
+export type FormErrors = {
+  [key: string]: string; 
+};
+
+
 export interface FormRegisterData {
     firstName: string;
     lastName: string;
@@ -54,7 +59,6 @@ export interface FormRegisterData {
     village: string;
     emergency_phone_number: string;
     underlying_disease: string;
-    genetic_disease: string;
     drugallergy: string;
     weight: number;
     height: number;

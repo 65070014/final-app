@@ -1,4 +1,4 @@
-import type { FormRegisterData } from "@/lib/types"
+import type { FormRegisterData,FormErrors } from "@/lib/types"
 
 export interface HealthDetailsFormProps {
   formData: FormRegisterData;
@@ -7,10 +7,11 @@ export interface HealthDetailsFormProps {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> 
   ) => void; 
   handleSubmit: React.MouseEventHandler<HTMLButtonElement>
+  errors : FormErrors;
 }
 
 
-export default function HealthDetailsForm({ formData, handleChange, handleSubmit }:HealthDetailsFormProps) {
+export default function HealthDetailsForm({ formData, handleChange, handleSubmit, errors }:HealthDetailsFormProps) {
   return (
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         {/* Field: กรุ๊ปเลือด */}
@@ -30,28 +31,33 @@ export default function HealthDetailsForm({ formData, handleChange, handleSubmit
           <option value="O">O</option>
           <option value="UN">ไม่ทราบ</option>
         </select>
+        {errors.bloodType && (<p className="mt-1 text-sm text-red-500">{errors.bloodType}</p>)}
       </div>
 
       {/* Field: น้ำหนัก */}
       <div className="col-span-1">
         <label htmlFor="weight" className="block text-sm font-medium mb-1">น้ำหนัก</label>
         <input type="number" id="weight" name="weight" value={formData.weight} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรอกน้ำหนัก (กก.)" />
+        {errors.weight && (<p className="mt-1 text-sm text-red-500">{errors.weight}</p>)}
       </div>
       {/* Field: ส่วนสูง */}
       <div className="col-span-1">
         <label htmlFor="height" className="block text-sm font-medium mb-1">ส่วนสูง</label>
         <input type="number" id="height" name="height" value={formData.height} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรอกส่วนสูง (ซม.)" />
+        {errors.height && (<p className="mt-1 text-sm text-red-500">{errors.height}</p>)}
       </div>
 
       {/* Field: โรคประจำตัว */}
       <div className="col-span-full"> {/* ใช้ col-span-full เพื่อให้กินพื้นที่เต็ม Grid */}
         <label htmlFor="underlying_disease" className="block text-sm font-medium mb-1">โรคประจำตัว</label>
         <input type="text" id="underlying_disease" name="underlying_disease" value={formData.underlying_disease} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกโรคประจำตัว" />
+        {errors.underlying_disease && (<p className="mt-1 text-sm text-red-500">{errors.underlying_disease}</p>)}
       </div>
       {/* Field: การแพ้ยา */}
       <div className="col-span-full">
         <label htmlFor="drugallergy" className="block text-sm font-medium mb-1">การแพ้ยา/อาหาร</label>
         <input type="text" id="drugallergy" name="drugallergy" value={formData.drugallergy} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรอกการแพ้ยา" />
+        {errors.drugallergy && (<p className="mt-1 text-sm text-red-500">{errors.drugallergy}</p>)}
       </div>
       
       {/* Submit Button */}

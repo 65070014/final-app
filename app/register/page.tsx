@@ -5,37 +5,23 @@ import { useRouter } from 'next/navigation';
 import PersonalDetailsForm from '@/components/register/personal-details-form';
 import AddressDetailsForm from '@/components/register/address-details-form';
 import HealthDetailsForm from '@/components/register/health-details-form';
+import { FormRegisterData } from '@/lib/types'
+import { validateRegisterStep } from '@/utils/formValidation'
 
+const initialFormData: FormRegisterData = {
+  firstName: '', lastName: '', gender: '', nation: '', occupation: '',
+  phone_number: '', id: '', dob: '', bloodType: '', email: '',
+  houseno: '', road: '', tambon: '', ampur: '', changwat: '',
+  village: '', emergency_phone_number: '', underlying_disease: '', drugallergy: '',
+  weight: 0, height: 0,
+  password: '', confirm_password: '',
+};
 
 export default function PatientForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    gender: '',
-    nation: '',
-    occupation: '',
-    phone_number: '',
-    id: '',
-    dob: '',
-    bloodType: '',
-    email: '',
-    houseno: '',
-    road: '',
-    tambon:'',
-    ampur: '',
-    changwat:'',
-    village:'',
-    emergency_phone_number: '',
-    underlying_disease: '',
-    genetic_disease: '',
-    drugallergy: '',
-    weight: 0,
-    height: 0,
-    password: "",
-    confirm_password: "",
-  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [formData, setFormData] = useState<FormRegisterData>(initialFormData);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (e: { target: { name: any; value: any; }; }) => {
@@ -44,7 +30,15 @@ export default function PatientForm() {
   };
 
   const nextStep = () => {
-    // ไปยัง Step ถัดไป
+    const stepErrors = validateRegisterStep(currentStep, formData);
+
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      return;
+    }
+
+    // ✅ ถ้าไม่มี Error ให้ล้าง Error เก่าออก แล้วไป Step ถัดไป
+    setErrors({});
     setCurrentStep(prev => prev + 1);
   };
 
@@ -53,11 +47,38 @@ export default function PatientForm() {
     setCurrentStep(stepNumber);
   };
 
+  const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
 
-  const handleSubmit: React.MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault(); 
-    console.log(formData);
-    router.push('/patient'); 
+    const stepErrors = validateRegisterStep(currentStep, formData);
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/register', { // 👈 URL API ที่คุณสร้าง
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('ลงทะเบียนสำเร็จ:', result);
+        alert('ลงทะเบียนผู้ป่วยสำเร็จ! ✅');
+        router.push('/patient');
+      } else {
+        setErrors(result.errors || {});
+        alert(`ลงทะเบียนไม่สำเร็จ: ${result.error}`);
+      }
+    } catch (error) {
+      console.error("เกิดข้อผิดพลาดในการเชื่อมต่อ:", error);
+      alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+    }
   };
 
   return (
@@ -73,7 +94,7 @@ export default function PatientForm() {
 
         <div className="grid grid-cols-3 gap-8 mb-10">
           <div className="flex flex-col items-center text-gray-400" onClick={() => goToStep(1)}>
-            <div className= {`w-10 h-10 rounded-full border-2 ${currentStep === 1 ? 'bg-blue-500 text-white' : 'border-gray-400 text-gray-400'} flex items-center justify-center font-bold mb-2 cursor-pointer`}>1</div>
+            <div className={`w-10 h-10 rounded-full border-2 ${currentStep === 1 ? 'bg-blue-500 text-white' : 'border-gray-400 text-gray-400'} flex items-center justify-center font-bold mb-2 cursor-pointer`}>1</div>
             <p className={`text-sm ${currentStep === 1 ? 'text-blue-500' : ''}  font-medium text-center cursor-pointer`}>ข้อมูลส่วนตัว</p>
           </div>
           <div className="flex flex-col items-center text-gray-400" onClick={() => goToStep(2)}>
@@ -88,13 +109,13 @@ export default function PatientForm() {
         {/* The actual form component */}
         <div>
           {currentStep === 1 && (
-            <PersonalDetailsForm formData={formData} handleChange={handleChange} nextStep={nextStep} />
+            <PersonalDetailsForm formData={formData} handleChange={handleChange} nextStep={nextStep} errors={errors} />
           )}
           {currentStep === 2 && (
-            <AddressDetailsForm formData={formData} handleChange={handleChange} nextStep={nextStep} />
+            <AddressDetailsForm formData={formData} handleChange={handleChange} nextStep={nextStep} errors={errors} />
           )}
           {currentStep === 3 && (
-            <HealthDetailsForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} />
+            <HealthDetailsForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} errors={errors} />
           )}
         </div>
       </div>
