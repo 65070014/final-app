@@ -5,9 +5,9 @@ import Link from "next/link"
 
 export default function NurseDashboard() {
     const [appointments, setAppointments] = useState([
-        { id: 1, patient: "สมชาย ใจดี", date: "6 ต.ค. 2568", time: "09:00 น.", department: "อายุรกรรม",doctor:"นพ. สมชาย ใจดี", status: "รอการยืนยัน" },
-        { id: 2, patient: "สายฝน นามดี", date: "7 ต.ค. 2568", time: "13:00 น.", department: "หัวใจ",doctor:"พญ. สายใจ นามงาม", status: "ยืนยันแล้ว" },
-        { id: 3, patient: "สายัญ สัญจร", date: "11 ต.ค. 2568", time: "15:00 น.", department: "ปอด",doctor:"นพ. วีระพล แก้วใส", status: "รอการยืนยัน" },
+        { id: 1, patient: "สมชาย ใจดี", date: "6 ต.ค. 2568", time: "09:00 น.", department: "อายุรกรรม",doctor:"นพ. สมชาย ใจดี", status: "รอการยืนยัน",patientstatus:"คนไข้ยืนยันแล้ว" },
+        { id: 2, patient: "สายฝน นามดี", date: "7 ต.ค. 2568", time: "13:00 น.", department: "หัวใจ",doctor:"พญ. สายใจ นามงาม", status: "ยืนยันแล้ว",patientstatus:"คนไข้ยืนยันแล้ว" },
+        { id: 3, patient: "สายัญ สัญจร", date: "11 ต.ค. 2568", time: "15:00 น.", department: "ปอด",doctor:"นพ. วีระพล แก้วใส", status: "รอการยืนยัน",patientstatus:"รอการยืนยันจากคนไข้" },
     ])
 
     const confirmAppointment = (id: number) => {
@@ -36,6 +36,9 @@ export default function NurseDashboard() {
                                     <p className="font-medium p-1">แพทย์: {appt.doctor}</p>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                    <span className={`px-3 py-1 rounded-full text-xs ${appt.patientstatus === "คนไข้ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
+                                        {appt.patientstatus}
+                                    </span>
                                     <span className={`px-3 py-1 rounded-full text-xs ${appt.status === "ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
                                         {appt.status}
                                     </span>

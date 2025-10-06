@@ -56,7 +56,7 @@ export default function NurseAppointments() {
         <div>
           <h2 className="text-lg font-semibold mb-4">สร้างนัดหมายใหม่</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            
+
             <div>
               <label className="block text-sm mb-1">เลือกผู้ป่วย</label>
               <select name="patient" value={formData.patient} onChange={handleChange} className="w-full p-2 border rounded">
@@ -66,7 +66,10 @@ export default function NurseAppointments() {
                 <option value="กมลวรรณ สุขใจ">กมลวรรณ สุขใจ</option>
               </select>
             </div>
-
+            <div>
+              <label className="text-sm pr-2">ดูตารางเวลานัดหมายของผู้ป่วย</label>
+              <Button type="button" className="p-2">คลิกเพื่อเปิด</Button>
+            </div>
             <div>
               <label className="text-sm ">เลือกแพทย์</label>
               <select name="doctor" value={formData.doctor} onChange={handleChange} className="w-full p-2 border rounded">
@@ -79,7 +82,7 @@ export default function NurseAppointments() {
 
             <div>
               <label className="text-sm pr-2">ดูตารางเวลานัดหมายของแพทย์</label>
-                <Button type="button" className="p-2">คลิกเพื่อเปิด</Button>
+              <Button type="button" className="p-2">คลิกเพื่อเปิด</Button>
             </div>
 
             <div>
