@@ -1,8 +1,14 @@
+"use client";
+
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, Weight} from "lucide-react"
+import { useSession } from "next-auth/react"; 
 
 export function PatientHeader() {
+    const { data: session } = useSession();
+    console.log(session)
+
     return (
         <Card className="p-6 bg-gradient-to-r from-blue-500/5 to-blue-500/10 border-blue-500/20">
             <div className="flex items-center justify-between">
@@ -12,7 +18,7 @@ export function PatientHeader() {
                         <AvatarFallback className="bg-blue-500/10 text-blue-500 text-lg font-semibold">ศป</AvatarFallback>
                     </Avatar>
                     <div>
-                        <h1 className="text-2xl font-bold text-foreground mb-1">สวัสดีคุณศุภวิชญ์ ปัทมภาสสกุล</h1>
+                        <h1 className="text-2xl font-bold text-foreground mb-1">สวัสดี{session?.user?.name || 'ผู้ใช้'}</h1>
                         <p className="text-muted-foreground">ผู้ป่วยเลขที่: HN-2025-000001</p>
                     </div>
                 </div>
