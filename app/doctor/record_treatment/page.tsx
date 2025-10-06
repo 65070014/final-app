@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { PatientReferencePanel } from "@/components/medical_record/patient_panel"
-import { DiagnosisSection } from "@/components/medical_record/diagnosis_section"
-import { MedicationSection } from "@/components/medical_record/medication_section"
-import { MonitoringSection } from "@/components/medical_record/monitoring_section"
+import { PatientReferencePanel } from "@/components/doctor/medical_record/patient_panel"
+import { DiagnosisSection } from "@/components/doctor/medical_record/diagnosis_section"
+import { MedicationSection } from "@/components/doctor/medical_record/medication_section"
+import { MonitoringSection } from "@/components/doctor/medical_record/monitoring_section"
 import { Button } from "@/components/ui/button"
 import { Save } from "lucide-react"
 

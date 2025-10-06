@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {Patient_Edit_Appointment} from '@/components/appointment/patient_edit_appointment';
+import {Patient_Edit_Appointment} from '@/components/patient/appointment/patient_edit_appointment';
 import { useState } from "react";
 import { Clock, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";

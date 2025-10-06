@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, User, Stethoscope } from "lucide-react"
-import { Button } from "../ui/button"
+import { Button } from "../../ui/button"
 
 export function TreatmentHistory() {
   const records = [

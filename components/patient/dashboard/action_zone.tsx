@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Calendar, Clock, Pill, FileText, AlertCircle, Bell} from "lucide-react"
 import { useState } from "react";
-import {Patient_Edit_Appointment} from '@/components/appointment/patient_edit_appointment';
+import {Patient_Edit_Appointment} from '@/components/patient/appointment/patient_edit_appointment';
 
 export function ActionZone() {
     const router = useRouter();

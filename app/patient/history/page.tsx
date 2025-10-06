@@ -1,4 +1,4 @@
-import { TreatmentHistory } from "@/components/history/treatment_history"
+import { TreatmentHistory } from "@/components/patient/history/treatment_history"
 
 export default function HistoryPage() {
   return (

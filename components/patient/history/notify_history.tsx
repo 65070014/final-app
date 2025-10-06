@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { Clock, AlertTriangle, Package, Calendar, Stethoscope } from "lucide-react"
-import { Button } from "../ui/button"
+import { Button } from "../../ui/button"
 import Link from "next/link";
 
 

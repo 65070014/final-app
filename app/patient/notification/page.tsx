@@ -1,4 +1,4 @@
-import { AllNotify } from "@/components/history/notify_history"
+import { AllNotify } from "@/components/patient/history/notify_history"
 
 export default function NotificationPage() {
   return (

@@ -1,6 +1,6 @@
-import { PatientHeader } from "@/components/dashboard/patient_header"
-import { ActionZone } from "@/components/dashboard/action_zone"
-import { HistorySection } from "@/components/dashboard/patient_history"
+import { PatientHeader } from "@/components/patient/dashboard/patient_header"
+import { ActionZone } from "@/components/patient/dashboard/action_zone"
+import { HistorySection } from "@/components/patient/dashboard/patient_history"
 
 export default function PatientDashboard() {
   return (
