@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { PatientListSidebar } from "@/components/vitals_track/patient-list-sidebar"
-import { PatientSummary } from "@/components/vitals_track/patient-summary"
-import { VitalSignsChart } from "@/components/vitals_track/vital-signs-chart-doc"
-import { SymptomLog } from "@/components/vitals_track/symptom-log"
-import { DoctorActions } from "@/components/vitals_track/doctor-actions"
+import { PatientListSidebar } from "@/components/doctor/vitals_track/patient-list-sidebar"
+import { PatientSummary } from "@/components/doctor/vitals_track/patient-summary"
+import { VitalSignsChart } from "@/components/doctor/vitals_track/vital-signs-chart-doc"
+import { SymptomLog } from "@/components/doctor/vitals_track/symptom-log"
+import { DoctorActions } from "@/components/doctor/vitals_track/doctor-actions"
 import { mockPatients, mockVitalSigns, mockSymptoms, mockTargets } from "@/lib/mock_data"
 import { Activity } from "lucide-react"
 

@@ -10,7 +10,7 @@ export default function Home() {
       <div className="flex flex-col items-center gap-10 p-5">
         <div className="flex gap-10 mt-8">
           
-          <Button onClick={() => router.push('/register')}> 
+          <Button onClick={() => router.push('/patient/login')}> 
             <span role="img" aria-label="patient" className="text-4xl mb-2"></span>
             ผู้ป่วย
           </Button>

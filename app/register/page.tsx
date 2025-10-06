@@ -2,9 +2,9 @@
 
 import { SetStateAction, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import PersonalDetailsForm from '@/components/register/personal-details-form';
-import AddressDetailsForm from '@/components/register/address-details-form';
-import HealthDetailsForm from '@/components/register/health-details-form';
+import PersonalDetailsForm from '@/components/patient/register/personal-details-form';
+import AddressDetailsForm from '@/components/patient/register/address-details-form';
+import HealthDetailsForm from '@/components/patient/register/health-details-form';
 import { FormRegisterData } from '@/lib/types'
 import { validateRegisterStep } from '@/utils/formValidation'
 

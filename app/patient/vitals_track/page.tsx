@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { VitalSignsForm } from "@/components/vitals_track/vital-signs-form"
-import { VitalSignsCharts } from "@/components/vitals_track/vital-signs-charts"
-import { VitalSignsTable } from "@/components/vitals_track/vital-signs-table"
+import { VitalSignsForm } from "@/components/patient/vitals_track/vital-signs-form"
+import { VitalSignsCharts } from "@/components/patient/vitals_track/vital-signs-charts"
+import { VitalSignsTable } from "@/components/patient/vitals_track/vital-signs-table"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Activity } from "lucide-react"

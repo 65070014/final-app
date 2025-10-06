@@ -92,9 +92,5 @@ export async function POST(request: Request) {
             error: 'ไม่สามารถบันทึกข้อมูลได้',
             message: (error as Error).message
         }, { status: 500 });
-    } finally {
-        if (db && db.end) {
-            await db.end();
-        }
     }
 }

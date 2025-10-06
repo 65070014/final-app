@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
-import { PatientAppointmentList } from '@/components/appointment/patient_appointment_list';
+import { PatientAppointmentList } from '@/components/patient/appointment/patient_appointment_list';
 
 
 
