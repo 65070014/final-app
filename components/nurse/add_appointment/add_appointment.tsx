@@ -1,12 +1,12 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function NurseAppointments() {
-  const [appointments, setAppointments] = useState([
-    { id: 1, patient: "สมชาย ใจดี", doctor: "นพ. สมชาย ใจดี", department: "อายุรกรรม", date: "2025-10-06", time: "09:00", symptom: "ปวดหัว" },
-    { id: 2, patient: "สายฝน นามดี", doctor: "พญ. สายใจ นามงาม", department: "หัวใจ", date: "2025-11-15", time: "13:30", symptom: "เหนื่อยง่าย" },
-  ])
+  const [appointments, setAppointments] = useState<any[]>([])
+  const [patients, setPatients] = useState<any[]>([])
+  const [doctors, setDoctors] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const [formData, setFormData] = useState({
     patient: "",
@@ -16,6 +16,29 @@ export default function NurseAppointments() {
     time: "",
     symptom: ""
   })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [patientsRes, doctorsRes] = await Promise.all([
+          fetch("/api/patients"),
+          fetch("/api/doctors")
+        ])
+
+        const patientsData = await patientsRes.json()
+        const doctorsData = await doctorsRes.json()
+
+        setPatients(patientsData)
+        setDoctors(doctorsData)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   const handleChange = (e: any) => {
     const { name, value } = e.target
@@ -32,6 +55,14 @@ export default function NurseAppointments() {
       }
     ])
     setFormData({ patient: "", doctor: "", department: "", date: "", time: "", symptom: "" })
+  }
+
+  if (isLoading) {
+    return <div>กำลังโหลดข้อมูล...</div>
+  }
+
+  if (!patients.length) {
+    return <div>ไม่พบข้อมูลผู้ป่วย</div>
   }
 
   return (
@@ -59,11 +90,18 @@ export default function NurseAppointments() {
 
             <div>
               <label className="block text-sm mb-1">เลือกผู้ป่วย</label>
-              <select name="patient" value={formData.patient} onChange={handleChange} className="w-full p-2 border rounded">
+              <select
+                name="patient"
+                value={formData.patient}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              >
                 <option value="">-- เลือกผู้ป่วย --</option>
-                <option value="สมชาย ใจดี">สมชาย ใจดี</option>
-                <option value="สายฝน นามดี">สายฝน นามดี</option>
-                <option value="กมลวรรณ สุขใจ">กมลวรรณ สุขใจ</option>
+                {patients.map((p) => (
+                  <option key={p.patient_id}>
+                    {p.gender === "1" ? "นาย" : "นาง/น.ส."} {p.fname} {p.lname}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
@@ -72,11 +110,20 @@ export default function NurseAppointments() {
             </div>
             <div>
               <label className="text-sm ">เลือกแพทย์</label>
-              <select name="doctor" value={formData.doctor} onChange={handleChange} className="w-full p-2 border rounded">
+              <select
+                name="doctor"
+                value={formData.doctor}
+                onChange={handleChange}
+                className="w-full p-2 border rounded"
+              >
                 <option value="">-- เลือกแพทย์ --</option>
-                <option value="นพ. สมชาย ใจดี">นพ. สมชาย ใจดี (อายุรกรรม)</option>
-                <option value="พญ. สายใจ นามงาม">พญ. สายใจ นามงาม (หัวใจ)</option>
-                <option value="นพ. วีระพล แก้วใส">นพ. วีระพล แก้วใส (กระดูก)</option>
+                {doctors.map((d) => (
+                  <option key={d.medical_personnel_id} value={d.medical_personnel_id}>
+                    {d.position === 1
+                      ? (d.gender === 1 ? "นพ." : "พญ.") : (d.gender === 1 ? "นาย" : "นาง/น.ส.")
+                    } {d.fname} {d.lname}
+                  </option>
+                ))}
               </select>
             </div>
 

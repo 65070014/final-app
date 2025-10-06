@@ -36,36 +36,28 @@ export default function MedicalRecordForm() {
       medications,
       monitoring,
     })
-    // Here you would send data to your backend/Google Sheets
     alert("บันทึกเวชระเบียนเรียบร้อยแล้ว")
   }
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-foreground mb-2">บันทึกเวชระเบียน</h1>
         <p className="text-muted-foreground">กรอกข้อมูลการตรวจและวินิจฉัยผู้ป่วย</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Panel - Patient Reference */}
         <div className="lg:col-span-1">
           <PatientReferencePanel />
         </div>
 
-        {/* Right Panel - Main Form */}
         <div className="lg:col-span-2 space-y-6">
-          {/* SOAP Note Section */}
           <DiagnosisSection diagnosisNote={diagnosisNote} setDiagnosisNote={setDiagnosisNote} />
 
-          {/* Medication Section */}
           <MedicationSection medications={medications} setMedications={setMedications} />
 
-          {/* Monitoring Section */}
           <MonitoringSection monitoring={monitoring} setMonitoring={setMonitoring} />
 
-          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t">
             <Button variant="outline" size="lg">
               ยกเลิก

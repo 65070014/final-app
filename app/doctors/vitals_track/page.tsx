@@ -19,18 +19,15 @@ export default function DoctorMonitoringDashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
       <PatientListSidebar
         patients={mockPatients}
         selectedPatientId={selectedPatientId}
         onSelectPatient={setSelectedPatientId}
       />
 
-      {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {selectedPatient ? (
           <div className="container mx-auto p-6 space-y-6">
-            {/* Header */}
             <div className="flex items-center gap-3 border-b border-border pb-4">
               <Activity className="h-8 w-8 text-primary" />
               <div>
@@ -39,18 +36,14 @@ export default function DoctorMonitoringDashboard() {
               </div>
             </div>
 
-            {/* Patient Summary */}
             <PatientSummary patient={selectedPatient} />
 
-            {/* Two Column Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Charts and Symptoms */}
               <div className="lg:col-span-2 space-y-6">
                 {targets && <VitalSignsChart vitalSigns={vitalSigns} targets={targets} />}
                 <SymptomLog symptoms={symptoms} />
               </div>
 
-              {/* Right Column - Doctor Actions */}
               <div className="lg:col-span-1">
                 <DoctorActions patient={selectedPatient} />
               </div>
