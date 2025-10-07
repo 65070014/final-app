@@ -18,26 +18,25 @@ export const authOptions: NextAuthOptions = {
                 try {
                     const db = await createConnection();
 
-                    // 1. ค้นหาผู้ใช้ในตาราง patients
                     const [rows] = await db.execute(
                         `SELECT patient_id, email, fname, lname, password_hash FROM Patient WHERE email = ?`,
                         [credentials.email]
                     );
                     const user = (rows as any)[0];
 
-                    if (!user) return null; // ไม่พบผู้ใช้
+                    if (!user) return null;
 
                     const isValid = await comparePassword(credentials.password, user.password_hash);
 
                     if (isValid) {
                         return {
-                            id: user.patient_id.toString(), // NextAuth ต้องการ String
+                            id: user.patient_id.toString(),
                             name: `${user.fname} ${user.lname}`,
                             email: user.email,
                             role: 'patient'
                         };
                     }
-                    return null; // รหัสผ่านไม่ถูกต้อง
+                    return null;
 
                 } catch (error) {
                     console.error("NextAuth Authorize Error:", error);
@@ -47,10 +46,10 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     session: {
-        strategy: "jwt", // ใช้ JWT ในการจัดการ Session (ดีที่สุดสำหรับ Next.js)
-        maxAge: 30 * 24 * 60 * 60, // 30 วัน
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60,
     },
-    // 3. กำหนด Callback (เพื่อเพิ่มข้อมูล user ID ลงใน Session/JWT)
+
     callbacks: {
         jwt: async ({ token, user }) => {
             if (user) {
@@ -65,7 +64,7 @@ export const authOptions: NextAuthOptions = {
             return session;
         }
     },
-    // 4. ตั้งค่าหน้า Login ที่กำหนดเอง
+
     pages: {
         signIn: '/patient/login',
     }

@@ -7,7 +7,7 @@ import { createConnection } from '@/lib/db'
 export async function POST(request: Request) {
     let db;
     try {
-        const patientData = await request.json(); // รับ Object formData ทั้งก้อน
+        const patientData = await request.json();
         const hashedPassword = await hashPassword(patientData.password);
 
         const patientvalues = [
