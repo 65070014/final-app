@@ -3,6 +3,32 @@
 import { NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db'
 
+export async function GET() {
+    let db;
+    try {
+        db = await createConnection();
+        const [rows] = await db.query(`
+            SELECT a.appointment_id AS id, 
+            CONCAT(p.fname, ' ', p.lname) AS patient, 
+            DATE_FORMAT(a.apdate, '%e %b %Y') AS date, 
+            DATE_FORMAT(a.apdate, '%H:%i น.') AS time, 
+            a.department, CONCAT( CASE WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 
+            ELSE (CASE WHEN d.gender = 1 THEN 'นาย ' ELSE 'นาง/น.ส. ' END) END,
+            d.fname, ' ', d.lname ) AS doctorname,
+            a.status, CASE WHEN a.status = 'ยืนยันแล้ว' THEN 'คนไข้ยืนยันแล้ว' ELSE 'รอการยืนยันจากคนไข้' END AS patientstatus 
+            FROM Appointment a 
+            JOIN Patient p ON a.patient_id = p.patient_id 
+            JOIN Medical_Personnel d ON a.medical_personnel_id = d.medical_personnel_id 
+            ORDER BY a.apdate ASC
+        `);
+
+        return NextResponse.json(rows);
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }
+}
+
 export async function POST(request: Request) {
     let db;
     try {

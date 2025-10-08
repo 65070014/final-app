@@ -1,5 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function NurseAppointments() {
@@ -7,14 +9,16 @@ export default function NurseAppointments() {
   const [patients, setPatients] = useState<any[]>([])
   const [doctors, setDoctors] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
+  const [error, setError] = useState("");
+  const { data: session, status } = useSession()
+  const router = useRouter()
   const [formData, setFormData] = useState({
-    patient: "",
-    doctor: "",
+    patientId: "",
+    doctorId: "",
     department: "",
     date: "",
     time: "",
-    symptom: ""
+    symptoms: ""
   })
 
   useEffect(() => {
@@ -24,6 +28,12 @@ export default function NurseAppointments() {
           fetch("/api/patients"),
           fetch("/api/doctors")
         ])
+        if (!patientsRes.ok) {
+          throw new Error('ไม่สามารถดึงรายชื่อคนไข้ได้');
+        }
+        if (!doctorsRes.ok) {
+          throw new Error('ไม่สามารถดึงรายชื่อแพทย์ได้');
+        }
 
         const patientsData = await patientsRes.json()
         const doctorsData = await doctorsRes.json()
@@ -40,29 +50,69 @@ export default function NurseAppointments() {
     fetchData()
   }, [])
 
-  const handleChange = (e: any) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    })
   }
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setAppointments(prev => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        ...formData
+    setError("")
+
+
+    if (!formData.date || !formData.time || !formData.symptoms || !formData.department) {
+      setError("กรุณากรอกข้อมูล วันที่, เวลา, อาการ, ชื่อคนไข้, แพทย์, แผนก ให้ครบถ้วน");
+      return;
+    }
+
+    setIsLoading(true)
+
+    const appointmentData = {
+      ...formData,
+    }
+
+    if (isLoading) {
+      return <div>กำลังโหลดข้อมูล...</div>
+    }
+
+    if (!patients.length) {
+      return <div>ไม่พบข้อมูลผู้ป่วย</div>
+    }
+
+    try {
+      const response = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(appointmentData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'ไม่สามารถบันทึกนัดหมายได้');
       }
-    ])
-    setFormData({ patient: "", doctor: "", department: "", date: "", time: "", symptom: "" })
+
+      alert("บันทึกนัดหมายสำเร็จ!");
+      router.push("/nurse/appointment_history");
+
+    } catch (err: any) {
+      console.error("Appointment submission failed:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  if (isLoading) {
-    return <div>กำลังโหลดข้อมูล...</div>
-  }
-
-  if (!patients.length) {
-    return <div>ไม่พบข้อมูลผู้ป่วย</div>
+  {
+    error && (
+      <div className="text-red-500 mb-4">
+        {error}
+      </div>
+    )
   }
 
   return (
@@ -92,13 +142,15 @@ export default function NurseAppointments() {
               <label className="block text-sm mb-1">เลือกผู้ป่วย</label>
               <select
                 name="patient"
-                value={formData.patient}
-                onChange={handleChange}
+                value={formData.patientId}
+                onChange={(e) =>
+                  setFormData({ ...formData, patientId: e.target.value })
+                }
                 className="w-full p-2 border rounded"
               >
                 <option value="">-- เลือกผู้ป่วย --</option>
                 {patients.map((p) => (
-                  <option key={p.patient_id}>
+                  <option key={p.patient_id} value={p.patient_id}>
                     {p.gender === "1" ? "นาย" : "นาง/น.ส."} {p.fname} {p.lname}
                   </option>
                 ))}
@@ -112,16 +164,18 @@ export default function NurseAppointments() {
               <label className="text-sm ">เลือกแพทย์</label>
               <select
                 name="doctor"
-                value={formData.doctor}
-                onChange={handleChange}
+                value={formData.doctorId}
+                onChange={(e) =>
+                  setFormData({ ...formData, doctorId: e.target.value })
+                }
                 className="w-full p-2 border rounded"
               >
                 <option value="">-- เลือกแพทย์ --</option>
                 {doctors.map((d) => (
-                  <option key={d.medical_personnel_id} value={d.medical_personnel_id}>
+                  <option key={d.id} value={d.id} >
                     {d.position === 1
                       ? (d.gender === 1 ? "นพ." : "พญ.") : (d.gender === 1 ? "นาย" : "นาง/น.ส.")
-                    } {d.fname} {d.lname}
+                    } {d.name}
                   </option>
                 ))}
               </select>
@@ -139,17 +193,17 @@ export default function NurseAppointments() {
 
             <div>
               <label className="block text-sm mb-1">วันที่</label>
-              <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full p-2 border rounded" />
+              <input type="date" name="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full p-2 border rounded" />
             </div>
 
             <div>
               <label className="block text-sm mb-1">เวลา</label>
-              <input type="time" name="time" value={formData.time} onChange={handleChange} className="w-full p-2 border rounded" />
+              <input type="time" name="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full p-2 border rounded" />
             </div>
 
             <div>
               <label className="block text-sm mb-1">อาการ</label>
-              <textarea name="symptom" value={formData.symptom} onChange={handleChange} className="w-full p-2 border rounded" rows={3} placeholder="อาการเบื้องต้น"></textarea>
+              <textarea name="symptoms" value={formData.symptoms} onChange={handleChange} className="w-full p-2 border rounded" rows={3} placeholder="อาการเบื้องต้น"></textarea>
             </div>
 
             <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">บันทึกการนัดหมาย</button>
@@ -159,3 +213,4 @@ export default function NurseAppointments() {
     </div>
   )
 }
+
