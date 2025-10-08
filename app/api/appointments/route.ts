@@ -15,7 +15,8 @@ export async function GET() {
             a.department, CONCAT( CASE WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 
             ELSE (CASE WHEN d.gender = 1 THEN 'นาย ' ELSE 'นาง/น.ส. ' END) END,
             d.fname, ' ', d.lname ) AS doctorname,
-            a.status, CASE WHEN a.status = 'ยืนยันแล้ว' THEN 'คนไข้ยืนยันแล้ว' ELSE 'รอการยืนยันจากคนไข้' END AS patientstatus 
+            a.status, 
+            a.patient_status
             FROM Appointment a 
             JOIN Patient p ON a.patient_id = p.patient_id 
             JOIN Medical_Personnel d ON a.medical_personnel_id = d.medical_personnel_id 

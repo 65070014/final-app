@@ -49,13 +49,13 @@ export default function NurseDashboard() {
                 <p className="font-medium p-1">แพทย์: {appt.doctorname} </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs ${appt.patientstatus === "คนไข้ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
-                  {appt.patientstatus}
+                <span className={`px-3 py-1 rounded-full text-xs ${appt.patient_status === "Confirmed" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
+                  {appt.patient_status}
                 </span>
-                <span className={`px-3 py-1 rounded-full text-xs ${appt.status === "ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
+                <span className={`px-3 py-1 rounded-full text-xs ${appt.status === "Confirmed" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
                   {appt.status}
                 </span>
-                {appt.status === "รอการยืนยัน" && (
+                {appt.status === "Confirmed" && (
                   <button onClick={() => confirmAppointment(appt.id)} className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                     <CheckCircle className="w-4 h-4" />
                   </button>
