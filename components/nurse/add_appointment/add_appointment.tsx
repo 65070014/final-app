@@ -1,6 +1,5 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -10,7 +9,6 @@ export default function NurseAppointments() {
   const [doctors, setDoctors] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState("");
-  const { data: session, status } = useSession()
   const router = useRouter()
   const [formData, setFormData] = useState({
     patientId: "",
@@ -18,7 +16,9 @@ export default function NurseAppointments() {
     department: "",
     date: "",
     time: "",
-    symptoms: ""
+    symptoms: "",
+    status: "Confirmed",
+    patient_status: "Pending"
   })
 
   useEffect(() => {
@@ -93,7 +93,9 @@ export default function NurseAppointments() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.log('Appointment submission failed:', errorData);
         throw new Error(errorData.error || 'ไม่สามารถบันทึกนัดหมายได้');
+        
       }
 
       alert("บันทึกนัดหมายสำเร็จ!");
