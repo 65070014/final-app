@@ -1,5 +1,3 @@
-// app/api/register-patient/route.ts
-
 import { NextResponse } from 'next/server';
 import { createConnection } from '@/lib/db'
 
@@ -9,7 +7,7 @@ export async function GET() {
         db = await createConnection();
         const [rows] = await db.query(`
             SELECT a.appointment_id AS id, 
-            CONCAT(p.fname, ' ', p.lname) AS patient, 
+            CONCAT(p.fname, ' ', p.lname) AS patient,
             DATE_FORMAT(a.apdate, '%e %b %Y') AS date, 
             DATE_FORMAT(a.apdate, '%H:%i น.') AS time, 
             a.department, CONCAT( CASE WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 

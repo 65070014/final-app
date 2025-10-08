@@ -5,9 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart, Weight} from "lucide-react"
 import { useSession } from "next-auth/react"; 
 
+
 export function PatientHeader() {
     const { data: session } = useSession();
-    console.log(session)
 
     return (
         <Card className="p-6 bg-gradient-to-r from-blue-500/5 to-blue-500/10 border-blue-500/20">

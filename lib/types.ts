@@ -65,3 +65,15 @@ export interface FormRegisterData {
     password: string;
     confirm_password:string;
 }
+
+export interface Appointment {
+  id: number;
+  patient: string;
+  date: string;
+  time: string;
+  doctorname: string;
+  department: string;
+  status:string;
+  patient_status:string
+  is_vitals_filled:boolean
+}

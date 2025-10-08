@@ -1,9 +1,10 @@
 "use client"
 import { useEffect, useState } from "react"
 import { Edit, Trash2, CheckCircle } from "lucide-react"
+import { Appointment } from "@/lib/types"
 
 export default function NurseDashboard() {
-  const [appointments, setAppointments] = useState<any[]>([])
+  const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {

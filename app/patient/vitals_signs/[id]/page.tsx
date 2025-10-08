@@ -1,15 +1,22 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, use } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Activity, Heart, Wind, Thermometer, Weight, Ruler } from "lucide-react"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation"
 
-export default function VitalsSignsForm() {
+
+export default function VitalsSignsForm({ params }: { params: Promise<{ id: string }> }) {
+  const router = useRouter()
+  const { data: session } = useSession();
+  const [error, setError] = useState<string | null>(null);
+  const { id } = use(params); 
+
   const [formData, setFormData] = useState({
     sbp: "",
     dbp: "",
@@ -20,9 +27,42 @@ export default function VitalsSignsForm() {
     height: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Health data submitted:", formData)
+    setError("")
+
+    if (!session?.user?.id) {
+      setError("ไม่พบข้อมูลผู้ใช้ โปรดล็อกอินใหม่");
+      return;
+    }
+
+    const vitalsSignsData = {
+      ...formData,
+      appointmentId: id,
+      patientId: session.user.id
+    }
+
+    try {
+      const response = await fetch('/api/vitals_signs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vitalsSignsData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'ไม่สามารถบันทึกนัดหมายได้');
+      }
+
+      alert("บันทึกนัดหมายสำเร็จ!");
+      router.push("patient/appointments");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Appointment submission failed:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+    }
   }
 
   const handleChange = (field: string, value: string) => {
@@ -43,6 +83,7 @@ export default function VitalsSignsForm() {
         </CardHeader>
 
         <CardContent>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Blood Pressure Section */}
             <div className="space-y-4 p-4 bg-muted/50 rounded-lg">

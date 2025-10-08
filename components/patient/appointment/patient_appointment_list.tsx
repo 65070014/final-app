@@ -1,113 +1,154 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {Patient_Edit_Appointment} from '@/components/patient/appointment/patient_edit_appointment';
-import { useState } from "react";
+import { Patient_Edit_Appointment } from '@/components/patient/appointment/patient_edit_appointment';
+import { useState, useEffect } from "react";
 import { Clock, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { Appointment } from "@/lib/types"
 
-const appointmentRecords = [
-    {
-        id: 1,
-        date: "1 ต.ค. 2568",
-        time: "10:00 น.",
-        doctor: "นพ. สมชาย ใจดี",
-        department: "อายุรกรรม",
-        status: "UPCOMING",
-        is_vitals_filled: false,
-    },
-    {
-        id: 2,
-        date: "15 พ.ค. 2568",
-        time: "14:00 น.",
-        doctor: "พญ. สุชาดา แพทย์หญิง",
-        department: "หัวใจ",
-        status: "CONFIRMED",
-        is_vitals_filled: true,
-    },
-    {
-        id: 3,
-        date: "15 ก.ย. 2568",
-        time: "09:00 น.",
-        doctor: "นพ. วิทยา แสนสุข",
-        department: "กายภาพบำบัด",
-        status: "COMPLETED",
-        is_vitals_filled: true,
-    },
-    {
-        id: 4,
-        date: "5 ต.ค. 2568",
-        time: "16:00 น.",
-        doctor: "พญ. รักษ์ สุขภาพ",
-        department: "โภชนาการ",
-        status: "CANCELLED",
-        is_vitals_filled: false,
-    },
-];
 interface PatientAppointmentListProps {
     activeTab: 'upcoming' | 'history';
 }
 
-export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) {
+export function PatientAppointmentList({ activeTab }: PatientAppointmentListProps) {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const { data: session, status } = useSession();
+    const [appointments, setAppointments] = useState<Appointment[]>([])
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // ฟังก์ชันช่วยในการกำหนดสี Badge ตามสถานะ
+    useEffect(() => {
+        async function fetchAppointments() {
+            if (status !== 'authenticated' || !session?.user?.id) {
+                if (status !== 'loading') {
+                    setIsLoading(false);
+                }
+                return;
+            }
+
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const patientId = session.user.id;
+                const response = await fetch(`/api/appointments/${patientId}`);
+
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
+                }
+
+                const data = await response.json();
+                setAppointments(data);
+                console.log(data)
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
+                console.error("Error fetching appointments:", error);
+                setError(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        if (status === 'authenticated') {
+            fetchAppointments();
+        }
+
+    }, [session, status]);
+
+    const handleConfirm = async (record: number) => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(`/api/appointments/${record}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Completed' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('ยืนยันไม่สำเร็จ');
+            }
+            setAppointments(prevAppointments =>
+                prevAppointments.map(appt =>
+                    appt.id === record
+                        ? { ...appt, patient_status: "Confirmed" }
+                        : appt
+                )
+            );
+
+        } catch (error) {
+            console.error('Confirm error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'UPCOMING':
-            case 'CONFIRMED':
+            case 'Confirmed':
                 return <Badge variant="default" className="bg-green-500 hover:bg-green-600">ยืนยันแล้ว</Badge>;
-            case 'COMPLETED':
+            case 'Complete':
                 return <Badge variant="secondary">เสร็จสิ้น</Badge>;
-            case 'CANCELLED':
+            case 'Cancelled':
                 return <Badge variant="destructive">ยกเลิกแล้ว</Badge>;
             default:
                 return <Badge variant="outline">รอการตรวจสอบ</Badge>;
         }
     };
 
-    // กรองรายการตาม Tab ที่เลือก
-    const filteredRecords = appointmentRecords.filter(record => {
+    const filteredRecords = appointments.filter(record => {
         if (activeTab === 'upcoming') {
-            return record.status === 'UPCOMING' || record.status === 'CONFIRMED';
+            return record.status === 'Pending' || record.status === 'Confirmed';
         }
         if (activeTab === 'history') {
-            return record.status === 'COMPLETED' || record.status === 'CANCELLED';
+            return record.status === 'Complete' || record.status === 'Cancelled';
         }
         return false;
     });
-  return (
-    <div className="space-y-4">
-                {filteredRecords.length === 0 ? (
+    return (
+        <div className="space-y-4">
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {isLoading ? (
+                <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
+            ) : (
+                filteredRecords.length === 0 ? (
                     <p className="text-center text-gray-500 py-10">ไม่พบรายการนัดหมายในหมวดหมู่นี้</p>
                 ) : (
                     filteredRecords.map((record) => (
                         <Card key={record.id} className="p-4 space-y-3 shadow-md hover:shadow-lg transition-shadow">
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
-                                    <h2 className="font-bold text-xl text-gray-700">นัดหมายกับ {record.doctor}</h2>
+                                    <h2 className="font-bold text-xl text-gray-700">นัดหมายกับ {record.doctorname}</h2>
                                     <p className="text-sm text-muted-foreground">{record.department}</p>
                                 </div>
                                 {getStatusBadge(record.status)}
                             </div>
 
-                            {/* รายละเอียดเวลา */}
                             <div className="flex items-center gap-4 text-sm">
                                 <Clock className="h-4 w-4 text-indigo-500" />
                                 <span className="font-semibold text-base">{record.date}</span>
                                 <span className="text-gray-600">เวลา {record.time}</span>
                             </div>
 
-                            {/* ปุ่ม Action ที่เปลี่ยนไปตามสถานะ */}
                             <div className="flex justify-end gap-3 pt-3 border-t mt-3">
 
-                                {/* 1. ปุ่มสำหรับนัดหมายที่กำลังจะมาถึง (UPCOMING/CONFIRMED) */}
-                                {(record.status === 'UPCOMING' || record.status === 'CONFIRMED') && (
+                                {(record.status === 'Pending' || record.status === 'Confirmed') && (
                                     <>
-                                        {/* ปุ่มกรอกข้อมูลสัญญาณชีพ */}
-                                        <Link href="/patient/vitals_signs">
+                                        {(record.patient_status === 'Pending') && (
                                             <Button
-                                                variant={record.is_vitals_filled ? 'outline' : 'default'} // ถ้ายังไม่กรอกใช้สีหลัก
+                                                className="bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                onClick={() => handleConfirm(record.id)}
+                                                size="sm"
+                                            >
+                                                ยืนยันเข้ารับ
+                                            </Button>
+                                        )}
+
+                                        <Link href={`/patient/vitals_signs/${record.id}`}>
+                                            <Button
+                                                variant={record.is_vitals_filled ? 'outline' : 'default'}
                                                 size="sm"
                                                 disabled={record.is_vitals_filled}
                                             >
@@ -116,10 +157,9 @@ export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) 
                                             </Button>
                                         </Link>
 
-                                        {/* ปุ่มจัดการ เลื่อน/ยกเลิก */}
                                         <Button
                                             onClick={() => setIsDialogOpen(true)}
-                                            variant="ghost" // ปุ่มรอง ใช้สีจาง
+                                            variant="destructive"
                                             size="sm"
                                         >
                                             เลื่อน / ยกเลิก
@@ -131,7 +171,6 @@ export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) 
                                     </>
                                 )}
 
-                                {/* 2. ปุ่มสำหรับนัดหมายที่เสร็จสิ้นแล้ว (COMPLETED) */}
                                 {record.status === 'COMPLETED' && (
                                     <Button
                                         /*onClick={() => router.push(`/patient/appointment/${record.id}`)}*/
@@ -142,7 +181,6 @@ export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) 
                                     </Button>
                                 )}
 
-                                {/* 3. ปุ่มสำหรับนัดหมายที่ถูกยกเลิก (CANCELLED) */}
                                 {record.status === 'CANCELLED' && (
                                     <Button variant="ghost" size="sm" disabled>
                                         นัดหมายนี้ถูกยกเลิกแล้ว
@@ -151,7 +189,8 @@ export function PatientAppointmentList({activeTab}:PatientAppointmentListProps) 
                             </div>
                         </Card>
                     ))
-                )}
-            </div>
-  )
+                )
+            )}
+        </div>
+    )
 }
