@@ -23,6 +23,7 @@ export function AppointmentForm() {
     doctorId: "",
     department: "",
     symptoms: "",
+    patient_status: "Confirmed",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")

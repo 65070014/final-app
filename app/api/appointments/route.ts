@@ -41,6 +41,7 @@ export async function POST(request: Request) {
             appointmentData.doctorId,
             appointmentData.department,
             appointmentDateTime,
+            appointmentData.patient_status,
             appointmentData.symptoms
         ];
 
@@ -50,8 +51,8 @@ export async function POST(request: Request) {
 
         const sqlPrimary = `
             INSERT INTO Appointment (
-                patient_id,medical_personnel_id,department,apdate,status,symptoms
-            ) VALUES (?, ?, ?, ?, 'Pending',?)
+                patient_id,medical_personnel_id,department,apdate,status,patient_status,symptoms
+            ) VALUES (?, ?, ?, ?, 'Pending',?,?)
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);
