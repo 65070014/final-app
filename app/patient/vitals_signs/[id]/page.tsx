@@ -55,7 +55,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
       }
 
       alert("บันทึกนัดหมายสำเร็จ!");
-      router.push("patient/appointments");
+      router.push("/patient/appointments");
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
