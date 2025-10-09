@@ -2,7 +2,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { comparePassword } from '@/utils/security';
-import { createConnection } from './db';
+import { getDbPool } from './db';
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -13,10 +13,12 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
+                let db = null;
                 if (!credentials) return null;
 
                 try {
-                    const db = await createConnection();
+                    const dbPool = getDbPool(); 
+                    db = await dbPool.getConnection();
 
                     const [rows] = await db.execute(
                         `SELECT patient_id, email, fname, lname, password_hash FROM Patient WHERE email = ?`,

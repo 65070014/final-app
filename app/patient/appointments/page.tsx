@@ -40,7 +40,6 @@ export default function AppointmentHistory() {
                 </Button>
             </div>
 
-            {/* ส่วนแสดงรายการนัดหมาย */}
             <PatientAppointmentList activeTab={activeTab} />
         </div>
     );

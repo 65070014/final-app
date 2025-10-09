@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db'
+import { getDbPool } from '@/lib/db';
+import { ResultSetHeader } from 'mysql2/promise';
 
 export async function GET() {
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
     try {
-        db = await createConnection();
+        db = await dbPool.getConnection(); 
         const [rows] = await db.query(`
             SELECT a.appointment_id AS id, 
             CONCAT(p.fname, ' ', p.lname) AS patient,
@@ -25,11 +27,16 @@ export async function GET() {
     } catch (error) {
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }
 
 export async function POST(request: Request) {
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
     try {
         const appointmentData = await request.json();
         const dateTimeString = `${appointmentData.date}T${appointmentData.time}:00`;
@@ -46,7 +53,7 @@ export async function POST(request: Request) {
         ];
 
 
-        db = await createConnection();
+        db = await dbPool.getConnection(); 
 
 
         const sqlPrimary = `
@@ -56,7 +63,8 @@ export async function POST(request: Request) {
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);
-        const patientId = resultPrimary.insertId;
+        const resultHeader = resultPrimary as ResultSetHeader; 
+        const patientId = resultHeader.insertId;
 
         return NextResponse.json({
             message: 'นัดหมายสำเร็จ',
@@ -70,5 +78,9 @@ export async function POST(request: Request) {
             error: 'ไม่สามารถบันทึกข้อมูลได้',
             message: (error as Error).message
         }, { status: 500 });
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }

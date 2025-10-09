@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db'
+import { getDbPool } from '@/lib/db'
+import { ResultSetHeader } from 'mysql2/promise';
+import { RowDataPacket } from 'mysql2/promise';
 
 export async function POST(request: Request) {
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
     try {
         const vitalsSignsData = await request.json();
 
@@ -20,7 +23,7 @@ export async function POST(request: Request) {
         
 
 
-        db = await createConnection();
+        db = await dbPool.getConnection(); 
 
         const checkSql = `
             SELECT appointment_id 
@@ -30,9 +33,10 @@ export async function POST(request: Request) {
         console.log(vitalsSignsData.appointmentId,vitalsSignsData.patientId)
         console.log(vitalsSignsValues)
 
-        const [checkResult] = await db.query(checkSql, [vitalsSignsData.appointmentId, vitalsSignsData.patientId]);
+        const [rows] = await db.query(checkSql, [vitalsSignsData.appointmentId, vitalsSignsData.patientId]);
+        const checkRows = rows as RowDataPacket[]; 
 
-        if (checkResult.length === 0) {
+        if (checkRows.length === 0) {
             throw new Error("Authorization failed: Appointment not found or not owned by this patient.");
         }
 
@@ -43,7 +47,8 @@ export async function POST(request: Request) {
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, vitalsSignsValues);
-        const patientId = resultPrimary.insertId;
+        const resultHeader = resultPrimary as ResultSetHeader; 
+        const patientId = resultHeader.insertId;
 
         return NextResponse.json({
             message: 'นัดหมายสำเร็จ',
@@ -57,5 +62,9 @@ export async function POST(request: Request) {
             error: 'ไม่สามารถบันทึกข้อมูลได้',
             message: (error as Error).message
         }, { status: 500 });
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }

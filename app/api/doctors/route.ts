@@ -1,9 +1,12 @@
-import {createConnection} from '@/lib/db'
+import {getDbPool} from '@/lib/db'
 import {NextResponse} from 'next/server'
 
 export async function GET(){
+    const dbPool = getDbPool(); 
+    let db = null;
+
     try{
-        const db = await createConnection()
+        db = await dbPool.getConnection(); 
         const sql = "SELECT * FROM Medical_Personnel"
         const [rows] = await db.query(sql)
 
@@ -18,5 +21,9 @@ export async function GET(){
     }catch(error){
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }
