@@ -14,9 +14,11 @@ export default function Banner() {
                     <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
                         <p className="font-medium text-[#012770]">วิดีโอคอล</p>
                     </div>
-                    <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
-                        <p className="font-medium text-[#012770]">การจ่ายยา</p>
-                    </div>
+                    <Link href="/doctor/dispensing">
+                        <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
+                            <p className="font-medium text-[#012770]">การจ่ายยา</p>
+                        </div>
+                    </Link>
                     <Link href="/doctor/schedule">
                         <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
 

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db';
+import { getDbPool } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id: doctorId } = params;
     let db;
-
+    const dbPool = getDbPool(); 
     try {
-        db = await createConnection();
+        db = await dbPool.getConnection();
 
         const [rows] = await db.query(
             `SELECT 
