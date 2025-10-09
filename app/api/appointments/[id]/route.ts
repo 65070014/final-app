@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import { createConnection } from '@/lib/db';
+import { getDbPool } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const { id: patientId } = await params;
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
 
     try {
-        db = await createConnection();
+        db = await dbPool.getConnection(); 
         const [rows] = await db.query(
 
             `SELECT
@@ -52,16 +53,21 @@ export async function GET(request: Request, { params }: { params: { id: string }
     } catch (error) {
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
     const { id: appointment_id } = await params;
 
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
 
     try {
-        db = await createConnection();
+        db = await dbPool.getConnection(); 
         await db.query(
             `UPDATE Appointment
             SET patient_status ='Confirmed'
@@ -77,5 +83,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     } catch (error) {
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }

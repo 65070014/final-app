@@ -24,6 +24,7 @@ export function AppointmentForm() {
     department: "",
     symptoms: "",
     patient_status: "Confirmed",
+    status: "Pending",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")

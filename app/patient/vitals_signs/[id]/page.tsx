@@ -9,26 +9,34 @@ import { Button } from "@/components/ui/button"
 import { Activity, Heart, Wind, Thermometer, Weight, Ruler } from "lucide-react"
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"
+import { validateVitalSigns } from '@/utils/formValidation'
+import { VitalSign } from '@/lib/types'
 
 
 export default function VitalsSignsForm({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { data: session } = useSession();
   const [error, setError] = useState<string | null>(null);
+  const [form_errors, setFormErrors] = useState<{ [key: string]: string }>({});
   const { id } = use(params); 
 
-  const [formData, setFormData] = useState({
-    sbp: "",
-    dbp: "",
-    pr: "",
-    rr: "",
-    temperature: "",
-    weight: "",
-    height: "",
-  })
+
+  const initialFormData: VitalSign = {
+    sbp: 0, dbp: 0, pr: 0, rr: 0, temperature: 0, weight: 0, height: 0,patientId: session?.user?.id ?? "",timestamp: new Date(),bloodSugar: 0
+  };
+
+   const [formData, setFormData] = useState<VitalSign>(initialFormData);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault(); 
+    const formErrors = validateVitalSigns(formData);
+
+    if (Object.keys(formErrors).length > 0) {
+      setFormErrors(formErrors);
+      return;
+    }
+
+    setFormErrors({});
     setError("")
 
     if (!session?.user?.id) {
@@ -108,6 +116,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">mmHg</span>
                 </div>
+                {form_errors.sbp && (<p className="mt-1 text-sm text-red-500">{form_errors.sbp}</p>)}
               </div>
 
               <div className="space-y-2">
@@ -127,6 +136,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">mmHg</span>
                 </div>
               </div>
+              {form_errors.dbp && (<p className="mt-1 text-sm text-red-500">{form_errors.dbp}</p>)}
             </div>
 
             {/* Vital Signs Section */}
@@ -148,6 +158,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">ครั้ง/นาที</span>
                 </div>
+                {form_errors.pr && (<p className="mt-1 text-sm text-red-500">{form_errors.pr}</p>)}
               </div>
 
               <div className="space-y-2">
@@ -167,6 +178,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">ครั้ง/นาที</span>
                 </div>
+                {form_errors.rr && (<p className="mt-1 text-sm text-red-500">{form_errors.rr}</p>)}
               </div>
 
               <div className="space-y-2">
@@ -188,6 +200,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">°C</span>
                 </div>
               </div>
+              {form_errors.temperature && (<p className="mt-1 text-sm text-red-500">{form_errors.temperature}</p>)}
             </div>
 
             {/* Body Measurements Section */}
@@ -214,6 +227,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">kg</span>
                 </div>
+                {form_errors.weight && (<p className="mt-1 text-sm text-red-500">{form_errors.weight}</p>)}
               </div>
 
               <div className="space-y-2">
@@ -233,6 +247,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">cm</span>
                 </div>
+                {form_errors.height && (<p className="mt-1 text-sm text-red-500">{form_errors.height}</p>)}
               </div>
             </div>
 

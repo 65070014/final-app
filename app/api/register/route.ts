@@ -2,10 +2,13 @@
 
 import { NextResponse } from 'next/server';
 import { hashPassword } from '@/utils/security';
-import { createConnection } from '@/lib/db'
+import { getDbPool } from '@/lib/db'
+import { ResultSetHeader } from 'mysql2/promise';
 
 export async function POST(request: Request) {
-    let db;
+    const dbPool = getDbPool(); 
+    let db = null;
+
     try {
         const patientData = await request.json();
         const hashedPassword = await hashPassword(patientData.password);
@@ -26,7 +29,7 @@ export async function POST(request: Request) {
         ];
 
 
-        db = await createConnection();
+        db = await dbPool.getConnection();
         await db.execute('START TRANSACTION'); 
 
         const sqlPrimary = `
@@ -37,7 +40,8 @@ export async function POST(request: Request) {
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);
-        const patientId = resultPrimary.insertId;
+        const resultHeader = resultPrimary as ResultSetHeader; 
+        const patientId = resultHeader.insertId;
 
         const medicalvalues = [
             patientData.weight,
@@ -54,7 +58,8 @@ export async function POST(request: Request) {
         `;
 
         const [resultMedical] = await db.execute(sqlMedical, medicalvalues);
-        const MedicalId = resultMedical.insertId;
+        const resultHeader2 = resultMedical as ResultSetHeader; 
+        const MedicalId = resultHeader2.insertId;
 
         const addressvalues = [
             patientData.road,
@@ -92,5 +97,9 @@ export async function POST(request: Request) {
             error: 'ไม่สามารถบันทึกข้อมูลได้',
             message: (error as Error).message
         }, { status: 500 });
+    }finally {
+        if (db) {
+            db.release(); 
+        }
     }
 }
