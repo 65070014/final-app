@@ -20,9 +20,6 @@ export async function POST(request: Request) {
             new Date()
         ];
 
-        
-
-
         db = await dbPool.getConnection(); 
 
         const checkSql = `

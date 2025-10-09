@@ -37,7 +37,6 @@ export default function PatientForm() {
       return;
     }
 
-    // ✅ ถ้าไม่มี Error ให้ล้าง Error เก่าออก แล้วไป Step ถัดไป
     setErrors({});
     setCurrentStep(prev => prev + 1);
   };

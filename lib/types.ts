@@ -11,13 +11,16 @@ export interface Patient {
 }
 
 export interface VitalSign {
-  id: string
   patientId: string
   timestamp: Date
-  systolic: number
-  diastolic: number
+  sbp: number
+  dbp: number
+  pr: number
+  rr: number
   weight: number
-  bloodSugar?: number
+  height: number
+  temperature: number
+  bloodSugar: number
 }
 
 export interface Symptom {
