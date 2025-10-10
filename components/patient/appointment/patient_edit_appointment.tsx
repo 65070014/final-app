@@ -5,13 +5,14 @@ import { Calendar, Clock, User, AlertCircle, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Appointment } from "@/lib/types"
 
 interface Patient_Edit_AppointmentProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  appointmentData: Appointment;
 }
 
 type ActionType = "none" | "reschedule" | "cancel"
@@ -19,9 +20,10 @@ type ActionType = "none" | "reschedule" | "cancel"
 export function Patient_Edit_Appointment({
   open,
   onOpenChange,
+  appointmentData
 }: Patient_Edit_AppointmentProps) {
   const [selectedAction, setSelectedAction] = useState<ActionType>("none")
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
+  const [selectedDate, setSelectedDate] = useState<string>("")
   const [selectedTime, setSelectedTime] = useState<string>("")
 
   const timeSlots = [
@@ -43,7 +45,7 @@ export function Patient_Edit_Appointment({
 
   const resetForm = () => {
     setSelectedAction("none")
-    setSelectedDate(undefined)
+    setSelectedDate("")
     setSelectedTime("")
   }
 
@@ -51,6 +53,50 @@ export function Patient_Edit_Appointment({
     resetForm()
     onOpenChange(false)
   }
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const dateString = e.target.value;
+    setSelectedDate(dateString);
+  };
+
+  const handleDelete = async (record: number) => {
+    try {
+      const response = await fetch(`/api/appointments/${record}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_status: 'Cancelled' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('ยืนยันไม่สำเร็จ');
+      }
+
+    } catch (error) {
+      console.error('Confirm error:', error);
+    } finally {
+      window.location.reload();
+    }
+  };
+
+  const handleReschedule = async (record: number) => {
+    try {
+      const response = await fetch(`/api/appointments/${record}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({selectedDate, selectedTime}),
+      });
+
+      if (!response.ok) {
+        throw new Error('ยืนยันไม่สำเร็จ');
+      }
+
+    } catch (error) {
+      console.error('Confirm error:', error);
+    } finally {
+      window.location.reload();
+    }
+  };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -66,16 +112,16 @@ export function Patient_Edit_Appointment({
           <div className="space-y-2">
             <div className="flex items-center gap-3 text-foreground">
               <User className="h-4 w-4 text-primary" />
-              <span className="font-medium">แพทย์หญิงสุดา</span>
-              <span className="text-sm text-muted-foreground">แพทย์เวชศาสตร์ครอบครัว</span>
+              <span className="font-medium">{appointmentData.doctorname}</span>
+              <span className="text-sm text-muted-foreground">{appointmentData.department}</span>
             </div>
             <div className="flex items-center gap-3 text-foreground">
               <Calendar className="h-4 w-4 text-primary" />
-              <span>วันพุธที่ 1 ตุลาคม 2568</span>
+              <span>{appointmentData.date}</span>
             </div>
             <div className="flex items-center gap-3 text-foreground">
               <Clock className="h-4 w-4 text-primary" />
-              <span>10:00</span>
+              <span>{appointmentData.time}</span>
             </div>
           </div>
         </div>
@@ -119,24 +165,17 @@ export function Patient_Edit_Appointment({
               </Button>
             </div>
 
+
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="new-date">เลือกวันที่ใหม่</Label>
-                <div className="flex justify-center border rounded-lg p-4 bg-card">
-                  <CalendarComponent
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
-                    className="rounded-md"
-                  />
-                </div>
+                <label htmlFor="dob" className="block text-sm font-medium mb-1">เลือกวันที่ใหม่</label>
+                <input type="date" id="dob" name="dob" value={selectedDate} onChange={handleDateChange} className="w-full p-2 border rounded-md" />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="new-time">เลือกเวลา</Label>
                 <Select value={selectedTime} onValueChange={setSelectedTime}>
-                  <SelectTrigger id="new-time">
+                  <SelectTrigger id="new-time" className="w-full">
                     <SelectValue placeholder="เลือกช่วงเวลา" />
                   </SelectTrigger>
                   <SelectContent>
@@ -153,6 +192,7 @@ export function Patient_Edit_Appointment({
                 className="w-full"
                 size="lg"
                 disabled={!selectedDate || !selectedTime}
+                onClick={() => handleReschedule(appointmentData.id)}
               >
                 ยืนยันการเลื่อนนัด
               </Button>
@@ -178,7 +218,7 @@ export function Patient_Edit_Appointment({
               </AlertDescription>
             </Alert>
 
-            <Button variant="destructive" className="w-full" size="lg">
+            <Button onClick={() => handleDelete(appointmentData.id)} variant="destructive" className="w-full" size="lg">
               ยืนยันการยกเลิกนัด
             </Button>
           </div>

@@ -33,7 +33,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
 
             try {
                 const patientId = session.user.id;
-                const response = await fetch(`/api/appointments/${patientId}`);
+                const response = await fetch(`/api/appointments/patient/${patientId}`);
 
                 if (!response.ok) {
                     throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
@@ -63,7 +63,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
             const response = await fetch(`/api/appointments/${record}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Completed' }),
+                body: JSON.stringify({ patient_status: 'Confirmed' }),
             });
 
             if (!response.ok) {
@@ -146,16 +146,27 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                                             </Button>
                                         )}
 
-                                        <Link href={`/patient/vitals_signs/${record.id}`}>
+                                        {record.is_vitals_filled ? (
                                             <Button
-                                                variant={record.is_vitals_filled ? 'outline' : 'default'}
+                                                variant="outline"
                                                 size="sm"
-                                                disabled={record.is_vitals_filled}
+                                                disabled={true}
                                             >
                                                 <Stethoscope className="h-4 w-4 mr-2" />
-                                                {record.is_vitals_filled ? 'กรอกข้อมูลแล้ว' : 'กรอกสัญญาณชีพ'}
+                                                {'กรอกข้อมูลแล้ว'}
                                             </Button>
-                                        </Link>
+                                        ) : (
+
+                                            <Link href={`/patient/vitals_signs/${record.id}`}>
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                >
+                                                    <Stethoscope className="h-4 w-4 mr-2" />
+                                                    {'กรอกสัญญาณชีพ'}
+                                                </Button>
+                                            </Link>
+                                        )}
 
                                         <Button
                                             onClick={() => setIsDialogOpen(true)}
@@ -167,6 +178,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                                         <Patient_Edit_Appointment
                                             open={isDialogOpen}
                                             onOpenChange={setIsDialogOpen}
+                                            appointmentData={record}
                                         />
                                     </>
                                 )}

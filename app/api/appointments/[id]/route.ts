@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id: patientId } = await params;
+    const { id: appointment_id } = await params;
     const dbPool = getDbPool(); 
     let db = null;
 
@@ -39,13 +39,13 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 LEFT JOIN 
                     Vital_Signs v ON a.appointment_id = v.appointment_id 
                 WHERE 
-                    a.patient_id = ?
+                    a.appointment_id = ?
                 GROUP BY 
                     a.appointment_id, a.apdate, a.status, a.patient_status, 
                     p.fname, p.lname, a.department, d.position, d.gender, d.fname, d.lname
                 ORDER BY 
                 a.apdate ASC;`,
-            [patientId]
+            [appointment_id]
         );
         console.log(rows)
         return NextResponse.json(rows);
@@ -70,13 +70,112 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         db = await dbPool.getConnection(); 
         await db.query(
             `UPDATE Appointment
-            SET patient_status ='Confirmed'
+            SET patient_status = 'Confirmed'
             WHERE appointment_id = ?`,
             [appointment_id]
         );
 
         return NextResponse.json({ 
             message: 'Patient status updated successfully.', 
+            appointment_id: appointment_id,
+        }, { status: 200 });
+
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
+    }
+}
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
+    const { id: appointment_id } = await params;
+    const body = await request.json();
+
+    const dbPool = getDbPool(); 
+    let db = null;
+
+    try {
+        db = await dbPool.getConnection(); 
+        await db.query(
+            `UPDATE Appointment
+            SET status = ?
+            WHERE appointment_id = ?`,
+            [body.patient_status,appointment_id]
+        );
+
+        return NextResponse.json({ 
+            message: 'Patient status updated successfully.', 
+            appointment_id: appointment_id,
+        }, { status: 200 });
+
+    } catch (error) {
+        console.log(error)
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    }finally {
+        if (db) {
+            db.release(); 
+        }
+    }
+}
+
+export async function POST(request: Request, { params }: { params: { id: string } }) {
+    const { id: appointment_id } = await params;
+    const body = await request.json();
+
+    console.log(body.selectedDate,body.selectedTime)
+
+    const combinedString = `${body.selectedDate} ${body.selectedTime}:00`;
+
+    const dbPool = getDbPool(); 
+    let db = null;
+
+    try {
+        db = await dbPool.getConnection(); 
+        await db.beginTransaction();
+
+        await db.query(
+            `UPDATE Appointment
+            SET status = 'Rescheduled'
+            WHERE appointment_id = ?`,
+            [appointment_id]
+        );
+
+        await db.query(
+            `INSERT INTO Appointment (
+            patient_id, 
+            medical_personnel_id, 
+            apdate,
+            status,
+            patient_status,
+            department,
+            staff_id,
+            date_serv,
+            symptoms
+            )
+            SELECT 
+                patient_id, 
+                medical_personnel_id, 
+                ?,
+                'Pending',
+                patient_status,
+                department,
+                staff_id,
+                date_serv,
+                symptoms
+            FROM 
+                Appointment
+            WHERE 
+                appointment_id = ?;
+
+            `,[combinedString,appointment_id]);
+
+            await db.commit();
+
+        return NextResponse.json({ 
+            message: 'Rescheduled successfully.', 
             appointment_id: appointment_id,
         }, { status: 200 });
 
