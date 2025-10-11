@@ -1,12 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import DispenseModal from "@/components/doctor/dispensing/DispenseModal"
+import DispenseModal from "@/components/doctor/dispensing/DispenseModal" 
+// หมายเหตุ: แก้ไข path ตามตำแหน่งไฟล์ DispenseModal ของคุณ
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 interface Appointment {
     id: number
+    patient_id: number
+    medical_personnel_id: number
     patient: string
     date: string
     time: string
@@ -17,7 +20,7 @@ interface Appointment {
 
 export default function DispensingPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([])
-    const [selectedPatient, setSelectedPatient] = useState<string | null>(null)
+    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
 
     useEffect(() => {
         const fetchAppointments = async () => {
@@ -34,7 +37,7 @@ export default function DispensingPage() {
 
     return (
         <div className="flex justify-center py-8">
-            <div className="w-full max-w-5xl"> {/* 👈 บีบความกว้างให้อยู่กลางจอ */}
+            <div className="w-full max-w-5xl">
                 <h2 className="text-2xl font-bold mb-4">การจ่ายยา</h2>
 
                 <Card className="p-4 shadow-md">
@@ -56,7 +59,7 @@ export default function DispensingPage() {
                                     <td className="p-2">{a.time}</td>
                                     <td className="p-2">{a.doctorname}</td>
                                     <td className="p-2 text-center">
-                                        <Button onClick={() => setSelectedPatient(a.patient)}>จ่ายยา</Button>
+                                        <Button onClick={() => setSelectedAppointment(a)}>จ่ายยา</Button>
                                     </td>
                                 </tr>
                             ))}
@@ -64,11 +67,12 @@ export default function DispensingPage() {
                     </table>
                 </Card>
 
-                {selectedPatient && (
+                {selectedAppointment && (
                     <DispenseModal
-                        open={!!selectedPatient}
-                        onClose={() => setSelectedPatient(null)}
-                        patientName={selectedPatient}
+                        open={!!selectedAppointment}
+                        onClose={() => setSelectedAppointment(null)}
+                        patientId={selectedAppointment.patient_id}
+                        medicalPersonnelId={selectedAppointment.medical_personnel_id}
                     />
                 )}
             </div>

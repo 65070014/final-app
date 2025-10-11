@@ -3,20 +3,28 @@ import { getDbPool } from '@/lib/db';
 import { ResultSetHeader } from 'mysql2/promise';
 
 export async function GET() {
-    const dbPool = getDbPool(); 
+    const dbPool = getDbPool();
     let db = null;
     try {
-        db = await dbPool.getConnection(); 
+        db = await dbPool.getConnection();
         const [rows] = await db.query(`
-            SELECT a.appointment_id AS id, 
-            CONCAT(p.fname, ' ', p.lname) AS patient,
-            DATE_FORMAT(a.apdate, '%e %b %Y') AS date, 
-            DATE_FORMAT(a.apdate, '%H:%i น.') AS time, 
-            a.department, CONCAT( CASE WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 
-            ELSE (CASE WHEN d.gender = 1 THEN 'นาย ' ELSE 'นาง/น.ส. ' END) END,
-            d.fname, ' ', d.lname ) AS doctorname,
-            a.status, 
-            a.patient_status
+            SELECT 
+                a.appointment_id AS id, 
+                a.patient_id,                 
+                a.medical_personnel_id,      
+                CONCAT(p.fname, ' ', p.lname) AS patient,
+                DATE_FORMAT(a.apdate, '%e %b %Y') AS date, 
+                DATE_FORMAT(a.apdate, '%H:%i น.') AS time, 
+                a.department, 
+                CONCAT(
+                    CASE 
+                        WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 
+                        ELSE (CASE WHEN d.gender = 1 THEN 'นาย ' ELSE 'นาง/น.ส. ' END) 
+                    END,
+                    d.fname, ' ', d.lname
+                ) AS doctorname,
+                a.status, 
+                a.patient_status
             FROM Appointment a 
             JOIN Patient p ON a.patient_id = p.patient_id 
             JOIN Medical_Personnel d ON a.medical_personnel_id = d.medical_personnel_id 
@@ -27,9 +35,9 @@ export async function GET() {
     } catch (error) {
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
-    }finally {
+    } finally {
         if (db) {
-            db.release(); 
+            db.release();
         }
     }
 }
