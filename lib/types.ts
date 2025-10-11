@@ -80,3 +80,11 @@ export interface Appointment {
   patient_status:string
   is_vitals_filled:boolean
 }
+
+export interface Notification{
+    notification_type: string; 
+    message_text: string;
+    linkUrl?: string;
+    create_at: string
+    is_read: boolean
+}
