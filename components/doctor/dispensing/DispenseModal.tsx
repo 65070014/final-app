@@ -1,139 +1,194 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Check, ChevronsUpDown } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+interface Medication {
+    medication_id: number;
+    medicine_name: string;
+}
 
 interface DispenseModalProps {
-  open: boolean
-  onClose: () => void
-  patientId?: number 
-  medicalPersonnelId?: number 
+    open: boolean
+    onClose: () => void
+    patientId: number
+    medicalPersonnelId: number
 }
+
 export default function DispenseModal({ open, onClose, patientId, medicalPersonnelId }: DispenseModalProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    drugName: "",
-    strength: "",
-    usage: "",
-    quantity: "",
-  })
+    const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [medications, setMedications] = useState<Medication[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setForm(prev => ({ ...prev, [name]: value }))
-  }
+    const [form, setForm] = useState({
+        strength: "",
+        usage: "",
+        quantity: "",
+        note: "",
+    });
 
-  const handleSubmit = async () => {
-    if (!patientId || !medicalPersonnelId) {
-        setError("ไม่พบข้อมูลผู้ป่วยหรือแพทย์");
-        return;
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchMedications = async () => {
+            try {
+                const res = await fetch(`/api/medications`);
+                const data = await res.json();
+                setMedications(data);
+            } catch (err) {
+                console.error("Failed to fetch medications", err);
+            }
+        };
+
+        const debounce = setTimeout(() => {
+            fetchMedications();
+        }, 300);
+
+        return () => clearTimeout(debounce);
+    }, [searchQuery]);
+
+    const handleClose = () => {
+        setSelectedMedication(null);
+        setForm({ strength: "", usage: "", quantity: "", note: "" });
+        setError(null);
+        setIsSubmitting(false);
+        onClose();
+    };
+    
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
     }
 
-    setIsSubmitting(true);
-    setError(null);
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        setError(null);
 
-    try {
-        const response = await fetch('/api/prescription_medication', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...form,
-                patientId: patientId,
-                medicalPersonnelId: medicalPersonnelId,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+        if (!selectedMedication) {
+            setError("กรุณาเลือกยาจากรายการ");
+            setIsSubmitting(false);
+            return;
         }
 
-        console.log("จ่ายยาสำเร็จ:", await response.json());
-        alert("บันทึกนัดการจ่ายยาสำเร็จ!");
-        handleClose();
-    } catch (err: any) {
-        console.error(err);
-        setError(err.message);
-    } finally {
-        setIsSubmitting(false);
+        const payload = {
+            ...form,
+            patientId,
+            medicalPersonnelId,
+            medicationId: selectedMedication.medication_id,
+        };
+
+        try {
+            const res = await fetch("/api/prescription_medication", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || 'เกิดข้อผิดพลาด');
+            }
+
+            handleClose();
+        } catch (err) {
+            setError((err as Error).message);
+        } finally {
+            setIsSubmitting(false);
+        }
     }
-  }
 
-  const handleClose = () => {
-    setForm({ drugName: "", strength: "", usage: "", quantity: "" });
-    setError(null);
-    setIsSubmitting(false);
-    onClose();
-  }
+    return (
+        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
+            <DialogContent onPointerDownOutside={(e) => e.preventDefault()} className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>เพิ่มรายการยา</DialogTitle>
+                    <p className="text-sm text-gray-400">ค้นหาและเลือกยาที่ต้องการสั่งให้ผู้ป่วย</p>
+                </DialogHeader>
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>เพิ่มรายการยา</DialogTitle>
-          <p className="text-sm text-gray-400">กรอกข้อมูลยาที่ต้องการสั่งให้ผู้ป่วย</p>
-        </DialogHeader>
+                <div className="space-y-3">
+                    <div>
+                        <Label>ชื่อยา</Label>
+                        <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={popoverOpen}
+                                    className="w-full justify-between font-normal text-left"
+                                >
+                                    {selectedMedication ? selectedMedication.medicine_name : "เลือกยา..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[370px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="พิมพ์เพื่อค้นหายา..." />
+                                    <CommandList>
+                                        <CommandEmpty>ไม่พบยาที่ค้นหา</CommandEmpty>
+                                        <CommandGroup>
+                                            {medications.map((med) => (
+                                                <CommandItem
+                                                    key={med.medication_id}
+                                                    value={med.medicine_name}
+                                                    onSelect={() => {
+                                                        setSelectedMedication(med);
+                                                        setPopoverOpen(false);
+                                                    }}
+                                                >
+                                                    <Check className={cn("mr-2 h-4 w-4", selectedMedication?.medication_id === med.medication_id ? "opacity-100" : "opacity-0")}/>
+                                                    {med.medicine_name}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                     <div>
+                        <Label>ขนาด/ความแรง</Label>
+                        <Input name="strength" placeholder="เช่น 500 mg (ถ้ามี)" value={form.strength} onChange={handleChange}/>
+                    </div>
+                    <div>
+                        <Label>วิธีการใช้</Label>
+                        <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange}/>
+                    </div>
+                    <div>
+                        <Label>จำนวนที่จ่าย</Label>
+                        <Input name="quantity" placeholder="เช่น 30 เม็ด" value={form.quantity} onChange={handleChange}/>
+                    </div>
+                    <div>
+                        <Label>หมายเหตุ (ถ้ามี)</Label>
+                        <Textarea 
+                            name="note" 
+                            placeholder="เช่น ทานยาติดต่อกันจนหมด, หยุดยาหากมีอาการแพ้" 
+                            value={form.note} 
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>
 
-        <div className="space-y-3 py-2">
-          <div>
-            <Label htmlFor="drugName">ชื่อยา</Label>
-            <Input
-              id="drugName"
-              name="drugName"
-              placeholder="เช่น Paracetamol"
-              value={form.drugName}
-              onChange={handleChange}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <Label htmlFor="strength">ขนาด/ความแรง</Label>
-            <Input
-              id="strength"
-              name="strength"
-              placeholder="เช่น 500 mg"
-              value={form.strength}
-              onChange={handleChange}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <Label htmlFor="usage">วิธีการใช้</Label>
-            <Input
-              id="usage"
-              name="usage"
-              placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร"
-              value={form.usage}
-              onChange={handleChange}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <Label htmlFor="quantity">จำนวนที่จ่าย</Label>
-            <Input
-              id="quantity"
-              name="quantity"
-              placeholder="เช่น 30 เม็ด"
-              value={form.quantity}
-              onChange={handleChange}
-              disabled={isSubmitting}
-            />
-          </div>
-        </div>
-        
-        {error && <p className="text-sm text-red-500">{error}</p>}
+                {error && <p className="text-sm text-red-500 text-center pt-2">{error}</p>}
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isSubmitting}>ยกเลิก</Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? 'กำลังเพิ่ม...' : 'เพิ่มยา'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
+                <DialogFooter>
+                    <Button variant="outline" onClick={handleClose}>ยกเลิก</Button>
+                    <Button onClick={handleSubmit} disabled={isSubmitting}>
+                        {isSubmitting ? 'กำลังบันทึก...' : 'เพิ่มยา'}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
 }
