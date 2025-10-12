@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         db = await dbPool.getConnection();
         await db.beginTransaction(); 
 
-        let finalMedicationId = medicationId;
+        const finalMedicationId = medicationId;
 
         // 1. สร้างใบสั่งยา Prescription
         const prescriptionSql = `

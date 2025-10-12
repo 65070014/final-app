@@ -7,8 +7,11 @@ import { MedicationSection } from "@/components/doctor/medical_record/medication
 import { MonitoringSection } from "@/components/doctor/medical_record/monitoring_section"
 import { Button } from "@/components/ui/button"
 import { Save } from "lucide-react"
+import { useParams } from 'next/navigation';
 
 export default function MedicalRecordForm() {
+  const params = useParams();
+  const { id: appointmentId } = params;
   const [diagnosisNote, setDiagnosisNote] = useState({
     diagName: "",
     diagCode: "",
@@ -22,6 +25,7 @@ export default function MedicalRecordForm() {
       dosage: string
       usage: string
       quantity: string
+      note: string
     }>
   >([])
 
@@ -30,13 +34,37 @@ export default function MedicalRecordForm() {
     endDate: "",
   })
 
-  const handleSaveRecord = () => {
-    console.log("Saving medical record...", {
+  const handleSaveRecord = async () => {
+    const payload = {
+      appointmentId,
       diagnosisNote,
       medications,
       monitoring,
-    })
-    alert("บันทึกเวชระเบียนเรียบร้อยแล้ว")
+    };
+    try {
+      const res = await fetch("/api/record_treatment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || `API Error: ${res.status} ${res.statusText}`);
+      }
+
+      const result = await res.json();
+      console.log("API Response:", result);
+
+      alert("บันทึกเวชระเบียนเรียบร้อยแล้ว");
+
+      window.close();
+
+    } catch (err) {
+      const errorMessage = (err as Error).message;
+      console.error("Submission Error:", errorMessage);
+      alert(`เกิดข้อผิดพลาดในการบันทึก: ${errorMessage}`);
+    }
   }
 
   return (

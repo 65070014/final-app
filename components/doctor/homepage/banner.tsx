@@ -11,9 +11,13 @@ export default function Banner() {
                             <p className="font-medium text-[#012770]">ข้อมูลส่วนตัว</p>
                         </div>
                     </Link>
+
+                    <Link href="/doctor/video_call/1">
                     <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
                         <p className="font-medium text-[#012770]">วิดีโอคอล</p>
                     </div>
+
+                    </Link>
                     <Link href="/doctor/dispensing">
                         <div className="p-4 border rounded-lg hover:bg-gray-200 cursor-pointer">
                             <p className="font-medium text-[#012770]">การจ่ายยา</p>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, Pill } from "lucide-react"
+import { Plus, Trash2, Pill, ChevronsUpDown, Check } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { cn } from "@/lib/utils"
+import { Textarea } from "@/components/ui/textarea"
 
 interface Medication {
   id: string
@@ -23,6 +27,12 @@ interface Medication {
   dosage: string
   usage: string
   quantity: string
+  note: string
+}
+
+interface Medication_item {
+  medication_id: number;
+  medicine_name: string;
 }
 
 interface MedicationSectionProps {
@@ -33,11 +43,35 @@ interface MedicationSectionProps {
 export function MedicationSection({ medications, setMedications }: MedicationSectionProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [newMed, setNewMed] = useState({
+    id: "",
     name: "",
     dosage: "",
     usage: "",
     quantity: "",
+    note:""
   })
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [selectedMedication, setSelectedMedication] = useState<Medication_item | null>(null);
+  const [medicationsitem, setMedicationsItem] = useState<Medication_item[]>([]);
+  const [searchQuery] = useState("");
+
+  useEffect(() => {
+    const fetchMedications = async () => {
+      try {
+        const res = await fetch(`/api/medications`);
+        const data = await res.json();
+        setMedicationsItem(data);
+      } catch (err) {
+        console.error("Failed to fetch medications", err);
+      }
+    };
+
+    const debounce = setTimeout(() => {
+      fetchMedications();
+    }, 300);
+
+    return () => clearTimeout(debounce);
+  }, [searchQuery]);
 
   const handleAddMedication = () => {
     if (!newMed.name || !newMed.dosage || !newMed.usage || !newMed.quantity) {
@@ -45,13 +79,8 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
       return
     }
 
-    const medication: Medication = {
-      id: Date.now().toString(),
-      ...newMed,
-    }
-
-    setMedications([...medications, medication])
-    setNewMed({ name: "", dosage: "", usage: "", quantity: "" })
+    setMedications([...medications, newMed])
+    setNewMed({ id: "", name: "", dosage: "", usage: "", quantity: "",note: "" })
     setIsDialogOpen(false)
   }
 
@@ -74,20 +103,62 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
                 เพิ่มยา
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px]"
+              onInteractOutside={(e) => {
+                const isClickInsidePopover = (e.target as HTMLElement).closest('.radix-popover-content');
+
+                if (isClickInsidePopover) {
+                  e.preventDefault();
+                }
+              }}>
               <DialogHeader>
                 <DialogTitle>เพิ่มรายการยา</DialogTitle>
-                <DialogDescription>กรอกข้อมูลยาที่ต้องการสั่งให้ผู้ป่วย</DialogDescription>
+                <DialogDescription>ค้นหาและเลือกยาที่ต้องการสั่งให้ผู้ป่วย</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="med-name">ชื่อยา</Label>
-                  <Input
-                    id="med-name"
-                    placeholder="เช่น Paracetamol"
-                    value={newMed.name}
-                    onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
-                  />
+                  <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={popoverOpen}
+                        className="w-full justify-between font-normal text-left"
+                      >
+                        {selectedMedication ? selectedMedication.medicine_name : "เลือกยา..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[370px] p-0" >
+                      <Command>
+                        <CommandInput placeholder="พิมพ์เพื่อค้นหายา..." />
+                        <CommandList>
+                          <CommandEmpty>ไม่พบยาที่ค้นหา</CommandEmpty>
+                          <CommandGroup>
+                            {medicationsitem.map((med) => (
+                              <CommandItem
+                                key={med.medication_id}
+                                value={med.medicine_name}
+                                onSelect={() => {
+                                  setNewMed(prevMed => ({
+                                    ...prevMed,
+                                    name: med.medicine_name,
+                                    id: med.medication_id.toString(),
+                                  }));
+                                  setSelectedMedication(med);
+                                  setPopoverOpen(false);
+                                }}
+                              >
+                                <Check className={cn("mr-2 h-4 w-4", selectedMedication?.medication_id === med.medication_id ? "opacity-100" : "opacity-0")} />
+                                {med.medicine_name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="med-dosage">ขนาด/ความแรง</Label>
@@ -116,6 +187,15 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
                     onChange={(e) => setNewMed({ ...newMed, quantity: e.target.value })}
                   />
                 </div>
+                <div>
+                        <Label>หมายเหตุ (ถ้ามี)</Label>
+                        <Textarea 
+                            name="note" 
+                            placeholder="เช่น ทานยาติดต่อกันจนหมด, หยุดยาหากมีอาการแพ้" 
+                            value={newMed.note} 
+                             onChange={(e) => setNewMed({ ...newMed, note: e.target.value })}
+                        />
+                    </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>

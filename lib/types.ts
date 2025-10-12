@@ -81,6 +81,15 @@ export interface Appointment {
   is_vitals_filled:boolean
 }
 
+export interface AppointmentList {
+  id: string;
+  patient: string;
+  date: string;
+  time: string;
+  patient_status:string
+  symptoms: string
+}
+
 export interface Notification{
     notification_type: string; 
     message_text: string;
