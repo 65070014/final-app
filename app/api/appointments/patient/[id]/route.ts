@@ -47,7 +47,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
                 a.apdate ASC;`,
             [patientId]
         );
-        console.log(rows)
         return NextResponse.json(rows);
 
     } catch (error) {

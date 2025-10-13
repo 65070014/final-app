@@ -197,7 +197,7 @@ export function ActionZone() {
                         <Pill className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">รายการยา</span>
                     </Button>
-                    <Button onClick={() => router.push('/patient/history')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/treatment_record')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
                         <Clock className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">ประวัติการรักษา</span>
                     </Button>
