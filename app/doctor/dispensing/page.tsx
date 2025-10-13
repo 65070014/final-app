@@ -1,8 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import DispenseModal from "@/components/doctor/dispensing/DispenseModal" 
-// หมายเหตุ: แก้ไข path ตามตำแหน่งไฟล์ DispenseModal ของคุณ
+import { useEffect, useState, useCallback } from "react"
+import DispenseModal from "@/components/doctor/dispensing/DispenseModal"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -16,30 +15,36 @@ interface Appointment {
     doctorname: string
     department: string
     status: string
+    is_prescribed: number
 }
 
 export default function DispensingPage() {
     const [appointments, setAppointments] = useState<Appointment[]>([])
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
 
-    useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const res = await fetch("/api/appointments")
-                const data = await res.json()
-                setAppointments(data)
-            } catch (err) {
-                console.error(err)
-            }
+    const fetchAppointments = useCallback(async () => {
+        try {
+            const res = await fetch("/api/appointments/complete_diagnosis")
+            if (!res.ok) throw new Error("Failed to fetch appointments")
+            const data = await res.json()
+            setAppointments(data)
+        } catch (err) {
+            console.error(err)
         }
-        fetchAppointments()
     }, [])
+
+    useEffect(() => {
+        fetchAppointments()
+    }, [fetchAppointments])
+
+    const handleDispenseSuccess = () => {
+        fetchAppointments(); 
+    }
 
     return (
         <div className="flex justify-center py-8">
             <div className="w-full max-w-5xl">
                 <h2 className="text-2xl font-bold mb-4">การจ่ายยา</h2>
-
                 <Card className="p-4 shadow-md">
                     <table className="w-full text-left border-collapse">
                         <thead className="border-b">
@@ -59,7 +64,11 @@ export default function DispensingPage() {
                                     <td className="p-2">{a.time}</td>
                                     <td className="p-2">{a.doctorname}</td>
                                     <td className="p-2 text-center">
-                                        <Button onClick={() => setSelectedAppointment(a)}>จ่ายยา</Button>
+                                        {a.is_prescribed ? (
+                                            <Button disabled variant="ghost">สั่งยาเสร็จสิ้น</Button>
+                                        ) : (
+                                            <Button onClick={() => setSelectedAppointment(a)}>จ่ายยา</Button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -73,6 +82,8 @@ export default function DispensingPage() {
                         onClose={() => setSelectedAppointment(null)}
                         patientId={selectedAppointment.patient_id}
                         medicalPersonnelId={selectedAppointment.medical_personnel_id}
+                        appointmentId={selectedAppointment.id}
+                        onSuccess={handleDispenseSuccess}
                     />
                 )}
             </div>

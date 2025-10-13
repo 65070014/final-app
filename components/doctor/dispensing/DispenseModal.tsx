@@ -21,71 +21,67 @@ interface DispenseModalProps {
     onClose: () => void
     patientId: number
     medicalPersonnelId: number
+    appointmentId: number
+    onSuccess: () => void
 }
 
-export default function DispenseModal({ open, onClose, patientId, medicalPersonnelId }: DispenseModalProps) {
+export default function DispenseModal({ open, onClose, patientId, medicalPersonnelId, appointmentId, onSuccess }: DispenseModalProps) {
     const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
-    const [searchQuery, setSearchQuery] = useState("");
     const [medications, setMedications] = useState<Medication[]>([]);
-
     const [form, setForm] = useState({
-        strength: "",
+        dosage: "", 
         usage: "",
         quantity: "",
         note: "",
     });
-
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [popoverOpen, setPopoverOpen] = useState(false);
 
     useEffect(() => {
         const fetchMedications = async () => {
+            if (!open) return;
             try {
                 const res = await fetch(`/api/medications`);
+                if (!res.ok) throw new Error("Network response was not ok");
                 const data = await res.json();
                 setMedications(data);
             } catch (err) {
                 console.error("Failed to fetch medications", err);
+                setError("ไม่สามารถโหลดรายการยาได้");
             }
         };
-
-        const debounce = setTimeout(() => {
-            fetchMedications();
-        }, 300);
-
-        return () => clearTimeout(debounce);
-    }, [searchQuery]);
+        fetchMedications();
+    }, [open]);
 
     const handleClose = () => {
         setSelectedMedication(null);
-        setForm({ strength: "", usage: "", quantity: "", note: "" });
+        setForm({ dosage: "", usage: "", quantity: "", note: "" });
         setError(null);
         setIsSubmitting(false);
+        setPopoverOpen(false);
         onClose();
     };
-    
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
     }
 
     const handleSubmit = async () => {
-        setIsSubmitting(true);
-        setError(null);
-
         if (!selectedMedication) {
             setError("กรุณาเลือกยาจากรายการ");
-            setIsSubmitting(false);
             return;
         }
+        setIsSubmitting(true);
+        setError(null);
 
         const payload = {
             ...form,
             patientId,
             medicalPersonnelId,
+            appointmentId,
             medicationId: selectedMedication.medication_id,
         };
 
@@ -98,10 +94,11 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
 
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.message || 'เกิดข้อผิดพลาด');
+                throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการบันทึก');
             }
-
-            handleClose();
+            
+            onSuccess();
+            handleClose(); 
         } catch (err) {
             setError((err as Error).message);
         } finally {
@@ -111,7 +108,12 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
 
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-            <DialogContent onPointerDownOutside={(e) => e.preventDefault()} className="max-w-md">
+            <DialogContent 
+                className="max-w-md"
+                onInteractOutside={(e) => {
+                    e.preventDefault();
+                }}
+            >
                 <DialogHeader>
                     <DialogTitle>เพิ่มรายการยา</DialogTitle>
                     <p className="text-sm text-gray-400">ค้นหาและเลือกยาที่ต้องการสั่งให้ผู้ป่วย</p>
@@ -125,7 +127,6 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                 <Button
                                     variant="outline"
                                     role="combobox"
-                                    aria-expanded={popoverOpen}
                                     className="w-full justify-between font-normal text-left"
                                 >
                                     {selectedMedication ? selectedMedication.medicine_name : "เลือกยา..."}
@@ -157,23 +158,23 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                             </PopoverContent>
                         </Popover>
                     </div>
-                     <div>
-                        <Label>ขนาด/ความแรง</Label>
-                        <Input name="strength" placeholder="เช่น 500 mg (ถ้ามี)" value={form.strength} onChange={handleChange}/>
+                    <div>
+                        <Label>ขนาด/ความแรง (Dosage)</Label>
+                        <Input name="dosage" placeholder="เช่น 500 mg" value={form.dosage} onChange={handleChange}/>
                     </div>
                     <div>
-                        <Label>วิธีการใช้</Label>
+                        <Label>วิธีการใช้ (Usage)</Label>
                         <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange}/>
                     </div>
                     <div>
                         <Label>จำนวนที่จ่าย</Label>
-                        <Input name="quantity" placeholder="เช่น 30 เม็ด" value={form.quantity} onChange={handleChange}/>
+                        <Input name="quantity" type="number" placeholder="เช่น 30" value={form.quantity} onChange={handleChange}/>
                     </div>
                     <div>
                         <Label>หมายเหตุ (ถ้ามี)</Label>
                         <Textarea 
                             name="note" 
-                            placeholder="เช่น ทานยาติดต่อกันจนหมด, หยุดยาหากมีอาการแพ้" 
+                            placeholder="เช่น ทานยาติดต่อกันจนหมด" 
                             value={form.note} 
                             onChange={handleChange}
                         />

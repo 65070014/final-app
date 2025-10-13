@@ -10,39 +10,59 @@ export async function POST(request: Request) {
         const {
             patientId,
             medicalPersonnelId,
-            medicationId,     
-            drugName,        
+            appointmentId,
+            medicationId,
+            drugName,
             usage,
+            dosage,
             quantity,
             note
         } = await request.json();
 
-        if (!patientId || !medicalPersonnelId || (!medicationId && !drugName) || !quantity) {
+        // --- Validate input ---
+        if (!patientId || !medicalPersonnelId || !appointmentId || (!medicationId && !drugName) || !quantity) {
             return NextResponse.json({ error: 'ข้อมูลไม่ครบถ้วน' }, { status: 400 });
         }
 
+        const numericQuantity = parseInt(quantity, 10);
+        if (isNaN(numericQuantity)) {
+            return NextResponse.json({ error: 'Quantity ต้องเป็นตัวเลขเท่านั้น' }, { status: 400 });
+        }
+
         db = await dbPool.getConnection();
-        await db.beginTransaction(); 
+        await db.beginTransaction();
 
-        const finalMedicationId = medicationId;
+        let finalMedicationId = medicationId;
+        if (!finalMedicationId && drugName) {
+            const medicationSql = `INSERT INTO Medication (medicine_name) VALUES (?)`;
+            const [medicationResult] = await db.execute(medicationSql, [drugName]);
+            finalMedicationId = (medicationResult as ResultSetHeader).insertId;
+        }
 
-        // 1. สร้างใบสั่งยา Prescription
+        // 1. สร้างใบสั่งยา Prescription และ appointment_id
         const prescriptionSql = `
-            INSERT INTO Prescription (patient_id, medical_personnel_id, prescription_date, note)
-            VALUES (?, ?, NOW(), ?)
+            INSERT INTO Prescription (patient_id, medical_personnel_id, appointment_id, prescription_date, note)
+            VALUES (?, ?, ?, NOW(), ?)
         `;
-        const [prescriptionResult] = await db.execute(prescriptionSql, [patientId, medicalPersonnelId, note || null]);
+        const [prescriptionResult] = await db.execute(prescriptionSql, [patientId, medicalPersonnelId, appointmentId, note || null]);
         const newPrescriptionId = (prescriptionResult as ResultSetHeader).insertId;
         
         // 2. บันทึกรายการยาลงในใบสั่งยา Prescription_Medication
-        // โดยใช้ finalMedicationId ที่อาจจะมาจากยาเก่า หรือยาที่เพิ่งสร้างใหม่
         const presMedSql = `
-            INSERT INTO Prescription_Medication (prescription_id, medication_id, dosage, quantity, note)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO Prescription_Medication (prescription_id, medication_id, dosage, \`usage\`, quantity, note)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
-        await db.execute(presMedSql, [newPrescriptionId, finalMedicationId, usage, quantity, note || null]);
 
-        await db.commit(); 
+        await db.execute(presMedSql, [
+            newPrescriptionId, 
+            finalMedicationId, 
+            dosage || null, 
+            usage || null,
+            numericQuantity, 
+            note || null,
+        ]);
+
+        await db.commit();
 
         return NextResponse.json({
             message: 'บันทึกการจ่ายยาสำเร็จ',
@@ -51,7 +71,7 @@ export async function POST(request: Request) {
 
     } catch (error) {
         if (db) {
-            await db.rollback(); 
+            await db.rollback();
         }
         console.error("TRANSACTION FAILED:", error);
         return NextResponse.json({
