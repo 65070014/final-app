@@ -99,3 +99,34 @@ export interface Notification{
     create_at: string
     is_read: boolean
 }
+
+export interface TreatmentHistorys{
+    appointment_id: string
+    department: string; 
+    date: string;
+    time: string;
+    doctorname: string
+    diag_name: string
+    status: string
+}
+
+export interface MedicationDetail {
+    medicine_name: string;
+    dosage: string;
+    quantity: number;
+    usage: string;
+    note: string;
+}
+
+export interface TreatmentDetail{
+  appointment_id: string;
+  date: string;
+  time: string;
+  doctorname: string
+  patient:string
+  diag_name: string
+  diag_code: string
+  diag_note: string
+  monitoringStatus: string
+  medications:MedicationDetail[]
+}

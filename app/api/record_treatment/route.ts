@@ -98,17 +98,19 @@ export async function POST(request: Request) {
                 const medicationValues = medications.map(med => [
                     prescriptionId,
                     med.id,
+                    med.usage,
                     med.dosage,
                     med.quantity,
                     med.note,
                 ]).flat();
 
-                const medicationPlaceholders = medications.map(() => `(?, ?, ?, ?, ?)`).join(', ');
+                const medicationPlaceholders = medications.map(() => `(?, ?, ?, ?, ?, ?)`).join(', ');
 
                 await db.execute(
                     `INSERT INTO Prescription_Medication (
                         prescription_id, 
                         medication_id, 
+                        usage,
                         dosage,
                         quantity, 
                         note
