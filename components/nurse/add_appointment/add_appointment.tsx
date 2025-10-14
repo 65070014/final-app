@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function NurseAppointments() {
-  const [appointments, setAppointments] = useState<any[]>([])
+  const [appointments] = useState<any[]>([])
   const [patients, setPatients] = useState<any[]>([])
   const [doctors, setDoctors] = useState<any[]>([])
   const [patientAppointments, setPatientAppointments] = useState<any[]>([])
