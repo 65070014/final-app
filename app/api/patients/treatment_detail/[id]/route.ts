@@ -44,25 +44,17 @@ export async function GET(request: Request, { params }: { params: { id: string }
         const [mainRecords] = await db.query<RowDataPacket[]>(sql, [appointmentId])
         const mainRecord = mainRecords[0];
 
-        const [rows] = await db.query<RowDataPacket[]>(`
-            SELECT diagnosis_id FROM Diagnosis WHERE appointment_id = ?
-            `, [appointmentId])
-
-        const diagnosisId = rows[0].diagnosis_id;
-
-        console.log(diagnosisId)
 
         const detailSql = `
         SELECT m.medicine_name, pm.dosage, pm.quantity, pm.usage, pm.note
-        FROM Diagnosis d
-        JOIN Prescription p on d.prescription_id = p.prescription_id
+        FROM Prescription p
         JOIN Prescription_Medication pm on p.prescription_id = pm.prescription_id
         JOIN Medication m on pm.medication_id = m.medication_id
         WHERE 
-            d.diagnosis_id = ?
+            p.appointment_id = ?
     `;
 
-        const [medicationDetails] = await db.query(detailSql, [diagnosisId]);
+        const [medicationDetails] = await db.query(detailSql, [appointmentId]);
 
         const finalResult = {
             ...mainRecord,

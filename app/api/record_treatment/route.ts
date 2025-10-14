@@ -86,9 +86,10 @@ export async function POST(request: Request) {
                     patient_id, 
                     medical_personnel_id,
                     prescription_date,
-                    note
-                ) VALUES (?, ?, NOW(), ?)`,
-                [patientId, doctorId, "" ]
+                    note,
+                    appointment_id
+                ) VALUES (?, ?, NOW(), ?, ?)`,
+                [patientId, doctorId, "" , appointmentId]
             );
 
             const prescriptionId = (prescriptionResult as ResultSetHeader).insertId;

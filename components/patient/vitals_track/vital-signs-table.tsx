@@ -2,7 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import type { VitalRecord } from "@/app/patient/vitals_track/page"
+import type { VitalRecord } from "@/lib/types"
 
 type VitalSignsTableProps = {
   records: VitalRecord[]
@@ -66,13 +66,13 @@ export function VitalSignsTable({ records }: VitalSignsTableProps) {
                       day: "numeric",
                     })}
                   </TableCell>
-                  <TableCell>{record.time}</TableCell>
+                  <TableCell>{record.date}{record.time}</TableCell>
                   <TableCell>
                     {record.systolic && record.diastolic ? `${record.systolic}/${record.diastolic}` : "-"}
                   </TableCell>
                   <TableCell>{getBloodPressureStatus(record.systolic, record.diastolic) || "-"}</TableCell>
                   <TableCell>{record.weight ? `${record.weight} กก.` : "-"}</TableCell>
-                  <TableCell>{record.bloodSugar ? `${record.bloodSugar} mg/dL` : "-"}</TableCell>
+                  <TableCell>{record.temp ? `${record.temp} °C` : "-"}</TableCell>
                   <TableCell className="max-w-xs truncate">{record.notes || "-"}</TableCell>
                 </TableRow>
               ))

@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, use } from "react";
 import { TreatmentDetail } from "@/lib/types";
+import Link from "next/link";
 
 export default function SingletreatmentPage({ params }: { params: Promise<{ id: string }> }) {
 
@@ -67,10 +68,6 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
   const handlePrint = () => {
     alert("กำลังพิมพ์บันทึกการรักษา...");
     window.print();
-  };
-
-  const handleAddAddendum = () => {
-    alert("เปิด Modal/ฟอร์ม เพื่อเพิ่มบันทึกเพิ่มเติม (Addendum)");
   };
 
   return (
@@ -155,10 +152,12 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
           <Card>
             <CardHeader className="flex flex-row justify-between items-center">
               <CardTitle className="text-lg">บันทึกเพิ่มเติมและการติดตาม</CardTitle>
-              <Button variant="outline" size="sm" onClick={handleAddAddendum}>
-                <Plus className="h-4 w-4 mr-2" />
-                เพิ่มบันทึก/แก้ไข
-              </Button>
+              <Link href={`/patient/vitals_track/${treatment.appointment_id}`}>
+                <Button variant="outline" size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  เพิ่มบันทึก
+                </Button>
+              </Link>
             </CardHeader>
             <CardContent>
               <div className="space-y-1 pb-4">

@@ -193,7 +193,7 @@ export function ActionZone() {
                         <Calendar className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">ตารางนัดหมายของฉัน</span>
                     </Button>
-                    <Button variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/medication')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
                         <Pill className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">รายการยา</span>
                     </Button>

@@ -8,88 +8,78 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { th } from "date-fns/locale"
-import { cn } from "@/lib/utils"
-import type { VitalRecord } from "@/app/patient/vitals_track/page"
+import type { VitalRecord } from "@/lib/types"
+import { useSession } from "next-auth/react"
 
-type VitalSignsFormProps = {
-  onSubmit: (record: Omit<VitalRecord, "id">) => void
-}
 
-export function VitalSignsForm({ onSubmit }: VitalSignsFormProps) {
-  const [date, setDate] = useState<Date>(new Date())
-  const [time, setTime] = useState<string>(
-    new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false }),
-  )
+export function VitalSignsForm({ id }: { id: string }) {
   const [systolic, setSystolic] = useState<string>("")
   const [diastolic, setDiastolic] = useState<string>("")
   const [weight, setWeight] = useState<string>("")
-  const [bloodSugar, setBloodSugar] = useState<string>("")
+  const [temp, setTemp] = useState<string>("")
   const [notes, setNotes] = useState<string>("")
+  const { data: session } = useSession();
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const record: Omit<VitalRecord, "id"> = {
-      date: format(date, "yyyy-MM-dd"),
-      time,
       systolic: systolic ? Number(systolic) : undefined,
       diastolic: diastolic ? Number(diastolic) : undefined,
       weight: weight ? Number(weight) : undefined,
-      bloodSugar: bloodSugar ? Number(bloodSugar) : undefined,
+      temp: temp ? Number(temp) : undefined,
       notes: notes.trim() || undefined,
+      date: "",
+      time: ""
     }
 
-    onSubmit(record)
+    setError("")
 
-    // Reset form
-    setSystolic("")
-    setDiastolic("")
-    setWeight("")
-    setBloodSugar("")
-    setNotes("")
-    setDate(new Date())
-    setTime(new Date().toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false }))
+    if (!session?.user?.id) {
+      setError("ไม่พบข้อมูลผู้ใช้ โปรดล็อกอินใหม่");
+      return;
+    }
+
+    const vitalsSignsData = {
+      ...record,
+      appointmentId: id,
+      patientId: session.user.id
+    }
+
+    try {
+      const response = await fetch('/api/patients/vitals_track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(vitalsSignsData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'ไม่สามารถบันทึกนัดหมายได้');
+      }
+
+      alert("บันทึกข้อมูลสุขภาพเสร็จสิ้น");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      console.error("Appointment submission failed:", err);
+      setError(err.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ");
+    } finally {
+      setSystolic("")
+      setDiastolic("")
+      setWeight("")
+      setTemp("")
+      setNotes("")
+      }
   }
+  
 
   return (
     <Card className="p-6">
       <h2 className="text-xl font-bold mb-6">บันทึกข้อมูลล่าสุด</h2>
-
+      {error && <p className="text-red-500 text-sm">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="date">วันที่วัด</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP", { locale: th }) : "เลือกวันที่"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(newDate) => newDate && setDate(newDate)}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="time">เวลาที่วัด</Label>
-            <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
-          </div>
-        </div>
-
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>ความดันโลหิต (mmHg)</Label>
@@ -141,15 +131,15 @@ export function VitalSignsForm({ onSubmit }: VitalSignsFormProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bloodSugar">ระดับน้ำตาล (mg/dL)</Label>
+              <Label htmlFor="temp">อุณหภูมิร่างกาย</Label>
               <Input
-                id="bloodSugar"
+                id="temp"
                 type="number"
-                placeholder="95"
-                value={bloodSugar}
-                onChange={(e) => setBloodSugar(e.target.value)}
+                placeholder="35"
+                value={temp}
+                onChange={(e) => setTemp(e.target.value)}
                 min="0"
-                max="600"
+                max="60"
               />
             </div>
           </div>
@@ -158,7 +148,7 @@ export function VitalSignsForm({ onSubmit }: VitalSignsFormProps) {
             <Label htmlFor="notes">อาการเพิ่มเติม</Label>
             <Textarea
               id="notes"
-              placeholder="วันนี้มีอาการ... (ถ้ามี)"
+              placeholder="วันนี้มีอาการ..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}

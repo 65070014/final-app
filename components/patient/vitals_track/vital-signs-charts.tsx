@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { Activity, Weight, Droplet, TrendingUp, TrendingDown, Minus } from "lucide-react"
-import type { VitalRecord } from "@/app/patient/vitals_track/page"
+import type { VitalRecord } from "@/lib/types"
 
 type VitalSignsChartsProps = {
   records: VitalRecord[]
@@ -35,11 +35,11 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
       weight: r.weight,
     }))
 
-  const bloodSugarData = last7Days
-    .filter((r) => r.bloodSugar)
+  const tempData = last7Days
+    .filter((r) => r.temp)
     .map((r) => ({
       date: new Date(r.date).toLocaleDateString("th-TH", { day: "numeric", month: "short" }),
-      bloodSugar: r.bloodSugar,
+      temp: r.temp,
     }))
 
   const getBloodPressureStatus = () => {
@@ -107,12 +107,12 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
           </Alert>
         )}
 
-        {sortedRecords[0]?.bloodSugar && (
+        {sortedRecords[0]?.temp && (
           <Alert>
             <Droplet className="h-4 w-4" />
             <AlertDescription>
-              <div className="font-medium">ระดับน้ำตาล</div>
-              <div className="text-sm">{sortedRecords[0].bloodSugar} mg/dL</div>
+              <div className="font-medium">อุณหภูมิร่างกาย</div>
+              <div className="text-sm">{sortedRecords[0].temp} °C</div>
             </AlertDescription>
           </Alert>
         )}
@@ -122,7 +122,7 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="blood-pressure">ความดัน</TabsTrigger>
           <TabsTrigger value="weight">น้ำหนัก</TabsTrigger>
-          <TabsTrigger value="blood-sugar">น้ำตาล</TabsTrigger>
+          <TabsTrigger value="blood-sugar">อุณหภูมิร่างกาย</TabsTrigger>
         </TabsList>
 
         <TabsContent value="blood-pressure">
@@ -203,10 +203,10 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
 
         <TabsContent value="blood-sugar">
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">ระดับน้ำตาล (7 วันย้อนหลัง)</h3>
-            {bloodSugarData.length > 0 ? (
+            <h3 className="text-lg font-semibold mb-4">อุณหภูมิร่างกาย (7 วันย้อนหลัง)</h3>
+            {tempData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={bloodSugarData}>
+                <LineChart data={tempData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                   <XAxis dataKey="date" className="text-xs" />
                   <YAxis className="text-xs" />
@@ -220,10 +220,10 @@ export function VitalSignsCharts({ records }: VitalSignsChartsProps) {
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="bloodSugar"
+                    dataKey="temp"
                     stroke="hsl(var(--chart-4))"
                     strokeWidth={2}
-                    name="น้ำตาล (mg/dL)"
+                    name="อุณหภูมิ (°C)"
                     dot={{ fill: "hsl(var(--chart-4))" }}
                   />
                 </LineChart>
