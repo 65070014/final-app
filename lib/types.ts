@@ -128,3 +128,11 @@ export interface TreatmentDetail{
   monitoringStatus: string
   medications:MedicationDetail[]
 }
+
+
+export interface DispensingRecord {
+    prescription_id: string;
+    appointment_date: string;
+    doctor_name: string;
+    items: MedicationDetail[];
+}
