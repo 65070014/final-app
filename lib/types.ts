@@ -129,10 +129,20 @@ export interface TreatmentDetail{
   medications:MedicationDetail[]
 }
 
-
 export interface DispensingRecord {
     prescription_id: string;
     appointment_date: string;
     doctor_name: string;
     items: MedicationDetail[];
+}
+
+export type VitalRecord = {
+  id: string
+  date: string
+  time: string
+  systolic?: number
+  diastolic?: number
+  weight?: number
+  temp?: number
+  notes?: string
 }
