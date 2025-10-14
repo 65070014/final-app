@@ -41,8 +41,8 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
 
   const bloodPressureData = filteredData.map((vs) => ({
     date: format(vs.timestamp, "dd/MM", { locale: th }),
-    systolic: vs.systolic,
-    diastolic: vs.diastolic,
+    systolic: vs.sbp,
+    diastolic: vs.dbp,
     timestamp: vs.timestamp.getTime(),
   }))
 

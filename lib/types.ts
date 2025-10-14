@@ -11,8 +11,6 @@ export interface Patient {
 }
 
 export interface VitalSign {
-  systolic: any
-  diastolic: any
   patientId: string
   timestamp: Date
   sbp: number
