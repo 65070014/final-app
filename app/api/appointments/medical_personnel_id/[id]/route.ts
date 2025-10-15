@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id: doctorId } = params;
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id: doctorId } = await params;
     let db;
     const dbPool = getDbPool(); 
     try {

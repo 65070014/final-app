@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Mail, Phone, Stethoscope, Building2, Calendar, Edit } from "lucide-react"
 
 export default function DoctorProfile() {
@@ -25,6 +26,7 @@ export default function DoctorProfile() {
         <img
           src={doctor.image}
           className="w-full h-full object-center"
+          alt={``}
         />
       </div>
 

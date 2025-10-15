@@ -22,7 +22,7 @@ export default function VitalsSignsForm({ params }: { params: Promise<{ id: stri
 
 
   const initialFormData: VitalSign = {
-    sbp: 0, dbp: 0, pr: 0, rr: 0, temperature: 0, weight: 0, height: 0,patientId: session?.user?.id ?? "",timestamp: new Date(),bloodSugar: 0
+    sbp: 0, dbp: 0, pr: 0, rr: 0, temperature: 0, weight: 0, height: 0,patientId: session?.user?.id ?? "",timestamp: new Date()
   };
 
    const [formData, setFormData] = useState<VitalSign>(initialFormData);

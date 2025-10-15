@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -125,19 +126,16 @@ export default function NurseAppointments() {
     }
   }
 
-  {
-    error && (
-      <div className="text-red-500 mb-4">
-        {error}
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6">เพิ่มการนัดหมาย</h1>
-
+        error && (
+        <div className="text-red-500 mb-4">
+          {error}
+        </div>
+        )
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4">นัดหมายที่มีอยู่</h2>
           <div className="space-y-4">
@@ -207,79 +205,79 @@ export default function NurseAppointments() {
               </Dialog>
             </div>
 
-              <div className="mt-4 mb-4">
-                <label className="block text-sm mb-1">เลือกแพทย์</label>
-                <select
-                  name="doctorId"
-                  value={formData.doctorId}
-                  onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">-- เลือกแพทย์ --</option>
-                  {doctors.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.position === 1
-                        ? (d.gender === 1 ? "นพ." : "พญ.")
-                        : (d.gender === 1 ? "นาย" : "นาง/น.ส.")
-                      } {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-sm pr-2">ดูตารางเวลานัดหมายของแพทย์</label>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      type="button"
-                      className="p-2 mb-6"
-                      onClick={() => fetchDoctorAppointments(formData.doctorId)}
-                      disabled={!formData.doctorId}
-                    >
-                      คลิกเพื่อเปิด
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>ตารางนัดของแพทย์</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-2">
-                      {doctorAppointments.length > 0 ? (
-                        doctorAppointments.map((appt) => (
-                          <div key={appt.id} className="p-2 border rounded">
-                            <p>{appt.date} {appt.time}</p>
-                            <p className="text-sm">ผู้ป่วย: {appt.patient}</p>
-                            <p className="text-sm">สถานะ: {appt.status}</p>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-500">ไม่มีนัดหมาย</p>
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <div>
-                <label className="block text-sm mb-1">แผนก</label>
-                <input type="text" name="department" value={formData.department} onChange={handleChange} className="w-full p-2 border rounded" placeholder="เช่น อายุรกรรม" />
-              </div>
+            <div className="mt-4 mb-4">
+              <label className="block text-sm mb-1">เลือกแพทย์</label>
+              <select
+                name="doctorId"
+                value={formData.doctorId}
+                onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                className="w-full p-2 border rounded"
+              >
+                <option value="">-- เลือกแพทย์ --</option>
+                {doctors.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.position === 1
+                      ? (d.gender === 1 ? "นพ." : "พญ.")
+                      : (d.gender === 1 ? "นาย" : "นาง/น.ส.")
+                    } {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm pr-2">ดูตารางเวลานัดหมายของแพทย์</label>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    type="button"
+                    className="p-2 mb-6"
+                    onClick={() => fetchDoctorAppointments(formData.doctorId)}
+                    disabled={!formData.doctorId}
+                  >
+                    คลิกเพื่อเปิด
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>ตารางนัดของแพทย์</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-2">
+                    {doctorAppointments.length > 0 ? (
+                      doctorAppointments.map((appt) => (
+                        <div key={appt.id} className="p-2 border rounded">
+                          <p>{appt.date} {appt.time}</p>
+                          <p className="text-sm">ผู้ป่วย: {appt.patient}</p>
+                          <p className="text-sm">สถานะ: {appt.status}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">ไม่มีนัดหมาย</p>
+                    )}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div>
+              <label className="block text-sm mb-1">แผนก</label>
+              <input type="text" name="department" value={formData.department} onChange={handleChange} className="w-full p-2 border rounded" placeholder="เช่น อายุรกรรม" />
+            </div>
 
-              <div>
-                <label className="block text-sm mb-1">วันที่</label>
-                <input type="date" name="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full p-2 border rounded" />
-              </div>
+            <div>
+              <label className="block text-sm mb-1">วันที่</label>
+              <input type="date" name="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full p-2 border rounded" />
+            </div>
 
-              <div>
-                <label className="block text-sm mb-1">เวลา</label>
-                <input type="time" name="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full p-2 border rounded" />
-              </div>
+            <div>
+              <label className="block text-sm mb-1">เวลา</label>
+              <input type="time" name="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full p-2 border rounded" />
+            </div>
 
-              <div>
-                <label className="block text-sm mb-1">อาการ</label>
-                <textarea name="symptoms" value={formData.symptoms} onChange={handleChange} className="w-full p-2 border rounded" rows={3} placeholder="อาการเบื้องต้น"></textarea>
-              </div>
+            <div>
+              <label className="block text-sm mb-1">อาการ</label>
+              <textarea name="symptoms" value={formData.symptoms} onChange={handleChange} className="w-full p-2 border rounded" rows={3} placeholder="อาการเบื้องต้น"></textarea>
+            </div>
 
-              <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">บันทึกการนัดหมาย</button>
+            <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">บันทึกการนัดหมาย</button>
           </form>
         </div>
       </div>

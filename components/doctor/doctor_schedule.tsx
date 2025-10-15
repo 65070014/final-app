@@ -9,6 +9,7 @@ import NextLink from "next/link"
 
 
 export function DoctorSchedule() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [appointments, setAppointments] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 

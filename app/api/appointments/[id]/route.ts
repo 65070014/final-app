@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+
+export async function GET(request: Request, { params } : { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const dbPool = getDbPool();
     let db = null;
@@ -60,20 +61,16 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-    const appointmentId = params.id;
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id: appointmentId } = await params;
     let body = {};
-
-    try {
-        body = await request.json();
-    } catch (error) {
-
-    }
+    body = await request.json();
 
     const dbPool = getDbPool();
     let db = null;
 
     try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { status, patient_status, date, time } = body as any;
         const updates = [];
         const values = [];
@@ -111,6 +108,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
         const [result] = await db.execute(sql, values);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((result as any).affectedRows === 0) {
             return NextResponse.json({ error: 'ไม่พบการนัดหมายที่ต้องการอัปเดต' }, { status: 404 });
         }
@@ -130,7 +128,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const body = await request.json();
 
@@ -161,7 +159,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const body = await request.json();
 
@@ -231,9 +229,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const appointmentId = params.id;
+    const {id:appointmentId} = await params;
     const dbPool = getDbPool();
     let db = null;
 
@@ -244,6 +242,7 @@ export async function DELETE(
 
         const [result] = await db.execute(sql, [appointmentId]);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((result as any).affectedRows === 0) {
             return NextResponse.json({ error: 'ไม่พบการนัดหมายที่ต้องการลบ' }, { status: 404 });
         }

@@ -2,7 +2,7 @@ import { getDbPool } from '@/lib/db'
 import { RowDataPacket } from 'mysql2/promise';
 import { NextResponse } from 'next/server'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointmentId } = await params;
     const dbPool = getDbPool();
     let db = null;

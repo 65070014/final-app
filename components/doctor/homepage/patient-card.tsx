@@ -1,6 +1,5 @@
 import { Calendar, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Button } from "@/components/ui/button" // สมมติว่ามีการใช้ Button component จาก shadcn/ui
 
 type Props = {
   name: string
