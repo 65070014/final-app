@@ -229,9 +229,9 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const appointmentId = params.id;
+    const {id:appointmentId} = await params;
     const dbPool = getDbPool();
     let db = null;
 
