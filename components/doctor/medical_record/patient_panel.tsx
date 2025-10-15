@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label"
 import { AlertCircle, User, Calendar, Activity } from "lucide-react"
 
 export function PatientReferencePanel() {
-  // Mock patient data - in real app, this would come from props or API
   const patient = {
     name: "นางสาวสมหญิง ใจดี",
     age: 35,
@@ -24,7 +23,6 @@ export function PatientReferencePanel() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Personal Info */}
         <div>
           <h3 className="font-semibold text-lg mb-2">{patient.name}</h3>
           <div className="flex gap-4 text-sm text-muted-foreground">
@@ -33,7 +31,6 @@ export function PatientReferencePanel() {
           </div>
         </div>
 
-        {/* Vital Signs */}
         <div className="p-4 bg-muted/50 border rounded-lg">
           <h4 className="font-semibold mb-3 flex items-center gap-2">
             <Activity className="w-4 h-4" />
@@ -106,7 +103,6 @@ export function PatientReferencePanel() {
           </div>
         </div>
 
-        {/* Chronic Diseases */}
         <div className="p-3 bg-accent/10 border border-accent/30 rounded-lg">
           <div className="flex items-start gap-2">
             <Activity className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
@@ -127,7 +123,6 @@ export function PatientReferencePanel() {
           </div>
         </div>
 
-        {/* Patient Symptoms */}
         <div>
           <h4 className="font-semibold mb-2 flex items-center gap-2">
             <Calendar className="w-4 h-4" />

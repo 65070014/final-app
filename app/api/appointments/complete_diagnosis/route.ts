@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
 export async function GET() {
-    const dbPool = getDbPool(); 
+    const dbPool = getDbPool();
     let db = null;
     try {
-        db = await dbPool.getConnection(); 
+        db = await dbPool.getConnection();
 
         const sql = `
             SELECT 
@@ -23,9 +23,10 @@ export async function GET() {
                     END,
                     d.fname, ' ', d.lname
                 ) AS doctorname,
-                a.status, 
+                a.status,
                 a.patient_status,
-                CASE WHEN pr.prescription_id IS NOT NULL THEN 1 ELSE 0 END AS is_prescribed
+                -- ใช้ MAX() ซึ่งเป็น aggregate function ทำให้ไม่ต้องใส่ใน GROUP BY
+                MAX(CASE WHEN pr.prescription_id IS NOT NULL THEN 1 ELSE 0 END) AS is_prescribed
             FROM 
                 Appointment a 
             JOIN 
@@ -34,12 +35,24 @@ export async function GET() {
                 Medical_Personnel d ON a.medical_personnel_id = d.medical_personnel_id
             LEFT JOIN 
                 Prescription pr ON a.appointment_id = pr.appointment_id
-            WHERE 
+            WHERE
                 a.status = 'Complete'
+            GROUP BY
+                a.appointment_id,
+                p.fname,
+                p.lname,
+                a.apdate,
+                a.department,
+                d.position,
+                d.gender,
+                d.fname,
+                d.lname,
+                a.status,
+                a.patient_status
             ORDER BY 
                 a.apdate ASC
         `;
-        
+
         const [rows] = await db.query(sql);
         return NextResponse.json(rows);
 
@@ -48,7 +61,7 @@ export async function GET() {
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     } finally {
         if (db) {
-            db.release(); 
+            db.release();
         }
     }
 }

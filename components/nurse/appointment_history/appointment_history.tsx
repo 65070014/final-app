@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation" // 1. Import useRouter
 import { Edit, Trash2, CheckCircle } from "lucide-react"
 import { Appointment } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -14,7 +13,7 @@ export default function NurseDashboard() {
   const [selectedDate, setSelectedDate] = useState("")
   const [selectedTime, setSelectedTime] = useState("")
 
-  const timeSlots = Array.from({ length: 10 }, (_, i) => { // 8:00 to 17:00
+  const timeSlots = Array.from({ length: 10 }, (_, i) => { 
     const hour = i + 8;
     return `${hour.toString().padStart(2, '0')}:00`;
   });
@@ -103,7 +102,6 @@ export default function NurseDashboard() {
         throw new Error(errorData.error || 'ไม่สามารถเลื่อนนัดหมายได้');
       }
 
-      // อัปเดต UI ด้วยข้อมูลใหม่ (ไม่ต้องแปลง date เพราะ API ส่ง format ที่ถูกต้องมาอยู่แล้ว)
       const newDateObj = new Date(selectedDate);
       const formattedDate = newDateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/ /g, ' ');
 
