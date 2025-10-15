@@ -1,11 +1,9 @@
 import React from 'react';
 import { DispensingRecord} from '@/lib/types';
-import { Pill, User, Clock, Package, AlertCircle, DollarSign } from 'lucide-react';
-import { usePaymentModal } from '@/components/patient/paymentmodal/paymentmodalcontext';
+import { Pill, User, Clock, Package, AlertCircle} from 'lucide-react';
+
 
 export function DispensingRecordCard({ record }: { record: DispensingRecord }) {
-    const { openPaymentModal } = usePaymentModal();
-
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
             <div className="p-4 bg-blue-50 border-b border-blue-200">
@@ -53,16 +51,6 @@ export function DispensingRecordCard({ record }: { record: DispensingRecord }) {
                             )}
                         </div>
                     ))}
-                </div>
-
-                <div className="flex justify-end mt-4">
-                    <button
-                        onClick={() => openPaymentModal(record)}
-                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                        <DollarSign className="w-5 h-5 mr-2" />
-                        จ่ายเงิน
-                    </button>
                 </div>
             </div>
         </div>

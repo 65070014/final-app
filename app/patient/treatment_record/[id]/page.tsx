@@ -8,9 +8,10 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState, use } from "react";
 import { TreatmentDetail } from "@/lib/types";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 export default function SingletreatmentPage({ params }: { params: Promise<{ id: string }> }) {
-
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true)
   const [treatment, setTreatment] = useState<TreatmentDetail>({
@@ -66,8 +67,11 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
   }, [id, session, status]);
 
   const handlePrint = () => {
-    alert("กำลังพิมพ์บันทึกการรักษา...");
-    window.print();
+    router.push(`/doctor/medical_certificate/${id}?print=true`)
+  };
+
+  const handlePrintMedic = () => {
+    router.push(`/doctor/prescription/${id}?print=true`)
   };
 
   return (
@@ -129,7 +133,7 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
             <CardHeader>
               <CardTitle className="text-lg flex justify-between items-center">
                 <span>รายการยาที่สั่งจ่าย</span>
-                <Button variant="secondary" size="sm" onClick={() => alert('เปิดหน้าพิมพ์ใบสั่งยา')}>
+                <Button variant="secondary" size="sm" onClick={handlePrintMedic}>
                   <Printer className="h-4 w-4 mr-2" /> พิมพ์ใบสั่งยา
                 </Button>
               </CardTitle>
