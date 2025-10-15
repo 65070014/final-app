@@ -61,8 +61,8 @@ export async function GET(request: Request, { params } : { params: Promise<{ id:
     }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-    const appointmentId = params.id;
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    const { id: appointmentId } = await params;
     let body = {};
     body = await request.json();
 
@@ -128,7 +128,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const body = await request.json();
 
@@ -159,7 +159,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const body = await request.json();
 
