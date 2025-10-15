@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react"
 import DispenseModal from "@/components/doctor/dispensing/DispenseModal"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { CheckCircle, Printer } from "lucide-react"
+import Link from "next/link"
 
 interface Appointment {
     id: number
@@ -38,7 +40,7 @@ export default function DispensingPage() {
     }, [fetchAppointments])
 
     const handleDispenseSuccess = () => {
-        fetchAppointments(); 
+        fetchAppointments();
     }
 
     return (
@@ -63,9 +65,24 @@ export default function DispensingPage() {
                                     <td className="p-2">{a.date}</td>
                                     <td className="p-2">{a.time}</td>
                                     <td className="p-2">{a.doctorname}</td>
-                                    <td className="p-2 text-center">
+                                    <td className="p-3 text-center">
                                         {a.is_prescribed ? (
-                                            <Button disabled variant="ghost">สั่งยาเสร็จสิ้น</Button>
+                                            <div className="flex justify-center items-center gap-2 sm:gap-4">
+                                                <span className="flex items-center text-sm text-green-600 dark:text-green-400 font-medium whitespace-nowrap">
+                                                    <CheckCircle className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                                                    สั่งยาแล้ว
+                                                </span>
+                                                <p></p>
+                                                <div>
+                                                    <Link href={`/doctor/prescription/${a.id}`} passHref >
+                                                        <Button variant="outline" size="sm" className="bg-green-500 text-white hover:bg-green-600 border-green-500 hover:border-green-600 dark:bg-green-600 dark:hover:bg-green-700 dark:border-green-600">
+                                                            <Printer className="w-4 h-4 mr-1.5" />
+                                                            พิมพ์
+                                                        </Button>
+                                                    </Link>
+                                                </div>
+
+                                            </div>
                                         ) : (
                                             <Button onClick={() => setSelectedAppointment(a)}>จ่ายยา</Button>
                                         )}

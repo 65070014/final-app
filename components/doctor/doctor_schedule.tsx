@@ -54,14 +54,14 @@ export function DoctorSchedule() {
                 {appt.status}
               </Badge>
 
-              {appt.status === "Complete" && (
-                <a href={`/doctor/medical_certificate//${appt.id}`} >
+              {/* {appt.status === "Complete" && (
+                <a href={`/doctor/prescription//${appt.id}`} >
                   <Button size="sm" className="bg-green-600 hover:bg-green-700">
                     <HeartPulse className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">พิมพ์ใบรับรองแพทย์</span>
+                    <span className="hidden sm:inline">พิมพ์ใบจ่ายยา</span>
                   </Button>
                 </a >
-              )}
+              )} */}
             </div>
           </div>
 
