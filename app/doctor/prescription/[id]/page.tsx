@@ -4,15 +4,18 @@
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
+import { useParams } from "next/navigation"
 
-export default function PrescriptionPage({ params }: { params: { id: string } }) {
+export default function PrescriptionPage() {
   const [prescription, setPrescription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const params = useParams();
+  const { id } = params;
 
   useEffect(() => {
     const fetchPrescription = async () => {
       try {
-        const res = await fetch(`/api/prescription/${params.id}`)
+        const res = await fetch(`/api/prescription/${id}`)
         const data = await res.json()
         setPrescription(data)
       } catch (error) {
@@ -22,7 +25,7 @@ export default function PrescriptionPage({ params }: { params: { id: string } })
       }
     }
     fetchPrescription()
-  }, [params.id])
+  }, [id])
 
   const handlePrint = () => {
     window.print()
