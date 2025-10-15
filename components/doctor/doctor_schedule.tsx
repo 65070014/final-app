@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, Calendar, HeartPulse} from "lucide-react"
+import { Clock, User, Calendar, HeartPulse, Link } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import NextLink from "next/link"
 
 
 export function DoctorSchedule() {
@@ -54,14 +55,14 @@ export function DoctorSchedule() {
                 {appt.status}
               </Badge>
 
-              {/* {appt.status === "Complete" && (
-                <a href={`/doctor/prescription//${appt.id}`} >
+              {appt.status === "Complete" && (
+                <a href={`/doctor/medical_certificate/${appt.id}`} >
                   <Button size="sm" className="bg-green-600 hover:bg-green-700">
                     <HeartPulse className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">พิมพ์ใบจ่ายยา</span>
+                    <span className="hidden sm:inline">พิมพ์ใบรับรองแพทย์</span>
                   </Button>
                 </a >
-              )} */}
+              )}
             </div>
           </div>
 
