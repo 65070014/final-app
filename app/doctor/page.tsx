@@ -8,8 +8,8 @@ interface Patient {
   patient_id: number;
   fname: string;
   lname: string;
-  gender: string; 
-} 
+  gender: string;
+}
 
 export default function HomePage() {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -74,11 +74,13 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
               {filteredPatients.length > 0 ? (
                 filteredPatients.map(patient => (
-                  <PatientCard 
+                  <PatientCard
                     key={patient.patient_id}
-                    name={`${patient.gender === "1" ? "นาย" : "น.ส."} ${patient.fname} ${patient.lname}`} 
-                    specialty="คนไข้ในระบบ" 
+                    name={`${patient.gender === "1" ? "นาย" : "น.ส."} ${patient.fname} ${patient.lname}`}
+                    specialty="คนไข้ในระบบ"
+                    href={`/doctor/treatment_history/${patient.patient_id}`} 
                   />
+
                 ))
               ) : (
                 <p className="col-span-full text-center text-gray-500">ไม่พบผู้ป่วยที่ค้นหา</p>

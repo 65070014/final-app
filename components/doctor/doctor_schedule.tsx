@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, Calendar } from "lucide-react"
+import { Clock, User, Calendar, HeartPulse, Link } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import NextLink from "next/link"
+
 
 export function DoctorSchedule() {
   const [appointments, setAppointments] = useState<any[]>([])
@@ -34,31 +37,51 @@ export function DoctorSchedule() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">ตารางนัดหมายแพทย์</h1>
       {appointments.map((appt) => (
-        <Card key={appt.id} className="p-4 space-y-2">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-lg">{appt.department}</h2>
-            <Badge
-              variant={appt.status === "Confirmed" ? "default" : "secondary"}
-            >
-              {appt.status}
-            </Badge>
+        <Card key={appt.id} className="p-4 space-y-3 transition-all hover:shadow-md">
+          <div className="flex justify-between items-start">
+            <h2 className="font-semibold text-lg text-gray-900 dark:text-white">{appt.department}</h2>
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={
+                  appt.status === "Complete" ? "default" :
+                    appt.status === "Confirmed" ? "default" : "secondary"
+                }
+                className="capitalize"
+              >
+                {appt.status}
+              </Badge>
+
+              {appt.status === "Complete" && (
+                <a href={`/doctor/medical_certificate//${appt.id}`} >
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <HeartPulse className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">พิมพ์ใบรับรองแพทย์</span>
+                  </Button>
+                </a >
+              )}
+            </div>
           </div>
 
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            {appt.date}
+          <div className="text-sm text-muted-foreground space-y-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>{appt.date}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span>{appt.time}</span>
+            </div>
           </div>
 
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            {appt.time}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-blue-500" />
-            <p className="text-sm">ผู้ป่วย: {appt.patient}</p>
+          <div className="border-t dark:border-gray-700 pt-3">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-blue-500" />
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">ผู้ป่วย: {appt.patient}</p>
+            </div>
           </div>
         </Card>
       ))}
