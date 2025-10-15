@@ -4,7 +4,7 @@ import { getDbPool } from '@/lib/db'
 import { RowDataPacket } from 'mysql2';
 import { NextResponse } from 'next/server'
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     // id ที่รับเข้ามาคือ diagnosis_id
     const { id: appointment_id } = await params;
     const dbPool = getDbPool();
