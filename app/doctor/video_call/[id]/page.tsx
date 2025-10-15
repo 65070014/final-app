@@ -58,7 +58,7 @@ export default function VideoConsultationPage() {
         */}
         fetchAppointments();
 
-    }, []);
+    }, [id]);
 
     const handleSwitchQueue = useCallback((newAppointmentId: string) => {
         if (newAppointmentId === appointmentId) {

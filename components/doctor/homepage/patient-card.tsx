@@ -1,5 +1,4 @@
-import { Calendar, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button" // สมมติว่ามีการใช้ Button component จาก shadcn/ui
+/* eslint-disable @next/next/no-img-element */
 
 type Props = {
   name: string

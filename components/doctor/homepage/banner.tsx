@@ -27,7 +27,7 @@ export default function Banner() {
 
             <div className="md:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-2xl shadow-xl flex flex-col items-center justify-center text-center text-white">
                 <Stethoscope size={64} className="opacity-80 mb-4" />
-                <h2 className="text-2xl font-bold mb-2">Doctor's Portal</h2>
+                <h2 className="text-2xl font-bold mb-2">Doctor&apos;s Portal</h2>
                 <p className="text-blue-200 max-w-xs">
                     เข้าถึงข้อมูลและจัดการการนัดหมายของผู้ป่วยได้อย่างรวดเร็วและปลอดภัย
                 </p>

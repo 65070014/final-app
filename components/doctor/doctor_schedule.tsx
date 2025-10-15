@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Clock, User, Calendar } from "lucide-react"
 
 export function DoctorSchedule() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [appointments, setAppointments] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
