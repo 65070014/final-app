@@ -1,4 +1,5 @@
-import { Calendar, ArrowRight } from "lucide-react"
+/* eslint-disable @next/next/no-img-element */
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button" // สมมติว่ามีการใช้ Button component จาก shadcn/ui
 import Link from "next/link"
 

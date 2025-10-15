@@ -1,17 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
+import { useParams } from "next/navigation"
 
-export default function PrescriptionPage({
-  params
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function PrescriptionPage() {
   const [prescription, setPrescription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const params = useParams();
+  const { id } = params;
 
   useEffect(() => {
     const fetchPrescription = async () => {

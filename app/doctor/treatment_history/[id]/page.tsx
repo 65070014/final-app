@@ -11,6 +11,7 @@ export default function TreatmentHistoryPage({
 }) {
   const { id } = use(params);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
