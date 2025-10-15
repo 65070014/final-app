@@ -1,25 +1,40 @@
 "use client"
-import { useState } from "react"
-import { Calendar, ClipboardList, PlusCircle, Edit, Trash2, CheckCircle } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ClipboardList, PlusCircle } from "lucide-react"
 import Link from "next/link"
 
+interface RecentAppointment {
+  id: number;
+  patient: string;
+  date: string;
+  time: string;
+  department: string;
+  status: string;
+  patient_status: string;
+}
+
 export default function NurseDashboard() {
-  const [appointments, setAppointments] = useState([
-    { id: 1, patient: "สมชาย ใจดี", date: "6 ต.ค. 2568", time: "09:00 น.", department: "อายุรกรรม", status: "รอการยืนยัน", patientstatus:"คนไข้ยืนยันแล้ว" },
-    { id: 2, patient: "สายฝน นามดี", date: "7 ต.ค. 2568", time: "13:00 น.", department: "หัวใจ", status: "ยืนยันแล้ว", patientstatus:"คนไข้ยืนยันแล้ว" },
-  ])
+  const [appointments, setAppointments] = useState<RecentAppointment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const confirmAppointment = (id: number) => {
-    setAppointments(prev =>
-      prev.map(appt =>
-        appt.id === id ? { ...appt, status: "ยืนยันแล้ว" } : appt
-      )
-    )
-  }
-
-  const deleteAppointment = (id: number) => {
-    setAppointments(prev => prev.filter(appt => appt.id !== id))
-  }
+  useEffect(() => {
+    const fetchRecentAppointments = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/appointments');
+        if (!res.ok) {
+          throw new Error("ไม่สามารถโหลดข้อมูลนัดหมายล่าสุดได้");
+        }
+        const data = await res.json();
+        setAppointments(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchRecentAppointments();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
@@ -29,7 +44,9 @@ export default function NurseDashboard() {
           <h1 className="text-2xl font-bold">Nurse Dashboard</h1>
           <span className="text-sm">ยินดีต้อนรับ, พยาบาล</span>
         </div>
-        <div className="grid grid-cols-2 gap-6 mb-8">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* หมายเหตุ: คุณอาจจะต้องเปลี่ยน path ให้ตรงกับโครงสร้างโปรเจกต์ของคุณ */}
           <Link href="/nurse/appointments">
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md flex flex-col items-center hover:bg-gray-100 cursor-pointer">
               <PlusCircle className="w-8 h-8 text-blue-600 mb-2" />
@@ -42,32 +59,39 @@ export default function NurseDashboard() {
               <p className="font-medium">ดูประวัติการนัดหมาย</p>
             </div>
           </Link>
-
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">การนัดหมายล่าสุด</h2>
-          <div className="space-y-4">
-            {appointments.map(appt => (
-              <div key={appt.id} className="p-4 border rounded-lg flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{appt.patient}</p>
-                  <p className="text-sm text-gray-600">{appt.date} | {appt.time} | {appt.department}</p>
+          {isLoading ? (
+            <p>กำลังโหลดข้อมูล...</p>
+          ) : (
+            <div className="space-y-4">
+              {appointments.length > 0 ? appointments.map(appt => (
+                <div key={appt.id} className="p-4 border dark:border-gray-700 rounded-lg flex justify-between items-center">
+                  <div>
+                    <p className="font-medium">{appt.patient}</p>
+                    <p className="text-sm  dark:text-gray-400">{appt.date} | {appt.time} | {appt.department}</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-center">
+                    <div>
+                      <p className="text-xs  mb-1">คนไข้</p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${appt.patient_status === "Confirmed" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}`}>
+                        {appt.patient_status}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs  mb-1">แพทย์</p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${appt.status === "Confirmed" || appt.status === "Complete" ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}`}>
+                        {appt.status}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs ${appt.patientstatus === "คนไข้ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
-                    {appt.patientstatus}
-                  </span>
-                  <span className={`px-3 py-1 rounded-full text-xs ${appt.status === "ยืนยันแล้ว" ? "bg-green-200 text-green-700" : "bg-yellow-200 text-yellow-700"}`}>
-                    {appt.status}
-                  </span>
-
-                </div>
-              </div>
-            ))}
-          </div>
+              )) : <p>ไม่มีการนัดหมายล่าสุด</p>}
+            </div>
+          )}
         </div>
-
       </div>
     </div>
   )

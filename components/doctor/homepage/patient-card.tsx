@@ -1,21 +1,27 @@
-import { Calendar } from "lucide-react"
+import { Calendar, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button" // สมมติว่ามีการใช้ Button component จาก shadcn/ui
 
 type Props = {
   name: string
   specialty: string
+  imageUrl?: string // เพิ่ม imageUrl สำหรับใส่รูปภาพจริง
 }
 
-export default function DoctorCard({ name, specialty }: Props) {
+export default function DoctorCard({ name, specialty, imageUrl }: Props) {
   return (
-    <div className="border rounded-lg p-4 shadow-sm flex flex-col items-center text-center">
-      <div className="w-24 h-24 bg-gray-200 rounded-full mb-4" />
-      <h3 className="font-bold text-black">{name}</h3>
-      <p className="text-sm text-gray-500 mb-4">{specialty}</p>
-      <div className="flex justify-between w-full text-sm text-gray-600">
-        <button className="flex items-center gap-1">
-          <Calendar className="w-4 h-4" /> นัดหมาย
-        </button>
-        <button className="text-blue-500">รายละเอียด</button>
+    <div className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center p-6">
+      
+      <img
+        src={imageUrl || `https://placehold.co/96x96/E2E8F0/4A5568?text=Patient`}
+        alt={`Profile of ${name}`}
+        className="w-24 h-24 rounded-full mb-4 object-cover border-4 border-gray-100 dark:border-gray-700"
+      />
+      
+      <h3 className="font-bold text-lg text-gray-800 dark:text-white">{name}</h3>
+      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-4">{specialty}</p>
+
+      <div className="mt-auto w-full space-y-2 pt-4">
+        
       </div>
     </div>
   )

@@ -167,7 +167,7 @@ export default function NurseAppointments() {
                 <option value="">-- เลือกผู้ป่วย --</option>
                 {patients.map((p) => (
                   <option key={p.patient_id} value={p.patient_id}>
-                    {p.gender === "1" ? "นาย" : "นาง/น.ส."} {p.fname} {p.lname}
+                    {p.gender === "1" ? "นาย" : "น.ส."} {p.fname} {p.lname}
                   </option>
                 ))}
               </select>
