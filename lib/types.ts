@@ -1,13 +1,14 @@
 export interface Patient {
   id: string
+  app_id: string
+  diag_id: string
   name: string
   age: number
-  chronicConditions: string[]
-  allergies: string[]
-  status: "ACTIVE" | "CLOSED"
+  chronicConditions: string
+  allergies: string
+  diag_name: string
   monitoringStartDate: Date
   monitoringEndDate: Date
-  riskLevel: "high" | "medium" | "low"
 }
 
 export interface VitalSign {
@@ -20,7 +21,6 @@ export interface VitalSign {
   weight: number
   height: number
   temperature: number
-  bloodSugar: number
 }
 
 export interface Symptom {

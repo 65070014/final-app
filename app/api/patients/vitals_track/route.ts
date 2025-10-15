@@ -18,6 +18,13 @@ export async function GET(request: Request) {
 
         db = await dbPool.getConnection();
 
+        let whereClause = `a.patient_id = ? AND vs.record_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`;
+        const params: (string | null)[] = [patientId];
+
+        if (appointmentId) {
+            whereClause += ` AND vs.appointment_id = ?`;
+            params.push(appointmentId);
+        }
         const sql = `
             SELECT 
                 vs.appointment_id, 
@@ -33,18 +40,13 @@ export async function GET(request: Request) {
             JOIN 
                 Appointment a ON vs.appointment_id = a.appointment_id
             WHERE 
-                a.patient_id = ?
-                AND
-                a.appointment_id = ?
-                AND vs.record_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                ${whereClause} 
             ORDER BY 
                 vs.record_date DESC, a.apdate DESC
         `;
 
-        const [rows] = await db.query(sql, [patientId, appointmentId]);
+        const [rows] = await db.query(sql, params);
         const vitalSignsHistory = rows;
-
-        console.log(vitalSignsHistory)
 
         return NextResponse.json(vitalSignsHistory);
     } catch (error) {

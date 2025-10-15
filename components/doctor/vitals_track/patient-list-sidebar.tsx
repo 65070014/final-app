@@ -21,7 +21,8 @@ export function PatientListSidebar({ patients, selectedPatientId, onSelectPatien
   const filteredPatients = patients.filter((patient) => {
     // Search filter
     const matchesSearch =
-      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) || patient.id.includes(searchQuery)
+      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      String(patient.id).includes(searchQuery)
 
 
     return matchesSearch
@@ -82,16 +83,9 @@ export function PatientListSidebar({ patients, selectedPatientId, onSelectPatien
                 </div>
 
                 <div className="mt-2 flex flex-wrap gap-1">
-                  {patient.chronicConditions.slice(0, 2).map((condition, idx) => (
-                    <Badge key={idx} variant="secondary" className="text-xs">
-                      {condition}
-                    </Badge>
-                  ))}
-                  {patient.chronicConditions.length > 2 && (
                     <Badge variant="secondary" className="text-xs">
-                      +{patient.chronicConditions.length - 2}
+                      {patient.diag_name}
                     </Badge>
-                  )}
                 </div>
                 {/*<div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />

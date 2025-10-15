@@ -1,88 +1,23 @@
-import type { Patient, VitalSign, Symptom } from "./types"
+import type {VitalRecord, Symptom } from "./types"
+import { format } from "date-fns";
 
-export const mockPatients: Patient[] = [
-  {
-    id: "1",
-    name: "สมชาย ใจดี",
-    age: 58,
-    chronicConditions: ["ความดันโลหิตสูง", "เบาหวาน"],
-    allergies: ["Penicillin"],
-    status: "ACTIVE",
-    monitoringStartDate: new Date("2025-01-15"),
-    monitoringEndDate: new Date("2025-04-15"),
-    riskLevel: "high",
-  },
-  {
-    id: "2",
-    name: "สมหญิง รักษ์ดี",
-    age: 45,
-    chronicConditions: ["ความดันโลหิตสูง"],
-    allergies: [],
-    status: "ACTIVE",
-    monitoringStartDate: new Date("2025-02-01"),
-    monitoringEndDate: new Date("2025-05-01"),
-    riskLevel: "medium",
-  },
-  {
-    id: "3",
-    name: "วิชัย สุขใจ",
-    age: 62,
-    chronicConditions: ["เบาหวาน", "โรคหัวใจ"],
-    allergies: ["Aspirin"],
-    status: "ACTIVE",
-    monitoringStartDate: new Date("2025-01-20"),
-    monitoringEndDate: new Date("2025-03-20"),
-    riskLevel: "high",
-  },
-  {
-    id: "4",
-    name: "มาลี สวยงาม",
-    age: 52,
-    chronicConditions: ["ความดันโลหิตสูง"],
-    allergies: [],
-    status: "ACTIVE",
-    monitoringStartDate: new Date("2025-02-10"),
-    monitoringEndDate: new Date("2025-05-10"),
-    riskLevel: "low",
-  },
-]
-
-export const mockVitalSigns: Record<string, VitalSign[]> = {
-  "1": Array.from({ length: 30 }, (_, i) => ({
-    id: `vs-1-${i}`,
-    patientId: "1",
-    timestamp: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-    systolic: 145 + Math.random() * 20 - 10,
-    diastolic: 92 + Math.random() * 15 - 7,
-    weight: 78 + Math.random() * 4 - 2,
-    bloodSugar: 180 + Math.random() * 40 - 20,
-  })),
-  "2": Array.from({ length: 30 }, (_, i) => ({
-    id: `vs-2-${i}`,
-    patientId: "2",
-    timestamp: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-    systolic: 135 + Math.random() * 15 - 7,
-    diastolic: 85 + Math.random() * 10 - 5,
-    weight: 65 + Math.random() * 2 - 1,
-  })),
-  "3": Array.from({ length: 30 }, (_, i) => ({
-    id: `vs-3-${i}`,
-    patientId: "3",
-    timestamp: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-    systolic: 150 + Math.random() * 25 - 12,
-    diastolic: 95 + Math.random() * 18 - 9,
-    weight: 82 + Math.random() * 5 - 2,
-    bloodSugar: 200 + Math.random() * 50 - 25,
-  })),
-  "4": Array.from({ length: 30 }, (_, i) => ({
-    id: `vs-4-${i}`,
-    patientId: "4",
-    timestamp: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-    systolic: 125 + Math.random() * 10 - 5,
-    diastolic: 80 + Math.random() * 8 - 4,
-    weight: 58 + Math.random() * 1.5 - 0.75,
-  })),
-}
+export const mockVitalSigns: Record<string, VitalRecord[]> = {
+    "60001": Array.from({ length: 30 }, (_, i) => {
+        const pastDate = new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000);
+        
+        return {
+            id: `vs-1-${i}`,
+            date: format(pastDate, 'yyyy-MM-dd'), 
+            time: format(pastDate, 'HH:mm'),
+            
+            systolic:Math.round(145 + Math.random() * 20 - 10),
+            diastolic:Math.round(92 + Math.random() * 15 - 7),
+            weight:parseFloat((78 + Math.random() * 4 - 2).toFixed(1)),
+            temp:parseFloat((36 + Math.random() * 0.5 - 0.2).toFixed(1)),
+            notes: i % 10 === 0 ? "มีอาการปวดศีรษะเล็กน้อย" : undefined,
+        };
+    })
+};
 
 export const mockSymptoms: Record<string, Symptom[]> = {
   "1": [
@@ -146,7 +81,7 @@ export const mockSymptoms: Record<string, Symptom[]> = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const mockTargets: Record<string, any> = {
-  "1": { systolicMax: 140, diastolicMax: 90, weightTarget: 75, bloodSugarMax: 180 },
+  "60001": { systolicMax: 140, diastolicMax: 90, weightTarget: 75, tempMax: 40 },
   "2": { systolicMax: 140, diastolicMax: 90, weightTarget: 63 },
   "3": { systolicMax: 130, diastolicMax: 85, weightTarget: 78, bloodSugarMax: 160 },
   "4": { systolicMax: 140, diastolicMax: 90, weightTarget: 58 },

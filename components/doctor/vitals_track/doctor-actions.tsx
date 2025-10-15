@@ -23,46 +23,99 @@ import { toast } from "sonner"
 
 interface DoctorActionsProps {
   patient: Patient
-  onUpdateMonitoringDate?: (newDate: Date) => void
-  onCloseMonitoring?: () => void
 }
 
-export function DoctorActions({ patient, onUpdateMonitoringDate, onCloseMonitoring }: DoctorActionsProps) {
+export function DoctorActions({ patient }: DoctorActionsProps) {
   const [soapNote, setSoapNote] = useState("")
   const [newEndDate, setNewEndDate] = useState(format(patient.monitoringEndDate, "yyyy-MM-dd"))
   const [isExtendDialogOpen, setIsExtendDialogOpen] = useState(false)
   const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false)
 
-  const handleSaveNote = () => {
-    if (!soapNote.trim()) {
-      toast.error("กรุณากรอกบันทึก", {
-        description: "กรุณากรอกข้อมูลบันทึกการวิเคราะห์และแผนการรักษา",
-      })
-      return
+  const handleSaveNote = async () => {
+    try {
+      if (!soapNote.trim()) {
+        throw new Error("กรุณาบันทึกข้อมูลการวิเคราะห์และแผนการรักษา");
+      }
+
+      const response = await fetch('/api/monitoring_log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          diagnosisId: patient.diag_id,
+          medPersonnelId: 1,
+          analysisPlanNote: soapNote,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `บันทึกไม่สำเร็จ (Status: ${response.status})`);
+      }
+
+      const successData = await response.json();
+
+      alert('บันทึกการติดตามผลสำเร็จ!');
+      window.location.reload();
+
+      return successData.logId; // คืนค่า ID Log ที่สร้างใหม่
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to save monitoring log:", error);
+
     }
-
-    // In a real app, this would save to the database
-    toast.success("บันทึกสำเร็จ", {
-      description: "บันทึกการวิเคราะห์และแผนการรักษาเรียบร้อยแล้ว",
-    })
-    setSoapNote("")
   }
 
-  const handleExtendMonitoring = () => {
-    const date = new Date(newEndDate)
-    onUpdateMonitoringDate?.(date)
-    setIsExtendDialogOpen(false)
-    toast.success("ขยายเวลาสำเร็จ", {
-      description: `ขยายเวลาติดตามผลถึง ${format(date, "dd MMMM yyyy", { locale: th })}`,
-    })
+  const handleExtendMonitoring = async () => {
+    try {
+      if (!newEndDate) {
+        throw new Error("กรุณาระบุวันที่สิ้นสุดการติดตามใหม่");
+      }
+      const response = await fetch('/api/monitoring', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentId: patient.app_id,
+          isMonitoring: true,
+          monitoringEndDate: newEndDate,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `ไม่สามารถขยายระยะเวลาติดตามได้ (Status: ${response.status})`);
+      }
+      alert(`ขยายวันสิ้นสุดการติดตามเป็น ${newEndDate} สำเร็จ!`);
+      window.location.reload();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to extend monitoring period:", error);
+    }
   }
 
-  const handleCloseMonitoring = () => {
-    onCloseMonitoring?.()
-    setIsCloseDialogOpen(false)
-    toast.success("จบการติดตามผล", {
-      description: "เปลี่ยนสถานะผู้ป่วยเป็น CLOSED เรียบร้อยแล้ว",
-    })
+  const handleCloseMonitoring = async () => {
+    try {
+      const response = await fetch('/api/monitoring', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          appointmentId: patient.app_id,
+          isMonitoring: false,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `ไม่สามารถยกเลิกการติดตามได้ (Status: ${response.status})`);
+      }
+
+      alert("ยกเลิกการติดตามสำเร็จ!");
+      window.location.reload();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Failed to close monitoring:", error);
+    }
   }
 
   const handleContactPatient = (type: "video" | "chat") => {

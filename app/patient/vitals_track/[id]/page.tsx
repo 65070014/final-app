@@ -52,7 +52,7 @@ export default function VitalSignsPage({ params }: { params: Promise<{ id: strin
       fetchRecord();
     }
 
-  }, [session, status]);
+  }, [id, session, status]);
 
   return (
     <div className="min-h-screen bg-background">

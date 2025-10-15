@@ -1,64 +1,92 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
-import type { VitalSign } from "@/lib/types"
+import type { VitalRecord } from "@/lib/types"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
 
 interface VitalSignsChartProps {
-  vitalSigns: VitalSign[]
+  vitalSigns: VitalRecord[]
   targets: {
     systolicMax: number
     diastolicMax: number
     weightTarget: number
-    bloodSugarMax?: number
+    tempMax?: number
   }
 }
 
 type TimeRange = "7d" | "30d" | "all"
 
+
 export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>("30d")
 
-  const getFilteredData = () => {
-    const now = Date.now()
+  const processedVitals = useMemo(() => {
+    return vitalSigns.map(vs => {
+      const cleanTime = vs.time.replace(' น.', '').trim();
+      const dateTimeString = `${vs.date} ${cleanTime}`;
+
+      const parsedWeight = vs.weight ? parseFloat(vs.weight as unknown as string) : undefined;
+      const parsedTemp = vs.temp ? parseFloat(vs.temp as unknown as string) : undefined;
+
+      return {
+        timestamp: new Date(dateTimeString),
+        systolic: vs.systolic,
+        diastolic: vs.diastolic,
+        weight: parsedWeight,
+        temp: parsedTemp,
+      };
+    });
+  }, [vitalSigns]);
+
+  const filteredData = useMemo(() => {
+
+    const now = Date.now();
     const ranges = {
       "7d": 7 * 24 * 60 * 60 * 1000,
       "30d": 30 * 24 * 60 * 60 * 1000,
       all: Number.POSITIVE_INFINITY,
-    }
+    };
 
-    return vitalSigns
+    return processedVitals
       .filter((vs) => now - vs.timestamp.getTime() <= ranges[timeRange])
-      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime())
-  }
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 
-  const filteredData = getFilteredData()
+  }, [processedVitals, timeRange]);
 
-  const bloodPressureData = filteredData.map((vs) => ({
-    date: format(vs.timestamp, "dd/MM", { locale: th }),
-    systolic: vs.sbp,
-    diastolic: vs.dbp,
-    timestamp: vs.timestamp.getTime(),
-  }))
+  const bloodPressureData = useMemo(() => {
+    return filteredData
+      .filter(vs =>
+        vs.systolic !== undefined && vs.systolic !== null &&
+        vs.diastolic !== undefined && vs.diastolic !== null
+      )
+      .map((vs) => ({
+        date: format(vs.timestamp, "dd/MM", { locale: th }),
+        systolic: vs.systolic as number,
+        diastolic: vs.diastolic as number,
+        timestamp: vs.timestamp.getTime(),
+      }));
+  }, [filteredData]);
 
-  const weightData = filteredData.map((vs) => ({
-    date: format(vs.timestamp, "dd/MM", { locale: th }),
-    weight: vs.weight,
-    timestamp: vs.timestamp.getTime(),
-  }))
-
-  const bloodSugarData = filteredData
-    .filter((vs) => vs.bloodSugar !== undefined)
+  const weightData = useMemo(() => filteredData
+    .filter(vs => vs.weight !== undefined && vs.weight !== null)
     .map((vs) => ({
       date: format(vs.timestamp, "dd/MM", { locale: th }),
-      bloodSugar: vs.bloodSugar,
+      weight: vs.weight as number,
       timestamp: vs.timestamp.getTime(),
-    }))
+    })), [filteredData]);
+
+  const temperatureData = useMemo(() => filteredData
+    .filter((vs) => vs.temp !== undefined && vs.temp !== null)
+    .map((vs) => ({
+      date: format(vs.timestamp, "dd/MM", { locale: th }),
+      temperature: vs.temp as number,
+      timestamp: vs.timestamp.getTime(),
+    })), [filteredData]);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -177,29 +205,28 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
         </CardContent>
       </Card>
 
-      {/* Blood Sugar Chart (if available) */}
-      {bloodSugarData.length > 0 && targets.bloodSugarMax && (
+      {temperatureData.length > 0 && targets.tempMax && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">ระดับน้ำตาล (mg/dL)</CardTitle>
+            <CardTitle className="text-base">อุณหภูมิร่างกาย (°C)</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={bloodSugarData}>
+              <LineChart data={temperatureData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} domain={[80, 250]} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} domain={[25, 45]} />
                 <Tooltip content={<CustomTooltip />} />
                 <ReferenceLine
-                  y={targets.bloodSugarMax}
+                  y={targets.tempMax}
                   stroke="hsl(var(--destructive))"
                   strokeDasharray="3 3"
                   label={{ value: "เป้าหมาย", position: "right", fill: "hsl(var(--destructive))" }}
                 />
                 <Line
                   type="monotone"
-                  dataKey="bloodSugar"
-                  name="ระดับน้ำตาล"
+                  dataKey="temperature"
+                  name="อุณหภูมิร่างกาย"
                   stroke="hsl(var(--chart-5))"
                   strokeWidth={2}
                   dot={{ fill: "hsl(var(--chart-5))", r: 3 }}

@@ -29,19 +29,32 @@ export function PatientSummary({ patient }: PatientSummaryProps) {
             </div>
           </div>
 
-          {/* Chronic Conditions */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">โรคประจำตัว</p>
-            <div className="flex flex-wrap gap-2">
-              {patient.chronicConditions.map((condition, idx) => (
-                <Badge key={idx} variant="secondary">
-                  {condition}
+          <div className="flex gap-6">
+
+            <div className="w-1/2 space-y-2">
+              <p className="text-sm font-medium text-foreground">โรคประจำตัว</p>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary">
+                  {patient.chronicConditions}
                 </Badge>
-              ))}
+              </div>
             </div>
+
+            <div className="w-1/2 space-y-2">
+              <p className="text-sm font-medium text-foreground">โรควินิจฉัย</p>
+              <div className="flex flex-wrap gap-2">
+                {patient.diag_name ? (
+                  <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                    {patient.diag_name}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">ไม่พบข้อมูล</Badge>
+                )}
+              </div>
+            </div>
+
           </div>
 
-          {/* Allergies */}
           {patient.allergies.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -49,20 +62,16 @@ export function PatientSummary({ patient }: PatientSummaryProps) {
                 <p className="text-sm font-medium text-destructive">ประวัติการแพ้ยา</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {patient.allergies.map((allergy, idx) => (
-                  <Badge
-                    key={idx}
-                    variant="outline"
-                    className="bg-destructive/10 text-destructive border-destructive/50"
-                  >
-                    {allergy}
-                  </Badge>
-                ))}
+                <Badge
+                  variant="outline"
+                  className="bg-destructive/10 text-destructive border-destructive/50"
+                >
+                  {patient.allergies}
+                </Badge>
               </div>
             </div>
           )}
 
-          {/* Monitoring Period */}
           <div className="space-y-2 rounded-lg border border-border bg-muted/50 p-3">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
