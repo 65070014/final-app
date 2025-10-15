@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, Calendar, HeartPulse} from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Clock, User, Calendar} from "lucide-react"
 
 
 export function DoctorSchedule() {
