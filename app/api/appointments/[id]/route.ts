@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id: appointment_id } = params; 
+interface RouteContext {
+    params: {
+        id: string; // ชื่อ 'id' ต้องตรงกับชื่อโฟลเดอร์ใน Path
+    };
+}
+
+export async function GET(request: Request, context: RouteContext) {
+    const { id: appointment_id } = context.params;
     const dbPool = getDbPool();
     let db = null;
 
