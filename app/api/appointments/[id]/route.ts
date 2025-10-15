@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const { id: appointment_id } = await params;
+    const { id: appointment_id } = params; 
     const dbPool = getDbPool();
     let db = null;
 
