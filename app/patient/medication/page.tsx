@@ -6,6 +6,7 @@ import { DispensingRecord } from '@/lib/types';
 import { useSession } from 'next-auth/react';
 
 
+
 export default function DispensingHistoryPage() {
     const { data: session, status } = useSession();
     const [history, setHistory] = useState<DispensingRecord[] | null>(null);
@@ -82,7 +83,7 @@ export default function DispensingHistoryPage() {
                         </div>
                     )}
                 </>
-            )}
+            )} 
         </div>
     );
 }

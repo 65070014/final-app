@@ -29,12 +29,12 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
     const [selectedMedication, setSelectedMedication] = useState<Medication | null>(null);
     const [medications, setMedications] = useState<Medication[]>([]);
     const [form, setForm] = useState({
-        dosage: "", 
+        dosage: "",
         usage: "",
         quantity: "",
         note: "",
     });
-    
+
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [popoverOpen, setPopoverOpen] = useState(false);
@@ -93,12 +93,17 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
             });
 
             if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการบันทึก');
+                let errorText = await res.text();
+                try {
+                    const errorData = JSON.parse(errorText);
+                    throw new Error(errorData.error || errorData.message || 'เกิดข้อผิดพลาด');
+                } catch {
+                    throw new Error(errorText);
+                }
             }
-            
+
             onSuccess();
-            handleClose(); 
+            handleClose();
         } catch (err) {
             setError((err as Error).message);
         } finally {
@@ -108,7 +113,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
 
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-            <DialogContent 
+            <DialogContent
                 className="max-w-md"
                 onInteractOutside={(e) => {
                     e.preventDefault();
@@ -148,7 +153,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                                         setPopoverOpen(false);
                                                     }}
                                                 >
-                                                    <Check className={cn("mr-2 h-4 w-4", selectedMedication?.medication_id === med.medication_id ? "opacity-100" : "opacity-0")}/>
+                                                    <Check className={cn("mr-2 h-4 w-4", selectedMedication?.medication_id === med.medication_id ? "opacity-100" : "opacity-0")} />
                                                     {med.medicine_name}
                                                 </CommandItem>
                                             ))}
@@ -160,22 +165,22 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                     </div>
                     <div>
                         <Label>ขนาด/ความแรง (Dosage)</Label>
-                        <Input name="dosage" placeholder="เช่น 500 mg" value={form.dosage} onChange={handleChange}/>
+                        <Input name="dosage" placeholder="เช่น 500 mg" value={form.dosage} onChange={handleChange} />
                     </div>
                     <div>
                         <Label>วิธีการใช้ (Usage)</Label>
-                        <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange}/>
+                        <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange} />
                     </div>
                     <div>
                         <Label>จำนวนที่จ่าย</Label>
-                        <Input name="quantity" type="number" placeholder="เช่น 30" value={form.quantity} onChange={handleChange}/>
+                        <Input name="quantity" type="number" placeholder="เช่น 30" value={form.quantity} onChange={handleChange} />
                     </div>
                     <div>
                         <Label>หมายเหตุ (ถ้ามี)</Label>
-                        <Textarea 
-                            name="note" 
-                            placeholder="เช่น ทานยาติดต่อกันจนหมด" 
-                            value={form.note} 
+                        <Textarea
+                            name="note"
+                            placeholder="เช่น ทานยาติดต่อกันจนหมด"
+                            value={form.note}
                             onChange={handleChange}
                         />
                     </div>
