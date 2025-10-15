@@ -1,17 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Printer } from "lucide-react"
 
-export default function PrescriptionPage({ params }: { params: { id: string } }) {
+export default function PrescriptionPage({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const [prescription, setPrescription] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchPrescription = async () => {
       try {
-        const res = await fetch(`/api/prescription/${params.id}`)
+        const res = await fetch(`/api/prescription/${id}`)
         const data = await res.json()
         setPrescription(data)
       } catch (error) {
@@ -21,7 +26,7 @@ export default function PrescriptionPage({ params }: { params: { id: string } })
       }
     }
     fetchPrescription()
-  }, [params.id])
+  }, [id])
 
   const handlePrint = () => {
     window.print()
@@ -30,7 +35,7 @@ export default function PrescriptionPage({ params }: { params: { id: string } })
   if (loading) return <p className="text-center mt-10">กำลังโหลดข้อมูล...</p>
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-md mt-10 print:shadow-none print:bg-white">
+    <div className="max-w-3xl mx-auto p-8  shadow-md mt-10 print:shadow-none ">
       <div className="flex justify-between items-center mb-4 print:hidden">
         <h1 className="text-2xl font-bold">ใบจ่ายยา</h1>
         <Button onClick={handlePrint} className="flex items-center gap-2">
@@ -50,7 +55,7 @@ export default function PrescriptionPage({ params }: { params: { id: string } })
 
         <table className="w-full border border-gray-400 mt-4">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="">
               <th className="border px-3 py-2 text-left">ชื่อยา</th>
               <th className="border px-3 py-2 text-left">วิธีใช้</th>
               <th className="border px-3 py-2 text-center">จำนวน</th>
