@@ -3,7 +3,7 @@ import { getDbPool } from '@/lib/db';
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: appointment_id } = await params;
     const dbPool = getDbPool();
     let db = null;
@@ -28,6 +28,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         `;
 
         const [rows] = await db.query(sql, [appointment_id]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const results = rows as any[];
 
         if (results.length === 0) {

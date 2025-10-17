@@ -22,7 +22,6 @@ export function PatientHeader() {
                         <p className="text-muted-foreground">ผู้ป่วยเลขที่: HN-2025-000001</p>
                     </div>
                 </div>
-
                 <div className="flex items-center gap-6">
                     <div className="text-center">
                         <div className="flex items-center gap-2 mb-1">

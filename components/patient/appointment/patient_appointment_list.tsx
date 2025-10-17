@@ -2,11 +2,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Patient_Edit_Appointment } from '@/components/patient/appointment/patient_edit_appointment';
 import { useState, useEffect } from "react";
-import { Clock, Stethoscope } from "lucide-react";
+import { Clock, DollarSign, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Appointment } from "@/lib/types"
+import { usePaymentModal } from '@/components/patient/paymentmodal/paymentmodalcontext';
 
 interface PatientAppointmentListProps {
     activeTab: 'upcoming' | 'history';
@@ -18,7 +19,8 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
     const [appointments, setAppointments] = useState<Appointment[]>([])
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const { openPaymentModal } = usePaymentModal();
+    
     useEffect(() => {
         async function fetchAppointments() {
             if (status !== 'authenticated' || !session?.user?.id) {
@@ -183,17 +185,27 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                                     </>
                                 )}
 
-                                {record.status === 'COMPLETED' && (
-                                    <Button
-                                        /*onClick={() => router.push(`/patient/appointment/${record.id}`)}*/
-                                        variant="outline"
-                                        size="sm"
+                                {record.status === 'Complete' && (
+                                    <>
+                                    <Link href={`/patient/treatment_record/${record.id}`} passHref>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                        >
+                                            ดูรายละเอียดการรักษา
+                                        </Button>
+                                    </Link>
+                                    <button
+                                        onClick={() => openPaymentModal(record)}
+                                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                     >
-                                        ดูรายละเอียดการรักษา
-                                    </Button>
+                                        <DollarSign className="w-5 h-5 mr-2" />
+                                        จ่ายเงิน
+                                    </button>
+                                    </>
                                 )}
 
-                                {record.status === 'CANCELLED' && (
+                                {record.status === 'Cancelled' && (
                                     <Button variant="ghost" size="sm" disabled>
                                         นัดหมายนี้ถูกยกเลิกแล้ว
                                     </Button>

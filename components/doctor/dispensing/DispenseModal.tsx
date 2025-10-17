@@ -93,7 +93,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
             });
 
             if (!res.ok) {
-                let errorText = await res.text();
+                const errorText = await res.text();
                 try {
                     const errorData = JSON.parse(errorText);
                     throw new Error(errorData.error || errorData.message || 'เกิดข้อผิดพลาด');

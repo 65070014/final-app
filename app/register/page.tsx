@@ -81,30 +81,86 @@ export default function PatientForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-8">
-      {/* Header Section */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-8 flex items-center justify-center">
 
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+      {/* Main Card Container: เพิ่มความกว้างและมิติ */}
+      <div className="w-full max-w-3xl bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
+
         {/* Title Section */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-2">ลงทะเบียน</h1>
-          <p className="text-lg text-gray-500 dark:text-gray-400">กรอกข้อมูล</p>
+        <div className="text-center mb-12 border-b pb-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400 mb-2">
+            ลงทะเบียนผู้ป่วยใหม่
+          </h1>
+          <p className="text-md text-gray-600 dark:text-gray-400">
+            กรอกข้อมูลส่วนตัว ที่อยู่ และข้อมูลสุขภาพเบื้องต้นตามขั้นตอน
+          </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-8 mb-10">
-          <div className="flex flex-col items-center text-gray-400" onClick={() => goToStep(1)}>
-            <div className={`w-10 h-10 rounded-full border-2 ${currentStep === 1 ? 'bg-blue-500 text-white' : 'border-gray-400 text-gray-400'} flex items-center justify-center font-bold mb-2 cursor-pointer`}>1</div>
-            <p className={`text-sm ${currentStep === 1 ? 'text-blue-500' : ''}  font-medium text-center cursor-pointer`}>ข้อมูลส่วนตัว</p>
+        {/* Step Indicator Section: ใช้โครงสร้างเดิมแต่ปรับ Class ให้เด่นชัด */}
+        <div className="grid grid-cols-3 gap-6 mb-12 relative after:absolute after:top-1/4 after:left-0 after:right-0 after:h-0.5 after:bg-gray-200 dark:after:bg-gray-700 after:z-0">
+
+          {/* Step 1 */}
+          <div className="flex flex-col items-center z-10" onClick={() => goToStep(1)}>
+            <div
+              className={`
+                        w-10 h-10 rounded-full border-4 transition-all duration-300
+                        ${currentStep >= 1
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400'} 
+                        flex items-center justify-center font-extrabold mb-2 cursor-pointer
+                    `}
+            >
+              1
+            </div>
+            <p
+              className={`text-sm ${currentStep >= 1 ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-500'} text-center cursor-pointer`}
+            >
+              ข้อมูลส่วนตัว
+            </p>
           </div>
-          <div className="flex flex-col items-center text-gray-400" onClick={() => goToStep(2)}>
-            <div className={`w-10 h-10 rounded-full border-2 ${currentStep === 2 ? 'bg-blue-500 text-white' : 'border-gray-400 text-gray-400'} flex items-center justify-center font-bold mb-2 cursor-pointer`}>2</div>
-            <p className={`text-sm ${currentStep === 2 ? 'text-blue-500' : ''}  text-center cursor-pointer`}>ข้อมูลที่อยู่</p>
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center z-10" onClick={() => goToStep(2)}>
+            <div
+              className={`
+                        w-10 h-10 rounded-full border-4 transition-all duration-300
+                        ${currentStep >= 2
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400'} 
+                        flex items-center justify-center font-extrabold mb-2 cursor-pointer
+                    `}
+            >
+              2
+            </div>
+            <p
+              className={`text-sm ${currentStep >= 2 ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-500'} text-center cursor-pointer`}
+            >
+              ข้อมูลที่อยู่
+            </p>
           </div>
-          <div className="flex flex-col items-center text-gray-400 " onClick={() => goToStep(3)}>
-            <div className={`w-10 h-10 rounded-full border-2 ${currentStep === 3 ? 'bg-blue-500 text-white' : 'border-gray-400 text-gray-400'} flex items-center justify-center font-bold mb-2 cursor-pointer`}>3</div>
-            <p className={`text-sm ${currentStep === 3 ? 'text-blue-500' : ''}  text-center cursor-pointer`}>ข้อมูลสุขภาพเบื้องต้น</p>
+
+          {/* Step 3 */}
+          <div className="flex flex-col items-center z-10" onClick={() => goToStep(3)}>
+            <div
+              className={`
+                        w-10 h-10 rounded-full border-4 transition-all duration-300
+                        ${currentStep >= 3
+                  ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                  : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400'} 
+                        flex items-center justify-center font-extrabold mb-2 cursor-pointer
+                    `}
+            >
+              3
+            </div>
+            <p
+              className={`text-sm ${currentStep >= 3 ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-500'} text-center cursor-pointer`}
+            >
+              ข้อมูลสุขภาพเบื้องต้น
+            </p>
           </div>
+
         </div>
+
         {/* The actual form component */}
         <div>
           {currentStep === 1 && (
@@ -117,6 +173,7 @@ export default function PatientForm() {
             <HealthDetailsForm formData={formData} handleChange={handleChange} handleSubmit={handleSubmit} errors={errors} />
           )}
         </div>
+
       </div>
     </div>
 
