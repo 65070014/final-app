@@ -146,3 +146,18 @@ export type VitalRecord = {
   temp?: number
   notes?: string
 }
+
+export interface PatientVitalSummary {
+    age: number;
+    patient: string;
+    patient_id: string;
+    pr: number | null;
+    rr: number | null;
+    sbp: number | null;
+    dbp: number | null;
+    weight: number | null;
+    temp: number | null;
+    symptoms: string | null;
+    allergies: string | null;
+    underlying_diseases: string | null;
+}

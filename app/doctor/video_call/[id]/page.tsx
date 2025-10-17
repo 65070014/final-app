@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import { Menu, X, Video, FileEdit, User, ChevronDown, ChevronUp } from 'lucide-react';
-import { AppointmentList } from "@/lib/types"
+import { AppointmentList, PatientVitalSummary } from "@/lib/types"
 import { DiagnosisSection } from '@/components/doctor/medical_record/diagnosis_section';
 import { MedicationSection } from '@/components/doctor/medical_record/medication_section';
+import Link from 'next/link';
 
 
 export default function VideoConsultationPage() {
@@ -15,11 +16,13 @@ export default function VideoConsultationPage() {
     const { id: doctorId } = params;
     const [appointment, setAppointments] = useState<AppointmentList[]>([])
     const [isloading, setIsLoading] = useState(true)
+    const [isloadingpatient, setIsLoadingPatient] = useState(true)
     const [, setError] = useState<string | null>(null);
     const selectedAppointmentId = searchParams.get('appointmentId');
     const [isDiagnosPanelOpen, setIsDiagnosPanelOpen] = useState(true);
     const [isVideoExpanded, setIsVideoExpanded] = useState(true);
     const videoHeightClass = isVideoExpanded ? 'h-4/5 min-h-[350px]' : 'h-2/4 min-h-[150px]';
+    const [patient, setPatient] = useState<PatientVitalSummary>()
 
 
     const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -45,7 +48,6 @@ export default function VideoConsultationPage() {
             setIsLoading(true);
             setError(null);
             try {
-                // ใช้ doctorId
                 const response = await fetch(`/api/appointments/medical_personnel_id/today/${doctorId}`);
 
                 if (!response.ok) {
@@ -64,6 +66,30 @@ export default function VideoConsultationPage() {
         }
         fetchAppointments();
     }, [doctorId]);
+
+    useEffect(() => {
+        async function fetchPatientVitals() {
+            setIsLoadingPatient(true);
+            setError(null);
+            try {
+                const response = await fetch(`/api/appointments/onePatient/${selectedAppointmentId}`);
+
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถดึงข้อมูลผู้ป่วยได้');
+                }
+
+                const data = await response.json();
+                setPatient(data[0]);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } catch (error: any) {
+                console.error("Error fetching appointments:", error);
+                setError(error.message);
+            } finally {
+                setIsLoadingPatient(false);
+            }
+        }
+        fetchPatientVitals();
+    }, [selectedAppointmentId]);
 
     const handleSwitchQueue = useCallback((newAppointmentId: string) => {
         if (newAppointmentId === selectedAppointmentId) {
@@ -84,10 +110,6 @@ export default function VideoConsultationPage() {
         const url = `/doctor/record_treatment/${selectedAppointmentId}`;
         window.open(url, '_blank', 'width=1000,height=700');
     }, [selectedAppointmentId]);
-
-    const currentAppointment = useMemo(() => {
-        return appointment.find(appt => appt.id === selectedAppointmentId);
-    }, [appointment, selectedAppointmentId]);
 
 
     return (
@@ -198,7 +220,7 @@ export default function VideoConsultationPage() {
             </div>
 
             <div className="w-80 flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10">
-                <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {currentAppointment ? currentAppointment.patient : 'ไม่ได้เลือก'}</h3>
+                <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {patient ? patient.patient : 'ไม่ได้เลือก'}</h3>
 
                 {selectedAppointmentId && (
                     <button
@@ -215,13 +237,91 @@ export default function VideoConsultationPage() {
                         กรุณาเลือกคิวในแถบด้านข้างเพื่อเริ่มการตรวจ
                     </div>
                 )}
+                <div className="text-sm space-y-3 pt-4 border-t border-gray-200">
+                    <h4 className="text-lg font-bold text-gray-800">ข้อมูลผู้ป่วย</h4>
+                    {isloadingpatient || !selectedAppointmentId ? (
+                        <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
+                    ) : (
+                        <>
+                            <div className="space-y-1">
+                                <p className="text-gray-600">
+                                    <span className="font-medium text-gray-800">อายุ:</span> {patient?.age ?? 'N/A'} ปี
+                                </p>
+                                <p className="text-gray-600">
+                                    <span className="font-medium text-gray-800">รหัสผู้ป่วย:</span> {patient?.patient_id ?? 'N/A'}
+                                </p>
+                            </div>
+                            <div className="pt-2 border-t border-gray-100">
+                                <p className="font-medium text-gray-700 flex items-center gap-1">
+                                    โรคประจำตัว:
+                                    <span className="font-normal text-sm text-gray-600">
+                                        {patient?.underlying_diseases || 'ไม่พบ'}
+                                    </span>
+                                </p>
+                                <p className="font-medium text-red-600 flex items-center gap-1 mt-1">
+                                    แพ้ยา:
+                                    <span className="font-normal text-sm text-red-700">
+                                        {patient?.allergies || 'ไม่พบ'}
+                                    </span>
+                                </p>
+                            </div>
 
-                <div className="text-sm space-y-2 pt-4 border-t">
-                    <h4 className="font-semibold">ข้อมูลผู้ป่วย</h4>
-                    <p>อายุ: N/A</p>
-                    <p>โรคประจำตัว: N/A</p>
+                            <div className="pt-2 border-t border-gray-100">
+                                <p className="font-medium text-gray-700 mb-1">อาการ/ข้อร้องเรียนล่าสุด:</p>
+                                <div className="p-2 bg-gray-100 rounded-md text-gray-700 text-xs italic">
+                                    {patient?.symptoms || 'ไม่ระบุอาการหลัก'}
+                                </div>
+                            </div>
+                            <div className="pt-2 border-t border-gray-100">
+                                <h4 className="font-bold text-gray-800 mb-2">สัญญาณชีพล่าสุด</h4>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                    <div className="col-span-2">
+                                        <span className="text-gray-500">ความดัน:</span>
+                                        <span className="font-semibold text-gray-800 ml-1">
+                                            {patient?.sbp ?? 'N/A'} / {patient?.dbp ?? 'N/A'} mmHg
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">น้ำหนัก:</span>
+                                        <span className="font-semibold text-gray-800">
+                                            {patient?.weight ? `${patient.weight} kg` : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">อุณหภูมิ:</span>
+                                        <span className="font-semibold text-gray-800">
+                                            {patient?.temp ? `${patient.temp} °C` : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">ชีพจร (PR):</span>
+                                        <span className="font-semibold text-gray-800">
+                                            {patient?.pr ? `${patient.pr} bpm` : 'N/A'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500">หายใจ (RR):</span>
+                                        <span className="font-semibold text-gray-800">
+                                            {patient?.rr ? `${patient.rr} /min` : 'N/A'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {patient && (
+                                <Link href={`/doctor/treatment_history/${patient.patient_id}`}>
+                                    <button
+                                        className="w-full flex items-center justify-center p-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors shadow-md mt-6"
+
+                                    >
+                                        <FileEdit className="w-5 h-5 mr-2" />
+                                        ประวัติการรักษาผู้ป่วย
+                                    </button>
+                                </Link>
+                            )}
+
+                        </>
+                    )}
                 </div>
-
             </div>
         </div>
     );
