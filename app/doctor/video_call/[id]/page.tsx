@@ -1,39 +1,52 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
-import { Menu, X, Video, FileEdit, } from 'lucide-react';
+import { Menu, X, Video, FileEdit, User, ChevronDown, ChevronUp } from 'lucide-react';
 import { AppointmentList } from "@/lib/types"
+import { DiagnosisSection } from '@/components/doctor/medical_record/diagnosis_section';
+import { MedicationSection } from '@/components/doctor/medical_record/medication_section';
 
 
 export default function VideoConsultationPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const params = useParams();
-    const { id } = params;
+    const { id: doctorId } = params;
     const [appointment, setAppointments] = useState<AppointmentList[]>([])
     const [isloading, setIsLoading] = useState(true)
     const [, setError] = useState<string | null>(null);
-    const appointmentId = searchParams.get('appointmentId');
-    
+    const selectedAppointmentId = searchParams.get('appointmentId');
+    const [isDiagnosPanelOpen, setIsDiagnosPanelOpen] = useState(true);
+    const [isVideoExpanded, setIsVideoExpanded] = useState(true);
+    const videoHeightClass = isVideoExpanded ? 'h-4/5 min-h-[350px]' : 'h-2/4 min-h-[150px]';
+
 
     const [isPanelOpen, setIsPanelOpen] = useState(true);
+    const [diagnosisNote, setDiagnosisNote] = useState({
+        diagName: "",
+        diagCode: "",
+        treatmentNote: "",
+    })
+
+    const [medications, setMedications] = useState<
+        Array<{
+            id: string
+            name: string
+            dosage: string
+            usage: string
+            quantity: string
+            note: string
+        }>
+    >([])
 
     useEffect(() => {
         async function fetchAppointments() {
-            //เดียวมาแก้หลังจากใส่ Login Doctor
-            {/* if (status !== 'authenticated' || !session?.user?.id) {
-                if (status !== 'loading') {
-                    setIsLoading(false);
-                }
-                return;
-            }*/}
-
             setIsLoading(true);
             setError(null);
-
             try {
-                const response = await fetch(`/api/appointments/medical_personnel_id/today/${id}`);
+                // ใช้ doctorId
+                const response = await fetch(`/api/appointments/medical_personnel_id/today/${doctorId}`);
 
                 if (!response.ok) {
                     throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
@@ -41,8 +54,6 @@ export default function VideoConsultationPage() {
 
                 const data = await response.json();
                 setAppointments(data);
-                console.log(data)
-
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
                 console.error("Error fetching appointments:", error);
@@ -51,17 +62,11 @@ export default function VideoConsultationPage() {
                 setIsLoading(false);
             }
         }
-        //เดียวมาแก้หลังจากใส่ Login Doctor
-        {/*if (status === 'authenticated') { 
-            fetchAppointments();
-        }
-        */}
         fetchAppointments();
-
-    }, [id]);
+    }, [doctorId]);
 
     const handleSwitchQueue = useCallback((newAppointmentId: string) => {
-        if (newAppointmentId === appointmentId) {
+        if (newAppointmentId === selectedAppointmentId) {
             setIsPanelOpen(false);
             return;
         }
@@ -70,102 +75,153 @@ export default function VideoConsultationPage() {
         params.set('appointmentId', newAppointmentId);
         router.replace(`?${params.toString()}`);
 
-        setIsPanelOpen(false); // ปิด Panel หลังสลับคิว
-    }, [router, searchParams, appointmentId]);
+        setIsPanelOpen(false);
+    }, [router, searchParams, selectedAppointmentId]);
 
     const handleOpenDiagnosis = useCallback(() => {
-        if (!appointmentId) return;
+        if (!selectedAppointmentId) return;
 
-        const url = `/doctor/record_treatment/${appointmentId}`;
+        const url = `/doctor/record_treatment/${selectedAppointmentId}`;
         window.open(url, '_blank', 'width=1000,height=700');
-    }, [appointmentId]);
+    }, [selectedAppointmentId]);
+
+    const currentAppointment = useMemo(() => {
+        return appointment.find(appt => appt.id === selectedAppointmentId);
+    }, [appointment, selectedAppointmentId]);
+
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 flex overflow-hidden">
 
-            <div className={`
-                w-96 flex-shrink-0 bg-gray-100 p-4 border-r border-gray-300 transition-all duration-300 
-                ${isPanelOpen ? 'translate-x-0' : '-translate-x-full absolute'}
-            `}>
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                        <Video className="w-5 h-5 mr-2" /> รายการคิววันนี้
-                    </h3>
-                    <button
-                        onClick={() => setIsPanelOpen(false)}
-                        className="p-1 rounded-full text-gray-600 hover:bg-gray-200"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                <div className="space-y-2 max-h-[85vh] overflow-y-auto pr-2">
-                    {isloading ? (
-                        <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
-                    ) : (
-                        <>
-                            {appointment.length === 0 ? (
-                                <div className="text-center py-6 text-gray-500 bg-white p-4 rounded-lg border border-dashed border-gray-300">
-                                    <p className="font-medium">วันนี้ไม่มีนัดหมายวิดีโอคอลล์</p>
-                                </div>
-                            ) : (
-                                appointment.map((appt) => (
-                                    <div
-                                        key={appt.id}
-                                        onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id)}
-                                        className={`p-3 rounded-lg border cursor-pointer transition-colors 
-                            ${appt.id === appointmentId ? 'bg-blue-100 border-blue-400 shadow-md' : 'bg-white hover:bg-gray-50'}
-                            ${appt.patient_status === 'Canceled' ? 'opacity-50' : ''}
-                        `}
-                                    >
-                                        <div className="font-bold">{appt.time} - {appt.patient}</div>
-                                        <div className="text-sm text-gray-600 truncate">{appt.symptoms}</div>
-                                        <div className="mt-1 text-xs">
-                                            <span className={`px-2 py-0.5 rounded-full ${appt.id === appointmentId ? 'bg-blue-600 text-white' : 'bg-green-200 text-green-800'}`}>
-                                                {appt.id === appointmentId ? 'กำลังตรวจ' : appt.patient_status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <div className={`flex-grow flex flex-col p-6 space-y-4 ${isPanelOpen ? 'ml-0' : 'ml-[-4rem]'}`}>
+            <div className="min-h-screen bg-gray-50 flex overflow-hidden">
                 {!isPanelOpen && (
                     <button
                         onClick={() => setIsPanelOpen(true)}
+                        className="fixed top-4 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
+                )}
+                {isPanelOpen && (
+                    <div className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300"
+                        onClick={() => setIsPanelOpen(false)}
+                    >
+                        <div
+                            className="absolute left-0 top-0 bottom-0 w-96 flex-shrink-0 bg-gray-100 p-4 border-r border-gray-300 shadow-xl z-50"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                                    <Video className="w-5 h-5 mr-2 text-blue-600" /> รายการคิววันนี้
+                                </h3>
+                                <button
+                                    onClick={() => setIsPanelOpen(false)}
+                                    className="p-1 rounded-full text-gray-600 hover:bg-gray-200"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-2 max-h-[90vh] overflow-y-auto pr-2">
+                                {isloading ? (
+                                    <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
+                                ) : (
+                                    appointment.length === 0 ? (
+                                        <div className="text-center py-6 text-gray-500 bg-white p-4 rounded-lg border border-dashed border-gray-300">
+                                            <p className="font-medium">วันนี้ไม่มีนัดหมาย</p>
+                                        </div>
+                                    ) : (
+                                        appointment.map((appt) => (
+                                            <div
+                                                key={appt.id}
+                                                onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id)}
+                                                className={`p-3 rounded-lg border cursor-pointer transition-colors 
+                                            ${appt.id === selectedAppointmentId ? 'bg-blue-100 border-blue-400 shadow-md' : 'bg-white hover:bg-gray-50'}
+                                            ${appt.patient_status === 'Canceled' ? 'opacity-50' : ''}
+                                        `}
+                                            >
+                                                <div className="font-bold">{appt.time} - {appt.patient}</div>
+                                                <div className="text-sm text-gray-600 truncate">{appt.symptoms}</div>
+                                                <div className="mt-1 text-xs">
+                                                    <span className={`px-2 py-0.5 rounded-full ${appt.id === selectedAppointmentId ? 'bg-blue-600 text-white' : 'bg-green-200 text-green-800'}`}>
+                                                        {appt.id === selectedAppointmentId ? 'กำลังตรวจ' : appt.patient_status}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className={`flex-grow flex flex-col p-6 space-y-4 transition-all duration-300 ${isDiagnosPanelOpen ? 'lg:ml-0' : 'ml-0'}`}>
+
+                {!isDiagnosPanelOpen && (
+                    <button
+                        onClick={() => setIsDiagnosPanelOpen(true)}
                         className="fixed top-4 left-4 z-10 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700"
                     >
                         <Menu className="w-6 h-6" />
                     </button>
                 )}
 
-                <div className="w-full aspect-video bg-black rounded-lg shadow-xl flex items-center justify-center">
-                    <span className="text-white text-2xl">วีดีโอคอล</span>
+                <div
+                    className={`w-full ${videoHeightClass} bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0 transition-all duration-300`}
+                >
+                    <button
+                        onClick={() => setIsVideoExpanded(!isVideoExpanded)}
+                        className="absolute bottom-2 right-2 z-20 p-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors"
+                        title={isVideoExpanded ? "ย่อหน้าจอ" : "ขยายหน้าจอ"}
+                    >
+                        {isVideoExpanded ? (
+                            <ChevronUp className="w-5 h-5" />
+                        ) : (
+                            <ChevronDown className="w-5 h-5" />
+                        )}
+                    </button>
+                    <span className="text-white text-2xl absolute inset-0 flex items-center justify-center">วีดีโอคอล (คนไข้)</span>
+                    <div className="absolute top-4 right-4 w-32 h-24 bg-gray-700 rounded-md border-2 border-white flex items-center justify-center z-10">
+                        <User className='w-6 h-6 text-white/70' />
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <DiagnosisSection diagnosisNote={diagnosisNote} setDiagnosisNote={setDiagnosisNote} />
+                        <MedicationSection medications={medications} setMedications={setMedications} />
+                    </div>
+                    <div className="h-10"></div>
                 </div>
             </div>
 
-            <div className="w-80 flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg rounded-lg">
-                <h3 className="text-xl font-semibold border-b pb-2 text-gray-800">เครื่องมือตรวจรักษา</h3>
+            <div className="w-80 flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10">
+                <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {currentAppointment ? currentAppointment.patient : 'ไม่ได้เลือก'}</h3>
 
-                {appointmentId && (
+                {selectedAppointmentId && (
                     <button
                         onClick={handleOpenDiagnosis}
                         className="w-full flex items-center justify-center p-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-md"
                     >
                         <FileEdit className="w-5 h-5 mr-2" />
-                        บันทึกการวินิจฉัย
+                        บันทึกการรักษาหลัก
                     </button>
                 )}
 
-                {!appointmentId && (
+                {!selectedAppointmentId && (
                     <div className="text-center text-gray-500 pt-10">
                         กรุณาเลือกคิวในแถบด้านข้างเพื่อเริ่มการตรวจ
                     </div>
                 )}
+
+                <div className="text-sm space-y-2 pt-4 border-t">
+                    <h4 className="font-semibold">ข้อมูลผู้ป่วย</h4>
+                    <p>อายุ: N/A</p>
+                    <p>โรคประจำตัว: N/A</p>
+                </div>
+
             </div>
         </div>
     );
