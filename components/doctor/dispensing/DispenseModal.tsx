@@ -164,10 +164,6 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                         </Popover>
                     </div>
                     <div>
-                        <Label>ขนาด/ความแรง (Dosage)</Label>
-                        <Input name="dosage" placeholder="เช่น 500 mg" value={form.dosage} onChange={handleChange} />
-                    </div>
-                    <div>
                         <Label>วิธีการใช้ (Usage)</Label>
                         <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange} />
                     </div>
