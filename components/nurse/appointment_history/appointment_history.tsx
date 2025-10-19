@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState,useMemo } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Edit, Trash2, CheckCircle, CalendarIcon, Search, List, ChevronLeft, ChevronRight } from "lucide-react"
 import { Appointment } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -16,7 +16,7 @@ export default function NurseDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [doctors, setDoctors] = useState<any[]>([])
 
-  const [currentMonth, setCurrentMonth] = useState(new Date()); 
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState<{ start: string, end: string } | null>(null);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>("");
 
@@ -89,6 +89,38 @@ export default function NurseDashboard() {
 
     fetchAppointments();
   }, [selectedWeek, selectedDoctorId]);
+
+  useEffect(() => {
+    const fetchMonthAppointments = async () => {
+      setIsLoading(true);
+      setHasSearched(true);
+
+      const startDate = format(startOfMonth(currentMonth), "yyyy-MM-dd");
+      const endDate = format(endOfMonth(currentMonth), "yyyy-MM-dd");
+
+      const params: Record<string, string> = { startDate, endDate };
+      if (selectedDoctorId) {
+        params.doctorId = selectedDoctorId;
+      }
+
+      const query = new URLSearchParams(params).toString();
+      const url = `/api/appointments?${query}`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("โหลดข้อมูลไม่สำเร็จ");
+        setAppointments(await res.json());
+      } catch (err) {
+        console.error(err);
+        setAppointments([]);
+        toast.error("เกิดข้อผิดพลาด", { description: (err as Error).message });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (hasSearched) fetchMonthAppointments();
+  }, [currentMonth, selectedDoctorId]);
 
   const groupedAppointments = useMemo(() => {
     return appointments.reduce((acc, appt) => {
@@ -209,48 +241,80 @@ export default function NurseDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">ตารางนัดหมาย</h2>
 
         <Card className="mb-8 shadow-sm">
-          <CardHeader><CardTitle className="flex items-center gap-2"><CalendarIcon className="w-5 h-5" />ค้นหาการนัดหมาย</CardTitle></CardHeader>
-          <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-            <div className="lg:col-span-2">
-              <div className="flex items-center justify-between mb-2">
-                <Button variant="ghost" size="icon" onClick={goToPreviousMonth}><ChevronLeft /></Button>
-                <h3 className="font-semibold text-lg">{format(currentMonth, "MMMM yyyy", { locale: th })}</h3>
-                <Button variant="ghost" size="icon" onClick={goToNextMonth}><ChevronRight /></Button>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5" />
+              ค้นหาการนัดหมาย
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap justify-center items-end gap-4">
+            <div className="flex flex-wrap items-end gap-4 text-center">
+              <div className="flex flex-col">
+                <Label className="mb-2">เลือกเดือน</Label>
+                <Select
+                  value={format(currentMonth, "yyyy-MM", { locale: th })}
+                  onValueChange={(value) => {
+                    const [year, month] = value.split("-").map(Number);
+                    setCurrentMonth(new Date(year, month - 1));
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="เลือกเดือน" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const date = new Date(currentMonth.getFullYear(), i, 1);
+                      return (
+                        <SelectItem
+                          key={i}
+                          value={`${currentMonth.getFullYear()}-${String(i + 1).padStart(2, "0")}`}
+                        >
+                          {format(date, "MMMM yyyy", { locale: th })}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
-              <Label>เลือกสัปดาห์</Label>
-              <Select
-                value={selectedWeek ? `${selectedWeek.start}|${selectedWeek.end}` : ""}
-                onValueChange={(value) => {
-                  const [start, end] = value.split("|");
-                  setSelectedWeek({ start, end });
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="เลือกสัปดาห์" />
-                </SelectTrigger>
-                <SelectContent>
-                  {weeks.map((week) => (
-                    <SelectItem key={week.value} value={week.value}>{week.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+              <div className="flex flex-col ">
+                <Label className="mb-2">เลือกสัปดาห์</Label>
+                <Select
+                  value={selectedWeek ? `${selectedWeek.start}|${selectedWeek.end}` : ""}
+                  onValueChange={(value) => {
+                    const [start, end] = value.split("|");
+                    setSelectedWeek({ start, end });
+                  }}
+                >
+                  <SelectTrigger className="w-[250px]">
+                    <SelectValue placeholder="เลือกสัปดาห์" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {weeks.map((week) => (
+                      <SelectItem key={week.value} value={week.value}>
+                        {week.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div><Label htmlFor="search-doctor">เลือกแพทย์ </Label>
-              <Select value={selectedDoctorId} onValueChange={(val) => setSelectedDoctorId(val === 'all' ? '' : val)}>
-                <SelectTrigger id="search-doctor"><SelectValue placeholder="แพทย์ทั้งหมด" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">แพทย์ทั้งหมด</SelectItem>
-                  {doctors.map((doc) => <SelectItem key={doc.id} value={String(doc.id)}>{doc.name}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2  lg:col-span-2">
-              <Button onClick={handleSearch} className="w-full" disabled={isLoading}><Search className="w-4 h-4 mr-2" /> {isLoading ? "..." : "ค้นหา"}</Button>
+            <div className="flex items-end gap-2">
+              <div className="flex flex-col">
+                <Select value={selectedDoctorId} onValueChange={(val) => setSelectedDoctorId(val === 'all' ? '' : val)}>
+                  <SelectTrigger id="search-doctor"><SelectValue placeholder="แพทย์ทั้งหมด" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">แพทย์ทั้งหมด</SelectItem>
+                    {doctors.map((doc) => <SelectItem key={doc.id} value={String(doc.id)}>{doc.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
               <Button onClick={handleShowAll} variant="outline" disabled={isLoading}><List className="w-4 h-4 mr-2" /> {isLoading ? "..." : "แสดงทั้งหมด"}</Button>
+
             </div>
           </CardContent>
         </Card>
