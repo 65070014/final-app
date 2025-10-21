@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState, useMemo } from "react"
-import { Edit, Trash2, CheckCircle, CalendarIcon, Search, List, ChevronLeft, ChevronRight } from "lucide-react"
+import { Edit, Trash2, CheckCircle, CalendarIcon, List } from "lucide-react"
 import { Appointment } from "@/lib/types"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ export default function NurseDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [hasSearched, setHasSearched] = useState(false);
   const [isLoading, setIsLoading] = useState(true)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [doctors, setDoctors] = useState<any[]>([])
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -120,7 +121,7 @@ export default function NurseDashboard() {
     };
 
     if (hasSearched) fetchMonthAppointments();
-  }, [currentMonth, selectedDoctorId]);
+  }, [currentMonth, hasSearched, selectedDoctorId]);
 
   const groupedAppointments = useMemo(() => {
     return appointments.reduce((acc, appt) => {
@@ -131,12 +132,15 @@ export default function NurseDashboard() {
     }, {} as Record<string, Appointment[]>);
   }, [appointments]);
 
-  const handleSearch = () => {
+  {/*
+    const handleSearch = () => {
     if (!selectedWeek) {
       toast.info("กรุณาเลือกสัปดาห์ที่ต้องการค้นหา");
       return;
     }
   };
+    */}
+  
 
   const handleShowAll = async () => {
     try {
@@ -236,8 +240,11 @@ export default function NurseDashboard() {
   };
   if (isLoading) return <div className="p-4">กำลังโหลดข้อมูล...</div>
 
-  const goToPreviousMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const goToNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  {/* 
+    const goToPreviousMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+    const goToNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+    */}
+  
 
   return (
     <div className="min-h-screen  p-4 sm:p-8 bg-blue-400">

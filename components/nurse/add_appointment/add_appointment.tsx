@@ -6,13 +6,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export default function NurseAppointments() {
-  const [appointments] = useState<any[]>([])
   const [patients, setPatients] = useState<any[]>([])
   const [doctors, setDoctors] = useState<any[]>([])
   const [patientAppointments, setPatientAppointments] = useState<any[]>([])
   const [doctorAppointments, setDoctorAppointments] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState("");
+  const [,setError] = useState("");
   const router = useRouter()
   const [formData, setFormData] = useState({
     patientId: "",
