@@ -7,7 +7,7 @@ const appointments = [
 
 export function AppointmentList() {
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-6 space-y-4 h-full shadow-lg">
       <h2 className="text-lg font-semibold">นัดหมายของคุณ</h2>
       {appointments.map((a, i) => (
         <div key={i} className="border-b pb-2">

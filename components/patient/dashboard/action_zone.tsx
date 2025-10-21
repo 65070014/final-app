@@ -104,7 +104,7 @@ export function ActionZone() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* การนัดหมาย */}
-            <Card className="p-6 bg-blue-500/5 border-blue-500/20">
+            <Card className="p-6 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -158,7 +158,7 @@ export function ActionZone() {
             </Card>
 
             {/* การแจ้งเตือน */}
-            <Card className="p-6">
+            <Card className="p-6 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
                 <div className="space-y-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-100 rounded-lg">
@@ -182,22 +182,22 @@ export function ActionZone() {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="p-6 lg:col-span-2">
+            <Card className="p-6 lg:col-span-2 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
                 <h3 className="text-lg font-semibold text-foreground mb-4">เมนู</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Button onClick={() => router.push('/patient/appointment')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/appointment')} variant="outline" className="h-20 flex-col bg-transparent gap-2 rounded-lg border-gray-600">
                         <FileText className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">นัดหมาย</span>
                     </Button>
-                    <Button onClick={() => router.push('/patient/appointments')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/appointments')} variant="outline" className="h-20 flex-col gap-2 bg-transparent rounded-lg border-gray-600">
                         <Calendar className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">ตารางนัดหมายของฉัน</span>
                     </Button>
-                    <Button onClick={() => router.push('/patient/medication')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/medication')} variant="outline" className="h-20 flex-col gap-2 bg-transparent rounded-lg border-gray-600">
                         <Pill className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">รายการยา</span>
                     </Button>
-                    <Button onClick={() => router.push('/patient/treatment_record')} variant="outline" className="h-20 flex-col gap-2 bg-transparent">
+                    <Button onClick={() => router.push('/patient/treatment_record')} variant="outline" className="h-20 flex-col bg-transparent gap-2 rounded-lg border-gray-600">
                         <Clock className="h-6 w-6 text-blue-500" />
                         <span className="text-sm">ประวัติการรักษา</span>
                     </Button>

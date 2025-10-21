@@ -114,7 +114,6 @@ export default function VideoConsultationPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex overflow-hidden">
-
             <div className="min-h-screen bg-gray-50 flex overflow-hidden">
                 {!isPanelOpen && (
                     <button
