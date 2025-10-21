@@ -131,11 +131,6 @@ export default function NurseAppointments() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
       <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6">เพิ่มการนัดหมาย</h1>
-        error && (
-        <div className="text-red-500 mb-4">
-          {error}
-        </div>
-        )
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-4">นัดหมายที่มีอยู่</h2>
           <div className="space-y-4">

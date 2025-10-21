@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils"
 interface Medication {
     medication_id: number;
     medicine_name: string;
+    strength: string;
 }
 
 interface DispenseModalProps {
@@ -30,14 +31,25 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
     const [medications, setMedications] = useState<Medication[]>([]);
     const [form, setForm] = useState({
         dosage: "",
+        unit: "",
         usage: "",
         quantity: "",
+        duration: "",
         note: "",
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [popoverOpen, setPopoverOpen] = useState(false);
+
+    useEffect(() => {
+        const dosageNum = parseFloat(form.dosage) || 0;
+        const frequencyNum = parseInt(form.usage) || 0;
+        const durationNum = parseInt(form.duration) || 0;
+
+        const total = dosageNum * frequencyNum * durationNum;
+        setForm(prev => ({ ...prev, quantity: total.toString() }));
+    }, [form.dosage, form.usage, form.duration]);
 
     useEffect(() => {
         const fetchMedications = async () => {
@@ -57,15 +69,15 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
 
     const handleClose = () => {
         setSelectedMedication(null);
-        setForm({ dosage: "", usage: "", quantity: "", note: "" });
+        setForm({ dosage: "", usage: "", quantity: "", note: "", duration: "", unit: "" });
         setError(null);
         setIsSubmitting(false);
         setPopoverOpen(false);
         onClose();
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         setForm(prev => ({ ...prev, [name]: value }));
     }
 
@@ -134,7 +146,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                     role="combobox"
                                     className="w-full justify-between font-normal text-left"
                                 >
-                                    {selectedMedication ? selectedMedication.medicine_name : "เลือกยา..."}
+                                    {selectedMedication ? `${selectedMedication.medicine_name}${selectedMedication.strength ? ` (${selectedMedication.strength})` : ""}` : "เลือกยา..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                             </PopoverTrigger>
@@ -147,14 +159,14 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                             {medications.map((med) => (
                                                 <CommandItem
                                                     key={med.medication_id}
-                                                    value={med.medicine_name}
+                                                    value={String(med.medication_id)}
                                                     onSelect={() => {
                                                         setSelectedMedication(med);
                                                         setPopoverOpen(false);
                                                     }}
                                                 >
                                                     <Check className={cn("mr-2 h-4 w-4", selectedMedication?.medication_id === med.medication_id ? "opacity-100" : "opacity-0")} />
-                                                    {med.medicine_name}
+                                                    {med.medicine_name} {med.strength ? `(${med.strength})` : null}
                                                 </CommandItem>
                                             ))}
                                         </CommandGroup>
@@ -163,13 +175,60 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                             </PopoverContent>
                         </Popover>
                     </div>
+                    <div className="flex items-center gap-2">
+                        {/* ป้อนค่าตัวเลขขนาดยา */}
+                        <div className="flex-1">
+                            <Label htmlFor="dosage">ขนาดยา (Dosage)</Label>
+                            <Input
+                                id="dosage"
+                                type="number"
+                                name="dosage"
+                                placeholder="เช่น 1"
+                                value={form.dosage}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        {/* เลือกหน่วยยา */}
+                        <div className="w-32">
+                            <Label htmlFor="unit">หน่วย</Label>
+                            <select
+                                id="unit"
+                                name="unit"
+                                className="border rounded-md w-full p-2"
+                                value={form.unit}
+                                onChange={handleChange}
+                            >
+                                <option value="">เลือกหน่วย</option>
+                                <option value="เม็ด">เม็ด</option>
+                                <option value="แคปซูล">แคปซูล</option>
+                                <option value="ml">มิลลิลิตร (ml)</option>
+                                <option value="ช้อนชา">ช้อนชา</option>
+                                <option value="ช้อนโต๊ะ">ช้อนโต๊ะ</option>
+                                <option value="หลอด">หลอด</option>
+                                <option value="ขวด">ขวด</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div>
                         <Label>วิธีการใช้ (Usage)</Label>
                         <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange} />
                     </div>
                     <div>
-                        <Label>จำนวนที่จ่าย</Label>
-                        <Input name="quantity" type="number" placeholder="เช่น 30" value={form.quantity} onChange={handleChange} />
+                        <Label>ระยะเวลา</Label>
+                        <Input name="duration" placeholder="เช่น 5 วัน" value={form.duration} onChange={handleChange} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                            <Label>จำนวนที่จ่าย</Label>
+                            <Input name="quantity" placeholder="เช่น 30" value={form.quantity} readOnly />
+                        </div>
+                        <div className="flext-2">
+                            <Label>หน่วยที่จ่าย</Label>
+                            <Input name="unit" placeholder="เช่น เม็ด" value={form.unit} readOnly />
+                        </div>
+
                     </div>
                     <div>
                         <Label>หมายเหตุ (ถ้ามี)</Label>

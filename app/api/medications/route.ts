@@ -8,9 +8,8 @@ export async function GET() {
         db = await dbPool.getConnection();
         
         const sql = `
-            SELECT medication_id, medicine_name 
+            SELECT medication_id, medicine_name, strength
             FROM Medication 
-            LIMIT 10
         `;
         
         const [rows] = await db.query(sql)
