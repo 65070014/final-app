@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addWeeks } from "date-fns";
 import { th } from "date-fns/locale";
 import { toast } from "sonner"
 
