@@ -126,7 +126,6 @@ export function DoctorActions({ patient }: DoctorActionsProps) {
 
   return (
     <div className="space-y-4">
-      {/* Quick Contact Actions */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">ติดต่อผู้ป่วย</CardTitle>
@@ -139,7 +138,6 @@ export function DoctorActions({ patient }: DoctorActionsProps) {
         </CardContent>
       </Card>
 
-      {/* SOAP Note */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">บันทึกการวิเคราะห์และแผนการรักษา</CardTitle>
@@ -159,7 +157,6 @@ export function DoctorActions({ patient }: DoctorActionsProps) {
         </CardContent>
       </Card>
 
-      {/* Monitoring Management */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">จัดการการติดตามผล</CardTitle>
