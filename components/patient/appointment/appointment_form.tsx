@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { Label } from "@radix-ui/react-label"
 
 interface Doctor {
   id: string;
@@ -113,84 +114,103 @@ export function AppointmentForm() {
 
 
   return (
-    <Card className="p-6 space-y-4">
-      <h2 className="text-lg font-semibold">สร้างนัดหมายใหม่</h2>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+    <div className="flex justify-center w-full">
+      <Card className="p-4 space-y-4 w-full shadow-xl rounded-xl">
+        <h2 className="text-2xl font-bold text-blue-700">สร้างนัดหมายใหม่</h2>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        {/* Date Input */}
-        <Input
-          type="date"
-          id="date"
-          placeholder="เลือกวันที่"
-          value={formData.date}
-          onChange={handleChange}
-          required
-        />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label htmlFor="date">วันที่นัดหมาย</Label>
+              <Input
+                type="date"
+                id="date"
+                placeholder="เลือกวันที่"
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <Select
-          value={formData.time}
-          onValueChange={(value) => setFormData({ ...formData, time: value })}
-          required
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="เลือกช่วงเวลา" />
-          </SelectTrigger>
-          <SelectContent className="w-full">
-            {timeSlots.map((time) => (
-              <SelectItem key={time} value={time}>
-                {time} น.
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <div className="space-y-1">
+              <Label>ช่วงเวลา</Label>
+              <Select
+                value={formData.time}
+                onValueChange={(value) => setFormData({ ...formData, time: value })}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="เลือกช่วงเวลา" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time} น.
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label>แพทย์ที่ต้องการนัดหมาย</Label>
+              <Select
+                value={formData.doctorId}
+                onValueChange={(value) => setFormData({ ...formData, doctorId: value })}
+                required
+                disabled={isDoctorsLoading || !!doctorError}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={
+                    isDoctorsLoading ? "กำลังโหลดแพทย์..." :
+                      doctorError ? "เกิดข้อผิดพลาดในการโหลด" :
+                        "เลือกแพทย์"
+                  } />
+                </SelectTrigger>
+                <SelectContent>
+                  {doctors.length === 0 && !isDoctorsLoading && (
+                    <SelectItem value="" disabled>ไม่พบรายชื่อแพทย์</SelectItem>
+                  )}
+                  {doctors.map((doctor) => (
+                    <SelectItem key={doctor.id} value={doctor.id}>
+                      {doctor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <Select
-          value={formData.doctorId}
-          onValueChange={(value) => setFormData({ ...formData, doctorId: value })}
-          required
-          disabled={isDoctorsLoading || !!doctorError}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={
-              isDoctorsLoading ? "กำลังโหลดแพทย์..." :
-                doctorError ? "เกิดข้อผิดพลาดในการโหลด" :
-                  "เลือกแพทย์"
-            } />
-          </SelectTrigger>
-          <SelectContent className="w-full">
-            {doctors.length === 0 && !isDoctorsLoading && (
-              <SelectItem value="" disabled>ไม่พบรายชื่อแพทย์</SelectItem>
-            )}
-            {doctors.map((doctor) => (
-              <SelectItem key={doctor.id} value={doctor.id}>
-                {doctor.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <div className="space-y-1">
+              <Label htmlFor="department">แผนก</Label>
+              <Input
+                type="text"
+                id="department"
+                placeholder="ระบุแผนก (เช่น อายุรกรรม)"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
 
-        <Input
-          type="text"
-          id="department"
-          placeholder="แผนก (เช่น อายุรกรรม)"
-          value={formData.department}
-          onChange={handleChange}
-        />
+          <div className="space-y-1">
+            <Label htmlFor="symptoms">อาการโดยละเอียด (จำเป็น)</Label>
+            <Textarea
+              id="symptoms"
+              placeholder="กรุณาอธิบายอาการโดยละเอียดเพื่อประกอบการวินิจฉัย"
+              rows={3}
+              value={formData.symptoms}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <Textarea
-          id="symptoms"
-          placeholder="อาการโดยละเอียด"
-          rows={3}
-          value={formData.symptoms}
-          onChange={handleChange}
-          required
-        />
-
-        <Button className="w-full" type="submit" disabled={isLoading}>
-          {isLoading ? 'กำลังบันทึก...' : 'บันทึกนัดหมาย'}
-        </Button>
-      </form>
-    </Card>
+          <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700" type="submit" disabled={isLoading}>
+            {isLoading ? 'กำลังบันทึก...' : 'บันทึกนัดหมาย'}
+          </Button>
+        </form>
+      </Card>
+    </div>
   )
 }

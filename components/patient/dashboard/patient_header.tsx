@@ -10,12 +10,12 @@ export function PatientHeader() {
     const { data: session } = useSession();
 
     return (
-        <Card className="p-6 bg-gradient-to-r from-blue-500/5 to-blue-500/10 border-blue-500/20">
+        <Card className="p-6 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16 border-2 border-blue-500/20">
+                    <Avatar className="h-16 w-16 border-2 border-blue-25">
                         <AvatarImage src="" />
-                        <AvatarFallback className="bg-blue-500/10 text-blue-500 text-lg font-semibold">ศป</AvatarFallback>
+                        <AvatarFallback className="bg-blue-50 text-blue-500 text-lg font-semibold">ศป</AvatarFallback>
                     </Avatar>
                     <div>
                         <h1 className="text-2xl font-bold text-foreground mb-1">สวัสดี{session?.user?.name || 'ผู้ใช้'}</h1>

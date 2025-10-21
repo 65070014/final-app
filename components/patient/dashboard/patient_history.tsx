@@ -56,7 +56,7 @@ export function HistorySection() {
 
   return (
     <div>
-      <Card className="lg:col-span-2 p-6">
+      <Card className="lg:col-span-2 p-6 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -86,10 +86,10 @@ export function HistorySection() {
                 history.map((visit, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                    className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer "
                   >
                     <div className="flex items-center gap-4">
-                      <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <div className="p-2 bg-blue-500/10 rounded-lg ">
                         <FileText className="h-5 w-5 text-blue-500" />
                       </div>
                       <div>

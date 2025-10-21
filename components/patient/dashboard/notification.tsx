@@ -30,7 +30,7 @@ export function NotificationAlert({ notification }: NotificationProps) {
     return (
         <>
             {config0 && IconComponent0 && (
-                <Alert className={`${config0.backgroundColor} flex items-start pl-6 mb-3`}>
+                <Alert className={`${config0.backgroundColor} flex items-start pl-6 mb-3 rounded-lg bg-gray-50 border-gray-800`}>
                     <IconComponent0 className={`h-4 w-4 ${config0.iconColor}`} />
                     <AlertDescription className={`${config0.descriptionColor} text-left`}>
                         <strong>{config0.title} :</strong> {notif0.message_text}
@@ -38,7 +38,7 @@ export function NotificationAlert({ notification }: NotificationProps) {
                 </Alert>
             )}
             {config1 && IconComponent1 && (
-                <Alert className={`${config1.backgroundColor} flex items-start pl-6`}>
+                <Alert className={`${config1.backgroundColor} flex items-start pl-6 rounded-lg bg-gray-50 border-gray-800`}>
                     <IconComponent1 className={`h-4 w-4 ${config1.iconColor}`} />
                     <AlertDescription className={`${config1.descriptionColor} text-left`}>
                         <strong>{config1.title} :</strong> {notif1.message_text}

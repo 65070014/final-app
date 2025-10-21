@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
   const router = useRouter();
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <main className="min-h-screen flex flex-col items-center justify-center">
       <div className="flex flex-col items-center gap-10 p-5">
         <div className="flex gap-10 mt-8">
           

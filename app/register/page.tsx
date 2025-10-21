@@ -81,12 +81,10 @@ export default function PatientForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 p-8 flex items-center justify-center">
+    <div className="min-h-screen text-gray-900 dark:text-gray-100 p-8 flex items-center justify-center">
 
-      {/* Main Card Container: เพิ่มความกว้างและมิติ */}
       <div className="w-full max-w-3xl bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
 
-        {/* Title Section */}
         <div className="text-center mb-12 border-b pb-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400 mb-2">
             ลงทะเบียนผู้ป่วยใหม่
