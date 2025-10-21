@@ -37,7 +37,7 @@ export function DoctorSchedule() {
   }
 
   return (
-    <div className="space-y-4 p-6 max-w-4xl mx-auto">
+    <div className="space-y-4 p-6 max-w-4xl mx-auto bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg shadow-lg ">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-white">ตารางนัดหมายแพทย์</h1>
       {appointments.map((appt) => (
         <Card key={appt.id} className="p-4 space-y-3 transition-all hover:shadow-md">

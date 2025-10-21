@@ -240,18 +240,18 @@ export default function NurseDashboard() {
   const goToNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen  p-4 sm:p-8 bg-blue-400">
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6 sm:p-8">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">ตารางนัดหมาย</h2>
 
-        <Card className="mb-8 shadow-sm">
+        <Card className="mb-8 bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarIcon className="w-5 h-5" />
               ค้นหาการนัดหมาย
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap justify-center items-end gap-4">
+          <CardContent className="flex flex-wrap justify-center items-end gap-4 ">
             <div className="flex flex-wrap items-end gap-4 text-center">
               <div className="flex flex-col">
                 <Label className="mb-2">เลือกเดือน</Label>
@@ -319,18 +319,18 @@ export default function NurseDashboard() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          {isLoading ? (<p className="text-center p-8 text-gray-500">กำลังโหลดข้อมูล...</p>)
+        <div className="space-y-4 ">
+          {isLoading ? (<p className="text-center p-8 ">กำลังโหลดข้อมูล...</p>)
             : hasSearched && appointments.length === 0 ? (<p className="text-center p-8 text-gray-500">ไม่พบการนัดหมายตามเงื่อนไขที่เลือก</p>)
               : Object.keys(groupedAppointments).length === 0 ? <p className="text-center p-8">ไม่พบการนัดหมายในสัปดาห์ที่เลือก</p>
                 : (
                   <div className="space-y-6">
                     {Object.keys(groupedAppointments).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => (
                       <div key={date}>
-                        <h3 className="font-semibold text-lg mb-2 p-2 bg-gray-200 dark:bg-gray-700 rounded-md sticky top-0">{date}</h3>
+                        <h3 className="font-semibold text-lg mb-2 p-2 rounded-md sticky top-0">{date}</h3>
                         <div className="space-y-4">
                           {groupedAppointments[date].map(appt => (
-                            <div key={appt.id} className="bg-white dark:bg-gray-800 border rounded-lg shadow-sm">
+                            <div key={appt.id} className="  border  bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg shadow-lg">
                               <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <div>
                                   <p className="font-medium text-lg p-1">{appt.patient}</p>

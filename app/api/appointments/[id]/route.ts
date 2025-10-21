@@ -40,7 +40,7 @@ export async function GET(request: Request, { params } : { params: Promise<{ id:
                 LEFT JOIN 
                     Vital_Signs v ON a.appointment_id = v.appointment_id 
                 WHERE 
-                    a.appointment_id = ?
+                    a.patient_id = ?
                 GROUP BY 
                     a.appointment_id, a.apdate, a.status, a.patient_status, 
                     p.fname, p.lname, a.department, d.position, d.gender, d.fname, d.lname

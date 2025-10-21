@@ -128,23 +128,9 @@ export default function NurseAppointments() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+    <div className="min-h-screen bg-blue-400 dark:bg-gray-900 p-8 ">
+      <div className="max-w-2xl mx-auto bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg shadow-lg dark:bg-gray-800 p-6">
         <h1 className="text-2xl font-bold mb-6">เพิ่มการนัดหมาย</h1>
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">นัดหมายที่มีอยู่</h2>
-          <div className="space-y-4">
-            {appointments.map(appt => (
-              <div key={appt.id} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
-                <p className="font-medium">{appt.date} เวลา {appt.time}</p>
-                <p className="text-sm">ผู้ป่วย: {appt.patient}</p>
-                <p className="text-sm">แพทย์: {appt.doctor} ({appt.department})</p>
-                <p className="text-sm ">อาการ: {appt.symptom}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div>
           <h2 className="text-lg font-semibold mb-4">สร้างนัดหมายใหม่</h2>
           <form onSubmit={handleSubmit} className="space-y-4">

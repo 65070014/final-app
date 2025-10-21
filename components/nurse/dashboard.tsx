@@ -37,7 +37,7 @@ export default function NurseDashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-8">
+    <div className="min-h-screen  p-8  bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg shadow-lg">
       <div className="max-w-6xl mx-auto">
 
         <div className="bg-blue-900 text-white rounded-lg p-6 mb-6 flex justify-between items-center">
