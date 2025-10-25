@@ -202,6 +202,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                 <option value="">เลือกหน่วย</option>
                                 <option value="เม็ด">เม็ด</option>
                                 <option value="แคปซูล">แคปซูล</option>
+                                <option value="แผง">แผง</option>
                                 <option value="หลอด">หลอด</option>
                             </select>
                         </div>
