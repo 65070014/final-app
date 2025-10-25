@@ -202,11 +202,7 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                                 <option value="">เลือกหน่วย</option>
                                 <option value="เม็ด">เม็ด</option>
                                 <option value="แคปซูล">แคปซูล</option>
-                                <option value="ml">มิลลิลิตร (ml)</option>
-                                <option value="ช้อนชา">ช้อนชา</option>
-                                <option value="ช้อนโต๊ะ">ช้อนโต๊ะ</option>
                                 <option value="หลอด">หลอด</option>
-                                <option value="ขวด">ขวด</option>
                             </select>
                         </div>
                     </div>
@@ -214,21 +210,6 @@ export default function DispenseModal({ open, onClose, patientId, medicalPersonn
                     <div>
                         <Label>วิธีการใช้ (Usage)</Label>
                         <Input name="usage" placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร" value={form.usage} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <Label>ระยะเวลา</Label>
-                        <Input name="duration" placeholder="เช่น 5 วัน" value={form.duration} onChange={handleChange} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="flex-1">
-                            <Label>จำนวนที่จ่าย</Label>
-                            <Input name="quantity" placeholder="เช่น 30" value={form.quantity} readOnly />
-                        </div>
-                        <div className="flext-2">
-                            <Label>หน่วยที่จ่าย</Label>
-                            <Input name="unit" placeholder="เช่น เม็ด" value={form.unit} readOnly />
-                        </div>
-
                     </div>
                     <div>
                         <Label>หมายเหตุ (ถ้ามี)</Label>
