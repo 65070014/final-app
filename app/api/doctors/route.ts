@@ -14,6 +14,7 @@ export async function GET(){
         const doctors = (rows as any[]).map(doc => ({
             id: doc.medical_personnel_id.toString(),
             name: `${doc.fname} ${doc.lname}`,
+            expertise: doc.expertise
         }));
 
         return NextResponse.json(doctors);

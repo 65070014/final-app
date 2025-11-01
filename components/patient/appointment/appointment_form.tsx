@@ -13,6 +13,7 @@ import { Label } from "@radix-ui/react-label"
 interface Doctor {
   id: string;
   name: string;
+  expertise: string;
 }
 
 export function AppointmentForm() {
@@ -54,7 +55,10 @@ export function AppointmentForm() {
     }
     fetchDoctors();
   }, []);
-
+  const departments = [
+    "อายุรกรรม", "ศัลยกรรม", "กุมารเวชกรรม", "โสต ศอ นาสิก", "ทันตกรรม", "สูติ–นรีเวชกรรม",
+    "จิตเวช", "อายุรกรรมโรคระบบทางเดินหายใจ", "หัวใจ", "ผิวหนัง", "เวชศาสตร์ฟื้นฟู", "ตรวจสุขภาพ / เวชศาสตร์ป้องกัน"
+  ]
   const timeSlots = [
     "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
     "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
@@ -184,13 +188,22 @@ export function AppointmentForm() {
 
             <div className="space-y-1">
               <Label htmlFor="department">แผนก</Label>
-              <Input
-                type="text"
-                id="department"
-                placeholder="ระบุแผนก (เช่น อายุรกรรม)"
+              <Select
                 value={formData.department}
-                onChange={handleChange}
-              />
+                onValueChange={(value) => setFormData({ ...formData, department: value })}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="เลือกแผนก" />
+                </SelectTrigger>
+                <SelectContent>
+                  {doctors.map((doctor) => (
+                    <SelectItem key={doctor.id} value={doctor.expertise}>
+                      {doctor.expertise} 
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

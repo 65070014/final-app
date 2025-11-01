@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, Calendar, HeartPulse} from "lucide-react"
+import { Clock, User, Calendar, HeartPulse } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 
@@ -44,24 +44,25 @@ export function DoctorSchedule() {
           <div className="flex justify-between items-start">
             <h2 className="font-semibold text-lg text-gray-900 dark:text-white">{appt.department}</h2>
             <div className="flex items-center gap-2">
+
+
+              {appt.status === "Complete" && (
+                <a href={`/doctor/medical_certificate/${appt.id}`} >
+                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                    <HeartPulse className="h-4" />
+                    <span className="hidden sm:inline">พิมพ์</span>
+                  </Button>
+                </a >
+              )}
               <Badge
                 variant={
-                  appt.status === "Complete" ? "default" :
-                    appt.status === "Confirmed" ? "default" : "secondary"
+                  appt.status === "Complete" ? "succcess" :
+                    appt.status === "Confirmed" ? "secondary" : "destructive"
                 }
                 className="capitalize"
               >
                 {appt.status}
               </Badge>
-
-              {appt.status === "Complete" && (
-                <a href={`/doctor/medical_certificate/${appt.id}`} >
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    <HeartPulse className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">พิมพ์ใบรับรองแพทย์</span>
-                  </Button>
-                </a >
-              )}
             </div>
           </div>
 
