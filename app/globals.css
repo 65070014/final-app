@@ -57,7 +57,137 @@
     --chart-5: 340 75% 55%;
   }
 }
+/* ======================================== */
+/* สไตล์สำหรับ Shadcn UI Calendar (react-day-picker) */
+/* ======================================== */
+.rdp {
+  --rdp-cell-size: 2.5rem/* 40px */;
+  --rdp-accent-color: hsl(var(--primary));
+  --rdp-background-color: hsl(var(--primary-foreground));
+  --rdp-accent-color-dark: hsl(var(--primary));
+  --rdp-background-color-dark: hsl(var(--primary-foreground));
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 3px solid var(--rdp-accent-color);
+  --rdp-border-radius: 0.5rem/* 8px */;
+  --rdp-caption-font-weight: 500;
+  --rdp-day-font-weight: 400;
+  --rdp-selected-color: hsl(var(--primary-foreground));
+  --rdp-selected-font-weight: 500;
 
+  margin: 1em 0;
+}
+.rdp-button:focus-visible:not([disabled]),
+.rdp-button:active:not([disabled]) {
+  border: unset;
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  outline: unset;
+  border-radius: var(--rdp-border-radius);
+}
+.rdp-button:hover:not([disabled]) {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+  border-radius: var(--rdp-border-radius);
+}
+.rdp-months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem/* 24px */;
+}
+.rdp-month {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem/* 16px */;
+}
+.rdp-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.25rem/* 4px */;
+}
+.rdp-caption_label {
+  font-size: 0.875rem/* 14px */;
+  line-height: 1.25rem/* 20px */;
+  font-weight: var(--rdp-caption-font-weight);
+}
+.rdp-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem/* 4px */;
+}
+.rdp-nav_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rdp-border-radius);
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+}
+.rdp-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.rdp-head_cell {
+  font-size: 0.875rem/* 14px */;
+  line-height: 1.25rem/* 20px */;
+  width: var(--rdp-cell-size);
+  font-weight: var(--rdp-day-font-weight);
+  color: hsl(var(--muted-foreground));
+}
+.rdp-cell {
+  width: var(--rdp-cell-size);
+  height: var(--rdp-cell-size);
+  padding: 0;
+  text-align: center;
+}
+.rdp-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rdp-border-radius);
+  font-weight: var(--rdp-day-font-weight);
+}
+.rdp-day_today {
+  font-weight: 700;
+  color: hsl(var(--accent-foreground));
+  background-color: hsl(var(--accent));
+}
+.rdp-day_selected,
+.rdp-day_range_middle {
+  font-weight: var(--rdp-selected-font-weight);
+  background-color: var(--rdp-accent-color);
+  color: var(--rdp-selected-color);
+}
+.rdp-day_selected:hover,
+.rdp-day_range_middle:hover {
+  background-color: var(--rdp-accent-color);
+  color: var(--rdp-selected-color);
+}
+.rdp-day_selected:focus-visible:not([disabled]),
+.rdp-day_range_middle:focus-visible:not([disabled]) {
+  outline: var(--rdp-outline-selected);
+  background-color: var(--rdp-accent-color);
+  color: var(--rdp-selected-color);
+}
+.rdp-day_range_start {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.rdp-day_range_end {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.rdp-day_outside {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.5;
+}
+.rdp-day_disabled {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.5;
+}
+.rdp-day_hidden {
+  visibility: hidden;
+}
 @layer base {
   * {
     @apply border-border;
