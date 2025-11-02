@@ -12,7 +12,7 @@ import { Patient, VitalRecord } from "@/lib/types"
 export default function DoctorMonitoringDashboard() {
   const [Patients, setPatients] = useState<Patient[]>([])
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(Patients[0]?.id || null)
-    const [vitalSigns, setvitalSigns] = useState<VitalRecord[]>([])
+  const [vitalSigns, setvitalSigns] = useState<VitalRecord[]>([])
 
 
   const selectedPatient = Patients.find((p) => p.id === selectedPatientId)
@@ -86,7 +86,7 @@ export default function DoctorMonitoringDashboard() {
   }, [selectedPatientId]);
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen">
       <PatientListSidebar
         patients={Patients}
         selectedPatientId={selectedPatientId}
@@ -96,20 +96,22 @@ export default function DoctorMonitoringDashboard() {
       <div className="flex-1 overflow-auto">
         {selectedPatient ? (
           <div className="container mx-auto p-6 space-y-6">
-            <div className="flex items-center gap-3 border-b border-border pb-4">
+            <div className="flex items-center gap-3 border-b border-border pb-4 bg-white rounded-lg p-6 shadow-md">
               <Activity className="h-8 w-8 text-primary" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">แดชบอร์ดติดตามผลผู้ป่วย { }</h1>
                 <p className="text-sm text-muted-foreground">ระบบ Telemedicine - Doctor&apos;s Monitoring Dashboard</p>
               </div>
             </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <PatientSummary patient={selectedPatient} />
+              <SymptomLog vitalSigns={vitalSigns} />
+            </div>
 
-            <PatientSummary patient={selectedPatient} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 {targets && <VitalSignsChart vitalSigns={vitalSigns} targets={targets} />}
-                <SymptomLog vitalSigns={vitalSigns} />
               </div>
 
               <div className="lg:col-span-1">

@@ -108,61 +108,77 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
 
   return (
     <div className="space-y-4">
-      {/* Time Range Selector */}
-      <div className="flex gap-2">
-        <Button variant={timeRange === "7d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("7d")}>
-          7 วัน
-        </Button>
-        <Button variant={timeRange === "30d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("30d")}>
-          30 วัน
-        </Button>
-        <Button variant={timeRange === "all" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("all")}>
-          ทั้งหมด
-        </Button>
-      </div>
-
       {/* Blood Pressure Chart */}
       <Card>
+        <div className="flex gap-2 p-6">
+          <Button variant={timeRange === "7d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("7d")}>
+            7 วัน
+          </Button>
+          <Button variant={timeRange === "30d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("30d")}>
+            30 วัน
+          </Button>
+          <Button variant={timeRange === "all" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("all")}>
+            ทั้งหมด
+          </Button>
+        </div>
         <CardHeader>
           <CardTitle className="text-base">ความดันโลหิต (mmHg)</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={bloodPressureData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
-              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} domain={[60, 180]} />
-              <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine
-                y={targets.systolicMax}
-                stroke="hsl(var(--destructive))"
-                strokeDasharray="3 3"
-                label={{ value: "เป้าหมาย Systolic", position: "right", fill: "hsl(var(--destructive))" }}
-              />
-              <ReferenceLine
-                y={targets.diastolicMax}
-                stroke="hsl(var(--warning))"
-                strokeDasharray="3 3"
-                label={{ value: "เป้าหมาย Diastolic", position: "right", fill: "hsl(var(--warning))" }}
-              />
-              <Line
-                type="monotone"
-                dataKey="systolic"
-                name="Systolic"
-                stroke="hsl(var(--chart-1))"
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--chart-1))", r: 3 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="diastolic"
-                name="Diastolic"
-                stroke="hsl(var(--chart-2))"
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--chart-2))", r: 3 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {bloodPressureData && bloodPressureData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={bloodPressureData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
+                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} domain={[60, 180]} />
+                <Tooltip content={<CustomTooltip />} />
+                <ReferenceLine
+                  y={targets.systolicMax}
+                  stroke="hsl(var(--destructive))"
+                  strokeDasharray="3 3"
+                  label={{ value: "เป้าหมาย Systolic", position: "right", fill: "hsl(var(--destructive))" }}
+                />
+                <ReferenceLine
+                  y={targets.diastolicMax}
+                  stroke="hsl(var(--warning))"
+                  strokeDasharray="3 3"
+                  label={{ value: "เป้าหมาย Diastolic", position: "right", fill: "hsl(var(--warning))" }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="systolic"
+                  name="Systolic"
+                  stroke="hsl(var(--chart-1))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--chart-1))", r: 3 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="diastolic"
+                  name="Diastolic"
+                  stroke="hsl(var(--chart-2))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--chart-2))", r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'hsl(var(--muted-foreground))',
+                fontSize: '1rem',
+                border: '1px dashed hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+                padding: '20px'
+              }}
+            >
+              ⚠️ ไม่มีข้อมูลความดันโลหิตในช่วงเวลานี้
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -172,70 +188,113 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
           <CardTitle className="text-base">น้ำหนัก (kg)</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={weightData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                domain={[
-                  Math.floor(Math.min(...weightData.map((d) => d.weight)) - 5),
-                  Math.ceil(Math.max(...weightData.map((d) => d.weight)) + 5),
-                ]}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <ReferenceLine
-                y={targets.weightTarget}
-                stroke="hsl(var(--success))"
-                strokeDasharray="3 3"
-                label={{ value: "เป้าหมาย", position: "right", fill: "hsl(var(--success))" }}
-              />
-              <Line
-                type="monotone"
-                dataKey="weight"
-                name="น้ำหนัก"
-                stroke="hsl(var(--chart-4))"
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--chart-4))", r: 3 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          {weightData && weightData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={weightData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  domain={[
+                    Math.floor(Math.min(...weightData.map((d) => d.weight)) - 5),
+                    Math.ceil(Math.max(...weightData.map((d) => d.weight)) + 5),
+                  ]}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <ReferenceLine
+                  y={targets.weightTarget}
+                  stroke="hsl(var(--success))"
+                  strokeDasharray="3 3"
+                  label={{ value: "เป้าหมาย", position: "right", fill: "hsl(var(--success))" }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="weight"
+                  name="น้ำหนัก"
+                  stroke="hsl(var(--chart-4))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--chart-4))", r: 3 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'hsl(var(--muted-foreground))',
+                fontSize: '1rem',
+                border: '1px dashed hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+                padding: '20px'
+              }}
+            >
+              ⚠️ ไม่มีข้อมูลน้ำหนักในช่วงเวลานี้
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {temperatureData.length > 0 && targets.tempMax && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">อุณหภูมิร่างกาย (°C)</CardTitle>
-          </CardHeader>
-          <CardContent>
+      {/* Temp Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">อุณหภูมิร่างกาย (°C)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {temperatureData && temperatureData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={temperatureData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} domain={[25, 45]} />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  domain={[
+                    Math.floor(Math.min(...temperatureData.map((d) => d.temperature)) - 5),
+                    Math.ceil(Math.max(...temperatureData.map((d) => d.temperature)) + 5),
+                  ]}
+                />
                 <Tooltip content={<CustomTooltip />} />
                 <ReferenceLine
                   y={targets.tempMax}
-                  stroke="hsl(var(--destructive))"
+                  stroke="hsl(var(--success))"
                   strokeDasharray="3 3"
-                  label={{ value: "เป้าหมาย", position: "right", fill: "hsl(var(--destructive))" }}
+                  label={{ value: "เป้าหมาย", position: "right", fill: "hsl(var(--success))" }}
                 />
                 <Line
                   type="monotone"
                   dataKey="temperature"
                   name="อุณหภูมิร่างกาย"
-                  stroke="hsl(var(--chart-5))"
+                  stroke="hsl(var(--chart-4))"
                   strokeWidth={2}
-                  dot={{ fill: "hsl(var(--chart-5))", r: 3 }}
+                  dot={{ fill: "hsl(var(--chart-4))", r: 3 }}
                 />
               </LineChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                color: 'hsl(var(--muted-foreground))',
+                fontSize: '1rem',
+                border: '1px dashed hsl(var(--border))',
+                borderRadius: 'var(--radius)',
+                padding: '20px'
+              }}
+            >
+              ⚠️ ไม่มีข้อมูลอุณหภูมิร่างกายในช่วงเวลานี้
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

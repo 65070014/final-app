@@ -21,12 +21,11 @@ export function SymptomLog({ vitalSigns }: SymptomLogProps) {
     };
   });
 
-  const twoDaysAgo = Date.now() - (48 * 60 * 60 * 1000);
-
   const filteredSymptoms = processedVitalsWithTimestamp.filter(symptom =>
-    (symptom.notes && symptom.timestamp.getTime() > twoDaysAgo)
+    symptom.notes
   );
 
+  // เรียงลำดับจากใหม่ไปเก่า (ล่าสุดขึ้นก่อน)
   const sortedSymptoms = [...filteredSymptoms].sort((a, b) =>
     b.timestamp.getTime() - a.timestamp.getTime()
   );
@@ -34,12 +33,12 @@ export function SymptomLog({ vitalSigns }: SymptomLogProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">ประวัติอาการล่าสุด (48 ชั่วโมง)</CardTitle>
+        <CardTitle className="text-base">ประวัติอาการล่าสุด</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-1">
           {sortedSymptoms.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-8">ไม่มีข้อมูลอาการที่บันทึกในช่วง 48 ชั่วโมง</p>
+            <p className="text-center text-sm text-muted-foreground py-8">ไม่มีข้อมูลอาการที่บันทึก</p>
           ) : (
             sortedSymptoms.map((symptom) => (
               <div

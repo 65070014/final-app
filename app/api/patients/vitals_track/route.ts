@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
         db = await dbPool.getConnection();
 
-        let whereClause = `a.patient_id = ? AND vs.record_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`;
+        let whereClause = `a.patient_id = ?`;
         const params: (string | null)[] = [patientId];
 
         if (appointmentId) {
@@ -47,6 +47,7 @@ export async function GET(request: Request) {
 
         const [rows] = await db.query(sql, params);
         const vitalSignsHistory = rows;
+        console.log(vitalSignsHistory);
 
         return NextResponse.json(vitalSignsHistory);
     } catch (error) {
