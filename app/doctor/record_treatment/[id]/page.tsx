@@ -12,22 +12,26 @@ import { useParams } from 'next/navigation';
 export default function MedicalRecordForm() {
   const params = useParams();
   const { id: appointmentId } = params;
-  const [diagnosisNote, setDiagnosisNote] = useState({
-    diagName: "",
-    diagCode: "",
-    treatmentNote: "",
-  })
+  const getInitialData = () => {
+    if (typeof window !== 'undefined') {
+      const diagItem = sessionStorage.getItem('initialDiagnosisNote');
+      const medsItem = sessionStorage.getItem('initialMedications');
+      
+      sessionStorage.removeItem('initialDiagnosisNote');
+      sessionStorage.removeItem('initialMedications');
 
-  const [medications, setMedications] = useState<
-    Array<{
-      id: string
-      name: string
-      dosage: string
-      usage: string
-      quantity: string
-      note: string
-    }>
-  >([])
+      return {
+        diag: diagItem ? JSON.parse(diagItem) : { diagName: "", diagCode: "", treatmentNote: "" },
+        meds: medsItem ? JSON.parse(medsItem) : [],
+      };
+    }
+    return { diag: { diagName: "", diagCode: "", treatmentNote: "" }, meds: [] };
+  };
+
+  const initialData = getInitialData();
+
+  const [diagnosisNote, setDiagnosisNote] = useState(initialData.diag);
+  const [medications, setMedications] = useState(initialData.meds);
 
   const [monitoring, setMonitoring] = useState({
     isActive: false,
@@ -76,7 +80,7 @@ export default function MedicalRecordForm() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <PatientReferencePanel />
+          <PatientReferencePanel appointmentId={appointmentId} />
         </div>
 
         <div className="lg:col-span-2 space-y-6">

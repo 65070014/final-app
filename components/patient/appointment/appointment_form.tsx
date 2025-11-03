@@ -197,9 +197,9 @@ export function AppointmentForm() {
                   <SelectValue placeholder="เลือกแผนก" />
                 </SelectTrigger>
                 <SelectContent>
-                  {doctors.map((doctor) => (
-                    <SelectItem key={doctor.id} value={doctor.expertise}>
-                      {doctor.expertise} 
+                  {departments.map((dep) => (
+                    <SelectItem key={dep} value={dep}>
+                      {dep} 
                     </SelectItem>
                   ))}
                 </SelectContent>

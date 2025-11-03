@@ -90,6 +90,7 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
+      
       return (
         <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
           <p className="text-sm text-muted-foreground">
@@ -147,7 +148,7 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
                 <Line
                   type="monotone"
                   dataKey="systolic"
-                  name="Systolic"
+                  name="systolic"
                   stroke="hsl(var(--chart-1))"
                   strokeWidth={2}
                   dot={{ fill: "hsl(var(--chart-1))", r: 3 }}

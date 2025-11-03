@@ -26,7 +26,7 @@ interface Medication {
   name: string
   dosage: string
   usage: string
-  quantity: string
+  unit: string
   note: string
 }
 
@@ -47,8 +47,8 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
     name: "",
     dosage: "",
     usage: "",
-    quantity: "",
-    note:""
+    unit: "",
+    note: ""
   })
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [selectedMedication, setSelectedMedication] = useState<Medication_item | null>(null);
@@ -74,13 +74,13 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
   }, [searchQuery]);
 
   const handleAddMedication = () => {
-    if (!newMed.name || !newMed.dosage || !newMed.usage || !newMed.quantity) {
+    if (!newMed.name || !newMed.dosage || !newMed.usage || !newMed.unit) {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน")
       return
     }
 
     setMedications([...medications, newMed])
-    setNewMed({ id: "", name: "", dosage: "", usage: "", quantity: "",note: "" })
+    setNewMed({ id: "", name: "", dosage: "", usage: "", unit: "", note: "" })
     setIsDialogOpen(false)
   }
 
@@ -124,13 +124,13 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
                         variant="outline"
                         role="combobox"
                         aria-expanded={popoverOpen}
-                        className="w-full justify-between font-normal text-left"
+                        className="w-full justify-between font-normal text-left z-50"
                       >
                         {selectedMedication ? selectedMedication.medicine_name : "เลือกยา..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[370px] p-0" >
+                    <PopoverContent className="w-[370px] p-0 z-50" >
                       <Command>
                         <CommandInput placeholder="พิมพ์เพื่อค้นหายา..." />
                         <CommandList>
@@ -160,49 +160,60 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="med-dosage">ขนาด/ความแรง</Label>
-                  <Input
-                    id="med-dosage"
-                    placeholder="เช่น 500 mg"
-                    value={newMed.dosage}
-                    onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
-                  />
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <Label htmlFor="dosage">ขนาดยา (Dosage)</Label>
+                    <Input
+                      id="dosage"
+                      type="number"
+                      name="dosage"
+                      placeholder="เช่น 1"
+                      value={newMed.dosage}
+                      onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
+                    />
+                  </div>
+                  <div className="w-32">
+                    <Label htmlFor="unit">หน่วย</Label>
+                    <select
+                      id="unit"
+                      name="unit"
+                      className="border rounded-md w-full p-2"
+                      value={newMed.unit}
+                      onChange={(e) => setNewMed({ ...newMed, unit: e.target.value })}
+                    >
+                      <option value="">เลือกหน่วย</option>
+                      <option value="เม็ด">เม็ด</option>
+                      <option value="แคปซูล">แคปซูล</option>
+                      <option value="แผง">แผง</option>
+                      <option value="หลอด">หลอด</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="med-usage">วิธีการใช้</Label>
-                  <Input
-                    id="med-usage"
-                    placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร"
-                    value={newMed.usage}
-                    onChange={(e) => setNewMed({ ...newMed, usage: e.target.value })}
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="med-usage">วิธีการใช้</Label>
+                    <Input
+                      id="med-usage"
+                      placeholder="เช่น วันละ 3 ครั้ง หลังอาหาร"
+                      value={newMed.usage}
+                      onChange={(e) => setNewMed({ ...newMed, usage: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label>หมายเหตุ (ถ้ามี)</Label>
+                    <Textarea
+                      name="note"
+                      placeholder="เช่น ทานยาติดต่อกันจนหมด, หยุดยาหากมีอาการแพ้"
+                      value={newMed.note}
+                      onChange={(e) => setNewMed({ ...newMed, note: e.target.value })}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="med-quantity">จำนวนที่จ่าย</Label>
-                  <Input
-                    id="med-quantity"
-                    placeholder="เช่น 30 เม็ด"
-                    value={newMed.quantity}
-                    onChange={(e) => setNewMed({ ...newMed, quantity: e.target.value })}
-                  />
-                </div>
-                <div>
-                        <Label>หมายเหตุ (ถ้ามี)</Label>
-                        <Textarea 
-                            name="note" 
-                            placeholder="เช่น ทานยาติดต่อกันจนหมด, หยุดยาหากมีอาการแพ้" 
-                            value={newMed.note} 
-                             onChange={(e) => setNewMed({ ...newMed, note: e.target.value })}
-                        />
-                    </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  ยกเลิก
-                </Button>
-                <Button onClick={handleAddMedication}>เพิ่มยา</Button>
-              </DialogFooter>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    ยกเลิก
+                  </Button>
+                  <Button onClick={handleAddMedication}>เพิ่มยา</Button>
+                </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
@@ -220,7 +231,6 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
               <TableHeader>
                 <TableRow>
                   <TableHead>ชื่อยา</TableHead>
-                  <TableHead>ขนาด/ความแรง</TableHead>
                   <TableHead>วิธีการใช้</TableHead>
                   <TableHead>จำนวน</TableHead>
                   <TableHead className="w-[80px]"></TableHead>
@@ -230,9 +240,8 @@ export function MedicationSection({ medications, setMedications }: MedicationSec
                 {medications.map((med) => (
                   <TableRow key={med.id}>
                     <TableCell className="font-medium">{med.name}</TableCell>
-                    <TableCell>{med.dosage}</TableCell>
                     <TableCell>{med.usage}</TableCell>
-                    <TableCell>{med.quantity}</TableCell>
+                    <TableCell>{med.dosage} {med.unit}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"

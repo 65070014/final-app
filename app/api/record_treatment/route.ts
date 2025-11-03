@@ -14,7 +14,7 @@ interface Medication {
     name: string;
     dosage: string;
     usage: string;
-    quantity: string;
+    unit: string;
     note: string
 }
 
@@ -100,20 +100,18 @@ export async function POST(request: Request) {
                     prescriptionId,
                     med.id,
                     med.usage,
-                    med.dosage,
-                    med.quantity,
+                    `${med.dosage} ${med.unit}`,
                     med.note,
                 ]).flat();
 
-                const medicationPlaceholders = medications.map(() => `(?, ?, ?, ?, ?, ?)`).join(', ');
+                const medicationPlaceholders = medications.map(() => `(?, ?, ?, ?, ?)`).join(', ');
 
                 await db.execute(
                     `INSERT INTO Prescription_Medication (
                         prescription_id, 
                         medication_id, 
-                        usage,
+                        \`usage\`,
                         dosage,
-                        quantity, 
                         note
                     ) VALUES ${medicationPlaceholders}`,
                     medicationValues

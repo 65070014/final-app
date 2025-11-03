@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@radix-ui/react-label"
 
 export default function NurseAppointments() {
   const [patients, setPatients] = useState<any[]>([])
@@ -23,6 +25,15 @@ export default function NurseAppointments() {
     status: "Confirmed",
     patient_status: "Pending"
   })
+  const departments = [
+    "อายุรกรรม", "ศัลยกรรม", "กุมารเวชกรรม", "โสต ศอ นาสิก", "ทันตกรรม", "สูติ–นรีเวชกรรม",
+    "จิตเวช", "อายุรกรรมโรคระบบทางเดินหายใจ", "หัวใจ", "ผิวหนัง", "เวชศาสตร์ฟื้นฟู", "ตรวจสุขภาพ / เวชศาสตร์ป้องกัน"
+  ]
+  const timeSlots = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
+    "16:00", "16:30",
+  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -238,8 +249,23 @@ export default function NurseAppointments() {
               </Dialog>
             </div>
             <div>
-              <label className="block text-sm mb-1">แผนก</label>
-              <input type="text" name="department" value={formData.department} onChange={handleChange} className="w-full p-2 border rounded" placeholder="เช่น อายุรกรรม" />
+              <Label className="block text-sm mb-1" htmlFor="department">แผนก</Label>
+              <Select
+                value={formData.department}
+                onValueChange={(value) => setFormData({ ...formData, department: value })}
+                required
+              >
+                <SelectTrigger className ="w-full p-2 border rounded bg-white">
+                  <SelectValue placeholder="เลือกแผนก" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((dep) => (
+                    <SelectItem key={dep} value={dep}>
+                      {dep} 
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -248,8 +274,23 @@ export default function NurseAppointments() {
             </div>
 
             <div>
-              <label className="block text-sm mb-1">เวลา</label>
-              <input type="time" name="time" value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full p-2 border rounded" />
+              <Label className="block text-sm mb-1">ช่วงเวลา</Label>
+              <Select
+                value={formData.time}
+                onValueChange={(value) => setFormData({ ...formData, time: value })}
+                required
+              >
+                <SelectTrigger className="w-full p-2 border rounded bg-white">
+                  <SelectValue placeholder="เลือกช่วงเวลา" />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeSlots.map((time) => (
+                    <SelectItem key={time} value={time}>
+                      {time} น.
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
