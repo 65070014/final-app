@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { toast } from "sonner"
 import { DateRange } from "react-day-picker"
 import { DatePickerWithRange } from "@/components/ui/date-range-picker" 
+import { th } from 'date-fns/locale';
 
 export default function NurseDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -237,14 +238,14 @@ export default function NurseDashboard() {
               <div className="space-y-6">
                  {Object.keys(groupedAppointments).sort((a, b) => new Date(a).getTime() - new Date(b).getTime()).map(date => (
                       <div key={date}>
-                        <h3 className="font-semibold text-lg mb-2 p-2 rounded-md sticky top-0">{date}</h3>
+                        <h3 className="font-semibold text-lg mb-2 p-2 rounded-md sticky top-0">{format(new Date(date), "dd MMM yyyy", { locale: th })}</h3>
                         <div className="space-y-4">
                           {groupedAppointments[date].map(appt => (
                             <div key={appt.id} className="   border   bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg shadow-lg ">
                               <div className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                 <div>
                                   <p className="font-medium text-lg p-1 text-black">{appt.patient}</p>
-                                  <p className="text-sm p-1 text-black dark:text-gray-400">{appt.date} | {appt.time} | {appt.department}</p>
+                                  <p className="text-sm p-1 text-black dark:text-gray-400">{format(new Date(appt.date), "dd MMM yyyy", { locale: th })} | {appt.time} | {appt.department}</p>
                                   <p className="font-medium p-1  text-black">แพทย์: {appt.doctorname}</p>
                                 </div>
                                 <div className="flex w-full sm:w-auto items-center justify-end flex-wrap gap-2">

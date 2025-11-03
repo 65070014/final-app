@@ -8,6 +8,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Appointment } from "@/lib/types"
 import { usePaymentModal } from '@/components/patient/paymentmodal/paymentmodalcontext';
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 interface PatientAppointmentListProps {
     activeTab: 'upcoming' | 'history';
@@ -130,7 +132,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
 
                             <div className="flex items-center gap-4 text-sm">
                                 <Clock className="h-4 w-4 text-indigo-500" />
-                                <span className="font-semibold text-base">{record.date}</span>
+                                <span className="font-semibold text-base">{format(new Date(record.date), "dd MMM yyyy", { locale: th })}</span>
                                 <span className="text-gray-600">เวลา {record.time}</span>
                             </div>
 

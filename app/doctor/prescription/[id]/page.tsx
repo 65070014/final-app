@@ -34,7 +34,7 @@ export default function PrescriptionPage() {
   if (loading) return <p className="text-center mt-10">กำลังโหลดข้อมูล...</p>
 
   return (
-    <div className="max-w-3xl mx-auto p-8  shadow-md mt-10 print:shadow-none ">
+    <div className="max-w-3xl mx-auto p-8  shadow-md mt-10 print:shadow-none bg-white">
       <div className="flex justify-between items-center mb-4 print:hidden">
         <h1 className="text-2xl font-bold">ใบจ่ายยา</h1>
         <Button onClick={handlePrint} className="flex items-center gap-2">

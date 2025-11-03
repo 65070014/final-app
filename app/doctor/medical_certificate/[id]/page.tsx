@@ -37,7 +37,7 @@ export default function MedicalCertificatePage({
   if (loading) return <p className="text-center mt-10">กำลังโหลดข้อมูล...</p>
 
   return (
-    <div className="max-w-3xl mx-auto p-8 shadow-md mt-10 print:shadow-none print:bg-white">
+    <div className="max-w-3xl mx-auto p-8 shadow-md mt-10 print:shadow-none print:bg-white bg-white">
       <div className="flex justify-between items-center mb-4 print:hidden">
         <h1 className="text-2xl font-bold">ใบรับรองแพทย์</h1>
         <Button onClick={handlePrint} className="flex items-center gap-2">

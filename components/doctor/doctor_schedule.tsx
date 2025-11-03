@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, User, Calendar, HeartPulse } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 
 export function DoctorSchedule() {
@@ -69,7 +71,7 @@ export function DoctorSchedule() {
           <div className="text-sm text-muted-foreground space-y-2">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              <span>{appt.date}</span>
+              <span>{format(new Date(appt.date), "dd MMM yyyy", { locale: th })}</span>
             </div>
 
             <div className="flex items-center gap-2">

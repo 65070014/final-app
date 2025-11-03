@@ -7,7 +7,9 @@ import { Button } from "../../ui/button"
 import { useEffect, useState } from "react";
 import { TreatmentHistorys } from "@/lib/types";
 import { useSession } from "next-auth/react";
-import Link from "next/link"
+import Link from "next/link";
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 export function TreatmentHistory() {
   const { data: session, status } = useSession();
@@ -77,7 +79,7 @@ export function TreatmentHistory() {
 
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <Clock className="h-4 w-4" />
-                  {record.date} เวลา {record.time}
+                  {format(new Date(record.date), "dd MMM yyyy", { locale: th })} เวลา {record.time}
                 </div>
 
                 <div className="flex items-center gap-2">
