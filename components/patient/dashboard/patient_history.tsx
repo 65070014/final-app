@@ -8,6 +8,8 @@ import { FileText, ChevronRight, Clock } from "lucide-react"
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { TreatmentHistorys } from "@/lib/types";
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 export function HistorySection() {
   const { data: session, status } = useSession();
@@ -104,7 +106,7 @@ export function HistorySection() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-foreground">{visit.date}</p>
+                      <p className="text-sm font-medium text-foreground">{format(new Date(visit.date), "dd MMM yyyy", { locale: th })}</p>
                       <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-1" /> 
                     </div>
                   </div>

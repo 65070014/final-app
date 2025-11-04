@@ -9,6 +9,8 @@ import { useEffect, useState, use } from "react";
 import { TreatmentDetail } from "@/lib/types";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 export default function SingletreatmentPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -105,7 +107,7 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
             <CardContent className="grid grid-cols-2 lg:grid-cols-4 gap-y-4 text-sm">
               <DetailItem label="ชื่อผู้ป่วย" value={treatment.patient} />
               <DetailItem label="แพทย์ผู้บันทึก" value={treatment.doctorname} />
-              <DetailItem label="วันที่" value={treatment.date} />
+              <DetailItem label="วันที่" value={format(new Date(treatment.date), "dd MMM yyyy", { locale: th })} />
               <DetailItem label="เวลา" value={treatment.time} />
             </CardContent>
           </Card>

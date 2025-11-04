@@ -3,11 +3,11 @@ import { getDbPool } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id: patientId } = await params;
-    const dbPool = getDbPool(); 
+    const dbPool = getDbPool();
     let db = null;
 
     try {
-        db = await dbPool.getConnection(); 
+        db = await dbPool.getConnection();
         const [rows] = await db.query(
 
             `SELECT
@@ -40,10 +40,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                     Vital_Signs v ON a.appointment_id = v.appointment_id 
                 WHERE 
                     a.patient_id = ?
-                AND
-                    a.status = 'Confirmed'
-                OR
-                    a.status = 'Pending'
+                    AND 
+                    (
+                        a.status = 'Confirmed'
+                        OR
+                        a.status = 'Pending'
+                    )
                 GROUP BY 
                     a.appointment_id, a.apdate, a.status, a.patient_status, 
                     p.fname, p.lname, a.department, d.position, d.gender, d.fname, d.lname
@@ -58,9 +60,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     } catch (error) {
         console.log(error)
         return NextResponse.json({ error: (error as Error).message }, { status: 500 })
-    }finally {
+    } finally {
         if (db) {
-            db.release(); 
+            db.release();
         }
     }
 }

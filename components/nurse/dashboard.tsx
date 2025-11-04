@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react"
 import { ClipboardList, PlusCircle } from "lucide-react"
 import Link from "next/link"
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 interface RecentAppointment {
   id: number;
@@ -71,7 +73,7 @@ export default function NurseDashboard() {
                 <div key={appt.id} className="p-4 border dark:border-gray-700 rounded-lg flex justify-between items-center">
                   <div>
                     <p className="font-medium">{appt.patient}</p>
-                    <p className="text-sm  dark:text-gray-400">{appt.date} | {appt.time} | {appt.department}</p>
+                    <p className="text-sm  dark:text-gray-400">{format(new Date(appt.date), "dd MMM yyyy", { locale: th })} | {appt.time} | {appt.department}</p>
                   </div>
                   <div className="flex items-center gap-2 text-center">
                     <div>

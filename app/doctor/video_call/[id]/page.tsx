@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
-import { Menu, X, Video, FileEdit, User, ChevronDown, ChevronUp } from 'lucide-react';
+import { Menu, X, Video, FileEdit, User } from 'lucide-react';
 import { AppointmentList, PatientVitalSummary } from "@/lib/types"
 import { DiagnosisSection } from '@/components/doctor/medical_record/diagnosis_section';
 import { MedicationSection } from '@/components/doctor/medical_record/medication_section';
@@ -20,8 +20,6 @@ export default function VideoConsultationPage() {
     const [, setError] = useState<string | null>(null);
     const selectedAppointmentId = searchParams.get('appointmentId');
     const [isDiagnosPanelOpen, setIsDiagnosPanelOpen] = useState(true);
-    const [isVideoExpanded, setIsVideoExpanded] = useState(true);
-    const videoHeightClass = isVideoExpanded ? 'h-4/5 min-h-[350px]' : 'h-2/4 min-h-[150px]';
     const [patient, setPatient] = useState<PatientVitalSummary>()
 
 
@@ -38,7 +36,7 @@ export default function VideoConsultationPage() {
             name: string
             dosage: string
             usage: string
-            quantity: string
+            unit: string
             note: string
         }>
     >([])
@@ -104,16 +102,17 @@ export default function VideoConsultationPage() {
         setIsPanelOpen(false);
     }, [router, searchParams, selectedAppointmentId]);
 
-    const handleOpenDiagnosis = useCallback(() => {
-        if (!selectedAppointmentId) return;
+    const handleOpenDiagnosis = () => {
 
-        const url = `/doctor/record_treatment/${selectedAppointmentId}`;
-        window.open(url, '_blank', 'width=1000,height=700');
-    }, [selectedAppointmentId]);
+        sessionStorage.setItem('initialDiagnosisNote', JSON.stringify(diagnosisNote));
+        sessionStorage.setItem('initialMedications', JSON.stringify(medications));
+
+        router.push(`/doctor/record_treatment/${selectedAppointmentId}`);
+    };
 
 
     return (
-        <div className="min-h-screen bg-gray-50 flex overflow-hidden">
+        <div className="min-h-screen bg-gray-300 flex overflow-hidden">
             <div className="min-h-screen bg-gray-50 flex overflow-hidden">
                 {!isPanelOpen && (
                     <button
@@ -190,21 +189,10 @@ export default function VideoConsultationPage() {
                 )}
 
                 <div
-                    className={`w-full ${videoHeightClass} bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0 transition-all duration-300`}
+                    className={`w-full h-2/3 min-h-[150px] bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0 transition-all duration-300`}
                 >
-                    <button
-                        onClick={() => setIsVideoExpanded(!isVideoExpanded)}
-                        className="absolute bottom-2 right-2 z-20 p-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors"
-                        title={isVideoExpanded ? "ย่อหน้าจอ" : "ขยายหน้าจอ"}
-                    >
-                        {isVideoExpanded ? (
-                            <ChevronUp className="w-5 h-5" />
-                        ) : (
-                            <ChevronDown className="w-5 h-5" />
-                        )}
-                    </button>
                     <span className="text-white text-2xl absolute inset-0 flex items-center justify-center">วีดีโอคอล (คนไข้)</span>
-                    <div className="absolute top-4 right-4 w-32 h-24 bg-gray-700 rounded-md border-2 border-white flex items-center justify-center z-10">
+                    <div className="absolute top-4 right-4 w-64 h-40 bg-gray-700 rounded-md border-2 border-white flex items-center justify-center z-10">
                         <User className='w-6 h-6 text-white/70' />
                     </div>
                 </div>
@@ -218,7 +206,7 @@ export default function VideoConsultationPage() {
                 </div>
             </div>
 
-            <div className="w-80 flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10">
+            <div className="w-[480px] flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10">
                 <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {patient ? patient.patient : 'ไม่ได้เลือก'}</h3>
 
                 {selectedAppointmentId && (
@@ -227,7 +215,7 @@ export default function VideoConsultationPage() {
                         className="w-full flex items-center justify-center p-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-md"
                     >
                         <FileEdit className="w-5 h-5 mr-2" />
-                        บันทึกการรักษาหลัก
+                        บันทึกการรักษา
                     </button>
                 )}
 
@@ -236,71 +224,71 @@ export default function VideoConsultationPage() {
                         กรุณาเลือกคิวในแถบด้านข้างเพื่อเริ่มการตรวจ
                     </div>
                 )}
-                <div className="text-sm space-y-3 pt-4 border-t border-gray-200">
-                    <h4 className="text-lg font-bold text-gray-800">ข้อมูลผู้ป่วย</h4>
+                <div className="text-base space-y-4 pt-4 border-t border-gray-200">
+                    <h4 className="text-xl font-bold text-gray-800">ข้อมูลผู้ป่วย</h4>
                     {isloadingpatient || !selectedAppointmentId ? (
                         <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
                     ) : (
                         <>
-                            <div className="space-y-1">
-                                <p className="text-gray-600">
-                                    <span className="font-medium text-gray-800">อายุ:</span> {patient?.age ?? 'N/A'} ปี
+                            <div className="space-y-2">
+                                <p className="text-gray-700">
+                                    <span className="font-medium text-gray-900">อายุ:</span> {patient?.age ?? 'N/A'} ปี
                                 </p>
-                                <p className="text-gray-600">
-                                    <span className="font-medium text-gray-800">รหัสผู้ป่วย:</span> {patient?.patient_id ?? 'N/A'}
+                                <p className="text-gray-700">
+                                    <span className="font-medium text-gray-900">รหัสผู้ป่วย:</span> {patient?.patient_id ?? 'N/A'}
                                 </p>
                             </div>
-                            <div className="pt-2 border-t border-gray-100">
+                            <div className="pt-3 border-t border-gray-200">
                                 <p className="font-medium text-gray-700 flex items-center gap-1">
                                     โรคประจำตัว:
-                                    <span className="font-normal text-sm text-gray-600">
+                                    <span className="font-normal text-base text-gray-600 ml-2">
                                         {patient?.underlying_diseases || 'ไม่พบ'}
                                     </span>
                                 </p>
-                                <p className="font-medium text-red-600 flex items-center gap-1 mt-1">
+                                <p className="font-medium text-red-600 flex items-center gap-1 mt-2">
                                     แพ้ยา:
-                                    <span className="font-normal text-sm text-red-700">
+                                    <span className="font-bold text-base text-red-700 ml-2">
                                         {patient?.allergies || 'ไม่พบ'}
                                     </span>
                                 </p>
                             </div>
 
-                            <div className="pt-2 border-t border-gray-100">
-                                <p className="font-medium text-gray-700 mb-1">อาการ/ข้อร้องเรียนล่าสุด:</p>
-                                <div className="p-2 bg-gray-100 rounded-md text-gray-700 text-xs italic">
+                            <div className="pt-3 border-t border-gray-200">
+                                <h4 className="font-bold text-xl text-gray-800 mb-2">อาการ</h4>
+                                <div className="p-3 bg-red-50/50 rounded-lg text-gray-800 text-sm italic">
                                     {patient?.symptoms || 'ไม่ระบุอาการหลัก'}
                                 </div>
                             </div>
-                            <div className="pt-2 border-t border-gray-100">
-                                <h4 className="font-bold text-gray-800 mb-2">สัญญาณชีพล่าสุด</h4>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                            <div className="pt-3 border-t border-gray-200">
+                                <h4 className="font-bold text-xl text-gray-800 mb-3">สัญญาณชีพ</h4>
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-base">
                                     <div className="col-span-2">
-                                        <span className="text-gray-500">ความดัน:</span>
-                                        <span className="font-semibold text-gray-800 ml-1">
+                                        <span className="text-gray-600">ความดัน:</span>
+                                        <span className="font-bold text-lg text-gray-800 ml-2">
                                             {patient?.sbp ?? 'N/A'} / {patient?.dbp ?? 'N/A'} mmHg
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">น้ำหนัก:</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-600">น้ำหนัก:</span>
+                                        <span className="font-bold text-gray-800">
                                             {patient?.weight ? `${patient.weight} kg` : 'N/A'}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">อุณหภูมิ:</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-600">อุณหภูมิ:</span>
+                                        <span className="font-bold text-gray-800">
                                             {patient?.temp ? `${patient.temp} °C` : 'N/A'}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">ชีพจร (PR):</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-600">ชีพจร (PR):</span>
+                                        <span className="font-bold text-gray-800">
                                             {patient?.pr ? `${patient.pr} bpm` : 'N/A'}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-500">หายใจ (RR):</span>
-                                        <span className="font-semibold text-gray-800">
+                                        <span className="text-gray-600">หายใจ (RR):</span>
+                                        <span className="font-bold text-gray-800">
                                             {patient?.rr ? `${patient.rr} /min` : 'N/A'}
                                         </span>
                                     </div>
@@ -309,15 +297,13 @@ export default function VideoConsultationPage() {
                             {patient && (
                                 <Link href={`/doctor/treatment_history/${patient.patient_id}`}>
                                     <button
-                                        className="w-full flex items-center justify-center p-3 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition-colors shadow-md mt-6"
-
+                                        className="w-full flex items-center justify-center p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-lg mt-6" // ➡️ เปลี่ยนเป็นสีน้ำเงินเข้มเพื่อให้เด่นขึ้น
                                     >
                                         <FileEdit className="w-5 h-5 mr-2" />
                                         ประวัติการรักษาผู้ป่วย
                                     </button>
                                 </Link>
                             )}
-
                         </>
                     )}
                 </div>

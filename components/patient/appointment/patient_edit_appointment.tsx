@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Appointment } from "@/lib/types"
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 interface Patient_Edit_AppointmentProps {
   open: boolean
@@ -117,7 +119,7 @@ export function Patient_Edit_Appointment({
             </div>
             <div className="flex items-center gap-3 text-foreground">
               <Calendar className="h-4 w-4 text-primary" />
-              <span>{appointmentData.date}</span>
+              <span>{format(new Date(appointmentData.date), "dd MMM yyyy", { locale: th })}</span>
             </div>
             <div className="flex items-center gap-3 text-foreground">
               <Clock className="h-4 w-4 text-primary" />

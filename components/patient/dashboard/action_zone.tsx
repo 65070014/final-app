@@ -9,6 +9,8 @@ import { Patient_Edit_Appointment } from '@/components/patient/appointment/patie
 import { NotificationAlert } from '@/components/patient/dashboard/notification';
 import { Appointment, Notification} from "@/lib/types";
 import { useSession } from "next-auth/react";
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 export function ActionZone() {
     const router = useRouter();
@@ -135,9 +137,9 @@ export function ActionZone() {
                                         <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <p className="font-medium text-foreground">{appointments[0].date}</p>
-                                                <p className="text-lg text-muted-foreground flex items-center gap-1">
+                                                <p className="text-sm text-muted-foreground flex items-center gap-1">
                                                     <Clock className="h-4 w-4" />
-                                                    เวลา {appointments[0].time} น. - พบ{appointments[0].doctorname}
+                                                    เวลา {appointments[0].time} - พบ {appointments[0].doctorname}
                                                 </p>
                                             </div>
                                         </div>

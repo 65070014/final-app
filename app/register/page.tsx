@@ -56,7 +56,7 @@ export default function PatientForm() {
     }
 
     try {
-      const response = await fetch('/api/register', { // 👈 URL API ที่คุณสร้าง
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export default function PatientForm() {
       if (response.ok) {
         console.log('ลงทะเบียนสำเร็จ:', result);
         alert('ลงทะเบียนผู้ป่วยสำเร็จ! ✅');
-        router.push('/patient');
+        router.push('/patient/login');
       } else {
         setErrors(result.errors || {});
         alert(`ลงทะเบียนไม่สำเร็จ: ${result.error}`);

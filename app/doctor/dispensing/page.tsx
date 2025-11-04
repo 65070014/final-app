@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Printer } from "lucide-react"
 import Link from "next/link"
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 interface Appointment {
     id: number
@@ -62,7 +64,7 @@ export default function DispensingPage() {
                             {appointments.map((a) => (
                                 <tr key={a.id} className="border-b hover:bg-muted/20">
                                     <td className="p-2">{a.patient}</td>
-                                    <td className="p-2">{a.date}</td>
+                                    <td className="p-2">{format(new Date(a.date), "dd MMM yyyy", { locale: th })}</td>
                                     <td className="p-2">{a.time}</td>
                                     <td className="p-2">{a.doctorname}</td>
                                     <td className="p-3 text-center">
