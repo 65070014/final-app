@@ -104,7 +104,7 @@ export function ActionZone() {
 
     return (
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 font-size: 20px" >
             {/* การนัดหมาย */}
             <Card className="p-6 bg-gradient-to-r from-blue-100 to-blue-50 border-blue-25 shadow-lg">
                 <div className="space-y-4">
@@ -114,7 +114,7 @@ export function ActionZone() {
                         </div>
                         <div>
                             <h3 className="text-lg font-semibold text-foreground">นัดหมายครั้งถัดไป</h3>
-                            {error && <p className="text-red-500 text-sm">{error}</p>}
+                            {error && <p className="text-red-500 text-lg">{error}</p>}
                         </div>
                     </div>
                     {isLoadingAppointments ? (
@@ -127,7 +127,7 @@ export function ActionZone() {
                                         <p className="text-lg font-semibold text-gray-700 mb-2">
                                             ไม่พบรายการนัดหมายที่กำลังจะมาถึง
                                         </p>
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-lg text-muted-foreground">
                                             กรุณาทำการจองนัดหมายใหม่
                                         </p>
                                     </div>
@@ -137,7 +137,7 @@ export function ActionZone() {
                                         <div className="flex items-center justify-between mb-3">
                                             <div>
                                                 <p className="font-medium text-foreground">{format(new Date(appointments[0].date), "dd MMM yyyy", { locale: th })}</p>
-                                                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                                <p className="text-lg text-muted-foreground flex items-center gap-1">
                                                     <Clock className="h-4 w-4" />
                                                     เวลา {appointments[0].time} - พบ {appointments[0].doctorname}
                                                 </p>
@@ -189,19 +189,19 @@ export function ActionZone() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <Button onClick={() => router.push('/patient/appointment')} variant="outline" className="h-20 flex-col bg-transparent gap-2 rounded-lg border-gray-600">
                         <FileText className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">นัดหมาย</span>
+                        <span className="text-lg">นัดหมาย</span>
                     </Button>
                     <Button onClick={() => router.push('/patient/appointments')} variant="outline" className="h-20 flex-col gap-2 bg-transparent rounded-lg border-gray-600">
                         <Calendar className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">ตารางนัดหมายของฉัน</span>
+                        <span className="text-lg">ตารางนัดหมายของฉัน</span>
                     </Button>
                     <Button onClick={() => router.push('/patient/medication')} variant="outline" className="h-20 flex-col gap-2 bg-transparent rounded-lg border-gray-600">
                         <Pill className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">รายการยา</span>
+                        <span className="text-lg">รายการยา</span>
                     </Button>
                     <Button onClick={() => router.push('/patient/treatment_record')} variant="outline" className="h-20 flex-col bg-transparent gap-2 rounded-lg border-gray-600">
                         <Clock className="h-6 w-6 text-blue-500" />
-                        <span className="text-sm">ประวัติการรักษา</span>
+                        <span className="text-lg">ประวัติการรักษา</span>
                     </Button>
                 </div>
             </Card>
