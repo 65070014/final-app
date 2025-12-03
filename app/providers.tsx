@@ -5,7 +5,7 @@ import { PaymentModalProvider } from "@/components/patient/paymentmodal/paymentm
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchOnWindowFocus={false}>
       <PaymentModalProvider>
         {children}
       </PaymentModalProvider>

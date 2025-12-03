@@ -46,6 +46,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                         OR
                         a.status = 'Pending'
                     )
+                    AND a.apdate > NOW()
                 GROUP BY 
                     a.appointment_id, a.apdate, a.status, a.patient_status, 
                     p.fname, p.lname, a.department, d.position, d.gender, d.fname, d.lname

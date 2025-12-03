@@ -71,7 +71,7 @@ export function TreatmentHistory() {
             </div>
           ) : (
             history.map((record, index) => (
-              <Card key={index} className="p-4 space-y-2">
+              <Card key={index} className="p-4 space-y-2 shadow-md border border-slate-400 rounded-lg">
                 <div className="flex justify-between items-center">
                   <h2 className="font-semibold text-lg">{record.department}</h2>
                   <Badge>{record.status}</Badge>

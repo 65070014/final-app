@@ -4,7 +4,8 @@ import { Clock, Loader, AlertCircle } from 'lucide-react';
 import { DispensingRecordCard } from '@/components/patient/dispensingRecord/dispensing_record_card';
 import { DispensingRecord } from '@/lib/types';
 import { useSession } from 'next-auth/react';
-
+import { PatientNav } from "@/components/patient/patient_nav"
+import { Card } from "@/components/ui/card"
 
 
 export default function DispensingHistoryPage() {
@@ -51,39 +52,42 @@ export default function DispensingHistoryPage() {
     }, [session, status]);
 
     return (
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
-            <header className="mb-8 border-b pb-4">
-                <h1 className="text-3xl font-extrabold text-gray-900 flex items-center">
-                    <Clock className="h-7 w-7 mr-3 text-blue-600" />
-                    ประวัติการรับยา
-                </h1>
-                <p className="text-gray-500 mt-1">รายการใบสั่งยาและการจ่ายยาที่ท่านได้รับทั้งหมด</p>
-            </header>
+        <div className="flex h-screen bg-slate-200 font-sans">
+            <PatientNav />
+            <main className="flex-1 overflow-y-auto p-8">
+                <header className="mb-8 border-b pb-4">
+                    <h1 className="text-3xl font-extrabold text-gray-900 flex items-center">
+                        <Clock className="h-7 w-7 mr-3 text-blue-600" />
+                        ประวัติการรับยา
+                    </h1>
+                    <p className="text-gray-500 mt-1">รายการใบสั่งยาและการจ่ายยาที่ท่านได้รับทั้งหมด</p>
+                </header>
+                {isLoading && (
+                    <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
+                        <Loader className="h-8 w-8 animate-spin text-blue-500" />
+                        <p className="mt-4 text-lg text-gray-600">กำลังโหลดประวัติ...</p>
+                    </div>
+                )}
 
-            {isLoading && (
-                <div className="flex flex-col items-center justify-center min-h-[50vh] p-8">
-                    <Loader className="h-8 w-8 animate-spin text-blue-500" />
-                    <p className="mt-4 text-lg text-gray-600">กำลังโหลดประวัติ...</p>
-                </div>
-            )}
-
-            {!isLoading && !error && (
-                <>
-                    {history && history.length > 0 ? (
-                        <div className="space-y-6">
-                            {history.map(record => (
-                                <DispensingRecordCard key={record.prescription_id} record={record} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="p-10 text-center bg-yellow-50 border border-yellow-300 rounded-lg mx-auto mt-10">
-                            <AlertCircle className="h-10 w-10 mx-auto text-yellow-600 mb-4" />
-                            <h2 className="text-xl font-bold text-yellow-800">ไม่พบประวัติการรับยา</h2>
-                            <p className="text-yellow-700 mt-2">ท่านยังไม่เคยมีการรับยาจากสถานพยาบาลนี้</p>
-                        </div>
-                    )}
-                </>
-            )} 
+                {!isLoading && !error && (
+                    <>
+                        {history && history.length > 0 ? (
+                            <div className="space-y-6">
+                                {history.map(record => (
+                                    <DispensingRecordCard key={record.prescription_id} record={record} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-10 text-center bg-yellow-50 border border-yellow-300 rounded-lg mx-auto mt-10">
+                                <AlertCircle className="h-10 w-10 mx-auto text-yellow-600 mb-4" />
+                                <h2 className="text-xl font-bold text-yellow-800">ไม่พบประวัติการรับยา</h2>
+                                <p className="text-yellow-700 mt-2">ท่านยังไม่เคยมีการรับยาจากสถานพยาบาลนี้</p>
+                            </div>
+                        )}
+                    </>
+                )}
+            </main>
         </div>
+
     );
 }

@@ -19,40 +19,50 @@ export function HistorySection() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchHistory() {
-      if (status !== 'authenticated' || !session?.user?.id) {
-        if (status !== 'loading') {
-          setIsLoading(false);
-        }
-        return;
-      }
+    if (status === 'loading') return;
 
-      setIsLoading(true);
-      setError(null);
+    if (status !== 'authenticated' || !session?.user?.id) {
+      setIsLoadingAppointments(false);
+      setIsLoading(false);
+      return;
+    }
+
+    const patientId = session.user.id;
+
+    const fetchAppointments = async () => {
+      setIsLoadingAppointments(true);
 
       try {
-        const patientId = session.user.id;
+        const response = await fetch(`/api/appointments/patient/next/${patientId}`);
+        if (!response.ok) throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+        setError(error.message);
+      } finally {
+        setIsLoadingAppointments(false);
+      }
+    };
+
+    const fetchHistory = async () => {
+      setIsLoading(true);
+
+      try {
         const response = await fetch(`/api/patients/treatment_history/${patientId}`);
-
-        if (!response.ok) {
-          throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
-        }
-
+        if (!response.ok) throw new Error('ไม่สามารถดึงประวัติการรักษาได้');
         const data = await response.json();
         setHistory(data);
-        console.log(data)
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        console.error("Error fetching appointments:", error);
+      } catch (error) {
+        console.error("Error fetching history:", error);
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
-    }
-    if (status === 'authenticated') {
-      fetchHistory();
-    }
+    };
+
+    fetchAppointments();
+    fetchHistory();
 
   }, [session, status]);
 
@@ -107,7 +117,7 @@ export function HistorySection() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-foreground">{format(new Date(visit.date), "dd MMM yyyy", { locale: th })}</p>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-1" /> 
+                      <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto mt-1" />
                     </div>
                   </div>
                 ))
