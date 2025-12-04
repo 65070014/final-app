@@ -5,12 +5,11 @@ import {
   Home,
   Calendar,
   FileText,
-  MessageSquare,
-  Settings,
   Activity,
   LogOut
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import {NotificationPopup} from '@/components/patient/history/notify_history'
 
 export function PatientNav() {
     return (
@@ -25,11 +24,10 @@ export function PatientNav() {
                 <NavItem href="/patient/appointment" icon={<Calendar size={20} />} text="นัดหมายแพทย์" />
                 <NavItem href="/patient/treatment_record" icon={<FileText size={20} />} text="ประวัติการรักษา" />
                 <NavItem href="/patient/medication" icon={<Activity size={20} />} text="ใบสั่งยา" />
-                <NavItem href="/patient/notification" icon={<MessageSquare size={20} />} text="การแจ้งเตือน" />
             </nav>
 
             <div className="p-4 border-t border-gray-200">
-                <NavItem icon={<Settings size={20} />} text="ตั้งค่าบัญชี" />
+                <NotificationPopup/>
                 <NavItem icon={<LogOut size={20} />} text="ออกจากระบบ" color="text-red-500 hover:bg-red-50" />
             </div>
         </aside>

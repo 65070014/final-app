@@ -91,6 +91,7 @@ export interface AppointmentList {
 }
 
 export interface Notification{
+    notification_id: string;
     notification_type: string; 
     message_text: string;
     linkUrl?: string;

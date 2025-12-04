@@ -1,9 +1,7 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, User, Stethoscope } from "lucide-react"
-import { Button } from "../../ui/button"
+import { Clock, User, Stethoscope, ChevronRight, FileText, Activity } from "lucide-react"
 import { useEffect, useState } from "react";
 import { TreatmentHistorys } from "@/lib/types";
 import { useSession } from "next-auth/react";
@@ -71,32 +69,66 @@ export function TreatmentHistory() {
             </div>
           ) : (
             history.map((record, index) => (
-              <Card key={index} className="p-4 space-y-2 shadow-md border border-slate-400 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <h2 className="font-semibold text-lg">{record.department}</h2>
-                  <Badge>{record.status}</Badge>
+              <div key={index} className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+
+                <div className="p-4 bg-blue-50 border-b border-blue-200">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-blue-100 rounded-lg text-blue-600">
+                        <Activity className="h-4 w-4" />
+                      </div>
+                      <span className="font-bold text-lg text-blue-800">
+                        {record.department}
+                      </span>
+                    </div>
+                    <Badge className={`${record.status === 'Completed' ? 'bg-green-500' : 'bg-gray-500'}`}>
+                      {record.status}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center text-sm text-gray-600 bg-white/50 p-2 rounded-md border border-blue-100">
+                    <Clock className="h-4 w-4 mr-2 text-blue-500 shrink-0" />
+                    <span className="mr-1">วันที่เข้ารับการรักษา:</span>
+                    <span className="font-semibold text-gray-800">
+                      {format(new Date(record.date), "dd MMM yyyy", { locale: th })}
+                    </span>
+                    <span className="mx-2 text-gray-300">|</span>
+                    <span className="font-semibold text-gray-800">
+                      เวลา {record.time} น.
+                    </span>
+                  </div>
                 </div>
 
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  {format(new Date(record.date), "dd MMM yyyy", { locale: th })} เวลา {record.time}
-                </div>
+                <div className="p-4 space-y-4">
 
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-blue-500" />
-                  <p className="text-sm">แพทย์ผู้รักษา: {record.doctorname}</p>
-                </div>
+                  <div className="flex items-center text-sm text-gray-700">
+                    <User className="h-4 w-4 mr-2 text-gray-500 shrink-0" />
+                    <span className="text-gray-500 mr-1">แพทย์ผู้รักษา:</span>
+                    <span className="font-semibold text-gray-900">{record.doctorname}</span>
+                  </div>
 
-                <div className="flex items-start gap-2">
-                  <Stethoscope className="h-4 w-4 text-green-500 mt-1" />
-                  <p className="text-sm">การวินิจฉัย: {record.diag_name}</p>
+                  <div className="border border-gray-100 bg-gray-50 rounded-lg p-3">
+                    <h5 className="text-sm font-semibold text-gray-700 flex items-center mb-1">
+                      <Stethoscope className="h-4 w-4 mr-2 text-green-600 shrink-0" />
+                      การวินิจฉัยโรค
+                    </h5>
+                    <p className="text-sm text-gray-600 ml-6 leading-relaxed">
+                      {record.diag_name}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-100">
+                    <Link href={`treatment_record/${record.appointment_id}`} className="block">
+                      <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-lg text-sm font-medium transition-colors group">
+                        <FileText className="h-4 w-4" />
+                        ดูรายละเอียดการรักษาและใบรับรองแพทย์
+                        <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </button>
+                    </Link>
+                  </div>
+
                 </div>
-                <Link href={`treatment_record/${record.appointment_id}`}>
-                  <Button variant="outline" size="sm" className="mt-2">
-                    ดูรายละเอียดการรักษา
-                  </Button>
-                </Link>
-              </Card>
+              </div>
             ))
           )}
         </>

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         db = await dbPool.getConnection(); 
         const [rows] = await db.query(
 
-            `SELECT notification_type,message_text,is_read,link_url,create_at FROM Notification
+            `SELECT notification_id,notification_type,message_text,is_read,link_url,create_at FROM Notification
             WHERE recipient_id = ?
             AND recipient_type = ?
             ORDER BY create_at DESC`,

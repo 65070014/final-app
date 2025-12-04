@@ -1,20 +1,14 @@
 "use client"
-
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Label } from "@radix-ui/react-label"
-
-interface Doctor {
-  id: string;
-  name: string;
-  expertise: string;
-}
+import { Plus } from "lucide-react";
 
 export function AppointmentForm() {
   const { data: session, status } = useSession()
@@ -30,9 +24,10 @@ export function AppointmentForm() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctors, setDoctors] = useState([]);
   const [isDoctorsLoading, setIsDoctorsLoading] = useState(true);
-  const [doctorError, setDoctorError] = useState<string | null>(null);
+  const [doctorError, setDoctorError] = useState(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function fetchDoctors() {
@@ -45,8 +40,7 @@ export function AppointmentForm() {
 
         const data = await response.json();
         setDoctors(data);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
+      } catch (error) {
         setDoctorError(error.message);
         console.error("Error fetching doctors:", error);
       } finally {
@@ -65,13 +59,13 @@ export function AppointmentForm() {
     "16:00", "16:30",
   ]
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
     })
   }
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
 
@@ -107,8 +101,7 @@ export function AppointmentForm() {
       alert("บันทึกนัดหมายสำเร็จ!");
       router.push("/patient");
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err) {
       console.error("Appointment submission failed:", err);
       setError(err.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ");
     } finally {
@@ -118,19 +111,28 @@ export function AppointmentForm() {
 
 
   return (
-    <div className="flex justify-center w-full">
-      <Card className="p-4 space-y-4 w-full shadow-xl rounded-xl">
-        <h2 className="text-2xl font-bold text-blue-700">สร้างนัดหมายใหม่</h2>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 h-11 px-8 text-base">
+          <Plus size={20} />
+          สร้างนัดหมายใหม่
+        </Button>
+      </DialogTrigger>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-blue-700">สร้างนัดหมายใหม่</DialogTitle>
+        </DialogHeader>
+
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label htmlFor="date">วันที่นัดหมาย</Label>
               <Input
                 type="date"
                 id="date"
-                placeholder="เลือกวันที่"
                 value={formData.date}
                 onChange={handleChange}
                 required
@@ -149,14 +151,13 @@ export function AppointmentForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time} น.
-                    </SelectItem>
+                    <SelectItem key={time} value={time}>{time} น.</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label>แพทย์ที่ต้องการนัดหมาย</Label>
@@ -167,20 +168,11 @@ export function AppointmentForm() {
                 disabled={isDoctorsLoading || !!doctorError}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={
-                    isDoctorsLoading ? "กำลังโหลดแพทย์..." :
-                      doctorError ? "เกิดข้อผิดพลาดในการโหลด" :
-                        "เลือกแพทย์"
-                  } />
+                  <SelectValue placeholder={isDoctorsLoading ? "กำลังโหลด..." : "เลือกแพทย์"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {doctors.length === 0 && !isDoctorsLoading && (
-                    <SelectItem value="" disabled>ไม่พบรายชื่อแพทย์</SelectItem>
-                  )}
                   {doctors.map((doctor) => (
-                    <SelectItem key={doctor.id} value={doctor.id}>
-                      {doctor.name}
-                    </SelectItem>
+                    <SelectItem key={doctor.id} value={doctor.id}>{doctor.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -198,9 +190,7 @@ export function AppointmentForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {departments.map((dep) => (
-                    <SelectItem key={dep} value={dep}>
-                      {dep} 
-                    </SelectItem>
+                    <SelectItem key={dep} value={dep}>{dep}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -211,7 +201,7 @@ export function AppointmentForm() {
             <Label htmlFor="symptoms">อาการโดยละเอียด (จำเป็น)</Label>
             <Textarea
               id="symptoms"
-              placeholder="กรุณาอธิบายอาการโดยละเอียดเพื่อประกอบการวินิจฉัย"
+              placeholder="กรุณาอธิบายอาการ..."
               rows={3}
               value={formData.symptoms}
               onChange={handleChange}
@@ -219,11 +209,20 @@ export function AppointmentForm() {
             />
           </div>
 
-          <Button className="w-full mt-4 bg-blue-600 hover:bg-blue-700" type="submit" disabled={isLoading}>
-            {isLoading ? 'กำลังบันทึก...' : 'บันทึกนัดหมาย'}
-          </Button>
+          <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
+            {/* ปุ่มยกเลิก (กดแล้วปิด Modal) */}
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              ยกเลิก
+            </Button>
+
+            {/* ปุ่มบันทึก */}
+            <Button className="bg-blue-600 hover:bg-blue-700" type="submit" disabled={isLoading}>
+              {isLoading ? 'กำลังบันทึก...' : 'บันทึกนัดหมาย'}
+            </Button>
+          </div>
+
         </form>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
