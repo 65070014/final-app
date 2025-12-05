@@ -20,7 +20,7 @@ export function PatientNav() {
             </div>
 
             <nav className="flex-1 px-4 py-4 space-y-1">
-                <NavItem href="/testDB" icon={<Home size={20} />} text="หน้าหลัก"/>
+                <NavItem href="/patient" icon={<Home size={20} />} text="หน้าหลัก"/>
                 <NavItem href="/patient/appointment" icon={<Calendar size={20} />} text="นัดหมายแพทย์" />
                 <NavItem href="/patient/treatment_record" icon={<FileText size={20} />} text="ประวัติการรักษา" />
                 <NavItem href="/patient/medication" icon={<Activity size={20} />} text="ใบสั่งยา" />

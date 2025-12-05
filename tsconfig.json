@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/testDB/page.jsx", "components/patient/appointment/appointment_form.jsx", "app/patient/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/testDB/page.jsx", "components/patient/appointment/appointment_form.jsx", "app/patient/page.jsx", "components/calendar.jsx"],
   "exclude": ["node_modules"]
 }

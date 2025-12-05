@@ -7,6 +7,7 @@ export async function GET(request: Request) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const doctorId = searchParams.get('doctorId');
+    const patientId = searchParams.get('patientId');
 
     const dbPool = getDbPool();
     let db = null;
@@ -52,6 +53,11 @@ export async function GET(request: Request) {
         if (doctorId) {
             whereClauses.push("a.medical_personnel_id = ?");
             queryParams.push(doctorId);
+        }
+
+        if (patientId) {
+            whereClauses.push("a.patient_id = ?");
+            queryParams.push(patientId);
         }
 
         // ถ้่ามีเงื่อนไขอย่างน้อย 1 ข้อ ให้เพิ่ม WHERE เข้าไปใน SQL

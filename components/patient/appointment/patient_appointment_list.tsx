@@ -10,6 +10,7 @@ import { Appointment } from "@/lib/types"
 import { usePaymentModal } from '@/components/patient/paymentmodal/paymentmodalcontext';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { VitalsSignsModal } from '@/components/patient/vitalsSignsModal';
 
 interface PatientAppointmentListProps {
     activeTab: 'upcoming' | 'history';
@@ -22,7 +23,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { openPaymentModal } = usePaymentModal();
-    
+
     useEffect(() => {
         async function fetchAppointments() {
             if (status !== 'authenticated' || !session?.user?.id) {
@@ -92,7 +93,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
         switch (status) {
             case 'UPCOMING':
             case 'Confirmed':
-                return <Badge variant="default" className="bg-green-500 hover:bg-green-600">ยืนยันแล้ว</Badge>;
+                return <Badge className="bg-green-500 hover:bg-green-600">ยืนยันแล้ว</Badge>;
             case 'Complete':
                 return <Badge variant="secondary">เสร็จสิ้น</Badge>;
             case 'Cancelled':
@@ -160,16 +161,13 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                                                 {'กรอกข้อมูลแล้ว'}
                                             </Button>
                                         ) : (
+                                            <VitalsSignsModal
+                                                appointmentId={String(record.id)}
+                                                onSuccess={() => {
+                                                    console.log("Recorded!");
+                                                }}
+                                            />
 
-                                            <Link href={`/patient/vitals_signs/${record.id}`}>
-                                                <Button
-                                                    variant="default"
-                                                    size="sm"
-                                                >
-                                                    <Stethoscope className="h-4 w-4 mr-2" />
-                                                    {'กรอกสัญญาณชีพ'}
-                                                </Button>
-                                            </Link>
                                         )}
 
                                         <Button
@@ -189,21 +187,21 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
 
                                 {record.status === 'Complete' && (
                                     <>
-                                    <Link href={`/patient/treatment_record/${record.id}`} passHref>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
+                                        <Link href={`/patient/treatment_record/${record.id}`} passHref>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                            >
+                                                ดูรายละเอียดการรักษา
+                                            </Button>
+                                        </Link>
+                                        <button
+                                            onClick={() => openPaymentModal(record)}
+                                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                         >
-                                            ดูรายละเอียดการรักษา
-                                        </Button>
-                                    </Link>
-                                    <button
-                                        onClick={() => openPaymentModal(record)}
-                                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                    >
-                                        <DollarSign className="w-5 h-5 mr-2" />
-                                        จ่ายเงิน
-                                    </button>
+                                            <DollarSign className="w-5 h-5 mr-2" />
+                                            จ่ายเงิน
+                                        </button>
                                     </>
                                 )}
 
