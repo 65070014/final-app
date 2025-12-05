@@ -1,32 +1,175 @@
-'use client';
-import { useEffect, useState } from 'react';
-
+'use client' 
+import { useEffect, useRef, useState } from 'react';
+import { io, Socket } from 'socket.io-client'; 
 export default function VideoCallDoctorPage() {
-    const [stream, setStream] = useState<MediaStream | null>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const [isCallButtonDisabled, setIsCallButtonDisabled] = useState(true);
+  const [isHangupButtonDisabled, setIsHangupButtonDisabled] = useState(true);
+  const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
+  const socketRef = useRef<Socket | null>(null);
+  const ROOM_ID = "room-123"; 
+  const peerConnectionConfig = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' }
+    ]
+  };
 
-    useEffect(() => {
-    const enableCamera = async () => {
-      try {
-        if (!navigator.mediaDevices?.getUserMedia) {
-          console.error("MediaDevices API not found. Are you on HTTPS/localhost?");
-          return;
-        }
-        const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        setStream(mediaStream);
-      } catch (err) {
-        console.error("Error accessing camera:", err);
+  useEffect(() => {
+    socketRef.current = io("http://localhost:3001");
+    socketRef.current.emit("join_room", ROOM_ID);
+    socketRef.current.on("answer", async (answer) => {
+      console.log("Received Answer via Socket");
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(answer));
+      }
+    });
+    socketRef.current.on("candidate", async (candidate) => {
+      if (peerConnectionRef.current) {
+        await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+      }
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, []);
+  const handleStart = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localStreamRef.current = stream;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      setIsCallButtonDisabled(false);
+    } catch (error) {
+      console.error('Error opening camera:', error);
+    }
+  };
+
+  //โทร
+  const handleCall = async () => {
+    setIsCallButtonDisabled(true);
+    setIsHangupButtonDisabled(false);
+
+    console.log('Starting call...');
+
+    //สร้าง Peer
+    peerConnectionRef.current = new RTCPeerConnection(peerConnectionConfig);
+
+    //เอาจอคนไข้มาใส่ไว้
+    peerConnectionRef.current.ontrack = (event) => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0];
       }
     };
-    enableCamera();
-    return () => {
-      stream?.getTracks().forEach(track => track.stop());
+
+    //ICE เจอ ip ฝั่งนี้แล้วก็ส่ง candidate ไปหาอีกฝั่งผ่าน socket
+    peerConnectionRef.current.onicecandidate = (event) => {
+      if (event.candidate) {
+        socketRef.current?.emit("candidate", { candidate: event.candidate, roomId: ROOM_ID });
+        console.log('New ICE candidate:', event.candidate);
+      }
     };
-  }, []); 
-  
-    return (
-        <div>
-      <h1>Camera Test</h1>
-      {stream ? <video autoPlay ref={video => { if (video) video.srcObject = stream }} /> : <p>Loading camera...</p>}
+
+    //เอากล้องเราใส่เข้าไปตอนโทร
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        peerConnectionRef.current?.addTrack(track, localStreamRef.current as MediaStream);
+      });
+    }
+
+    //สร้าง Offer จำไว้แล้วก็ส่งผ่าน socket     
+    try {
+      const offer = await peerConnectionRef.current.createOffer();
+      await peerConnectionRef.current.setLocalDescription(offer);
+      socketRef.current?.emit("offer", { offer, roomId: ROOM_ID });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ปุ่ม Hang Up: วางสาย
+  const handleHangup = () => {
+    // ปิด Connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+
+    // Reset ปุ่ม
+    setIsCallButtonDisabled(false);
+    setIsHangupButtonDisabled(true);
+    console.log('Call ended.');
+  };
+
+  // Cleanup: ปิดกล้องเมื่อปิดหน้าเว็บ
+  useEffect(() => {
+    return () => {
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
+    };
+  }, []);
+
+  return (
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Realtime communication with WebRTC</h1>
+
+      <div className="flex gap-4 mb-4">
+        {/* เปิดกล้องตัวเอง */}
+        <div className="border border-gray-300 rounded overflow-hidden">
+          <p className="bg-gray-100 p-2 text-center">Local Video</p>
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted 
+            className="w-[300px] h-[225px] bg-black"
+          />
+        </div>
+
+        {/* กล้องคนอีกฝั่ง */}
+        <div className="border border-gray-300 rounded overflow-hidden">
+          <p className="bg-gray-100 p-2 text-center">Remote Video</p>
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="w-[300px] h-[225px] bg-black"
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        <button
+          onClick={handleStart}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
+        >
+          Start
+        </button>
+
+        <button
+          onClick={handleCall}
+          disabled={isCallButtonDisabled}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+        >
+          Call
+        </button>
+
+        <button
+          onClick={handleHangup}
+          disabled={isHangupButtonDisabled}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-gray-300"
+        >
+          Hang Up
+        </button>
+      </div>
     </div>
-    );
+  );
 }

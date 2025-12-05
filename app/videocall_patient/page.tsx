@@ -1,0 +1,191 @@
+'use client' // จำเป็นมาก เพราะ WebRTC ใช้ window/navigator
+
+import { useEffect, useRef, useState } from 'react';
+import { io, Socket } from 'socket.io-client'; // import เพิ่ม
+
+export default function VideoCallPatientPage() {
+    const localVideoRef = useRef<HTMLVideoElement>(null);
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+    const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+    const localStreamRef = useRef<MediaStream | null>(null);
+    const [isCallButtonDisabled, setIsCallButtonDisabled] = useState(true);
+    const [isHangupButtonDisabled, setIsHangupButtonDisabled] = useState(true);
+    const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
+    const socketRef = useRef<Socket | null>(null);
+    const ROOM_ID = "room-123"; //อันนี้เป็นเลขห้อง (fix ไว้ก่อนเพื่อ test)
+    const peerConnectionConfig = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' } //ใช้ stun เพื่อแปลง localhost เป็น ip
+        ]
+    };
+
+    useEffect(() => {
+        //ต้องต่อพอร์ต Server Port 3001
+        socketRef.current = io("http://localhost:3001");
+
+        //จอยห้องตอนเปิดเว็ป
+        socketRef.current.emit("join_room", ROOM_ID);
+
+        //ถ้าหมอโทรมาจะได้ offer มา
+        socketRef.current.on("offer", (offer) => {
+            console.log("Received Offer via Socket");
+            setIncomingOffer(offer);
+        });
+        //รับ ICE มา เอาไว้หาเส้นทางเชื่อมต่อ
+        socketRef.current.on("candidate", async (candidate) => {
+            if (peerConnectionRef.current) {
+                await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+        });
+
+        return () => {
+            socketRef.current?.disconnect();
+        };
+    }, []);
+    //เปิดกล้องตัวเอง
+    const handleStart = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localStreamRef.current = stream;
+            if (localVideoRef.current) {
+                localVideoRef.current.srcObject = stream;
+            }
+            setIsCallButtonDisabled(false);
+        } catch (error) {
+            console.error('Error opening camera:', error);
+        }
+    };
+
+
+    // วางสาย
+    const handleHangup = () => {
+        if (peerConnectionRef.current) {
+            peerConnectionRef.current.close();
+            peerConnectionRef.current = null;
+        }
+        setIsCallButtonDisabled(false);
+        setIsHangupButtonDisabled(true);
+        console.log('Call ended.');
+    };
+
+    // รับสาย
+    const handleAnswer = async () => {
+        if (!incomingOffer) return;
+        console.log('Answering call...');
+        peerConnectionRef.current = new RTCPeerConnection(peerConnectionConfig);
+        peerConnectionRef.current.ontrack = (event) => {
+            if (remoteVideoRef.current) {
+                remoteVideoRef.current.srcObject = event.streams[0];
+            }
+        };
+
+        peerConnectionRef.current.onicecandidate = (event) => {
+            if (event.candidate) {
+                socketRef.current?.emit("candidate", { candidate: event.candidate, roomId: ROOM_ID });
+            }
+        };
+
+        if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach((track) => {
+                peerConnectionRef.current?.addTrack(track, localStreamRef.current as MediaStream);
+            });
+        }
+
+        try {
+
+            //ไม่แน่ใจแต่เหมือนว่าจะเป็นการจำ offer ของหมอ
+            await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(incomingOffer));
+
+            //สร้าง Answer ของฝั่งคนไข้
+            const answer = await peerConnectionRef.current.createAnswer();
+
+            //เซ็ต Answer เป็น Local Description
+            await peerConnectionRef.current.setLocalDescription(answer);
+
+            //ส่ง Answer กลับไปหาหมอ
+            socketRef.current?.emit("answer", { answer, roomId: ROOM_ID });
+            console.log("Sending Answer back:", answer);
+
+            setIncomingOffer(null);
+            setIsHangupButtonDisabled(false);
+
+        } catch (err) {
+            console.error("Error answering call:", err);
+        }
+    };
+
+    //ปิดกล้องตอนปิดหน้าเว็บ
+    useEffect(() => {
+        return () => {
+            if (localStreamRef.current) {
+                localStreamRef.current.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnectionRef.current) {
+                peerConnectionRef.current.close();
+            }
+        };
+    }, []);
+
+    return (
+        <div className="p-5">
+            <h1 className="text-2xl font-bold mb-4">Realtime communication with WebRTC</h1>
+
+            <div className="flex gap-4 mb-4">
+                {/*หน้าจอเรา*/}
+                <div className="border border-gray-300 rounded overflow-hidden">
+                    <p className="bg-gray-100 p-2 text-center">Local Video</p>
+                    <video
+                        ref={localVideoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-[300px] h-[225px] bg-black"
+                    />
+                </div>
+
+                {/*หน้าจออีกฝั่ง*/}
+                <div className="border border-gray-300 rounded overflow-hidden">
+                    <p className="bg-gray-100 p-2 text-center">Remote Video</p>
+                    <video
+                        ref={remoteVideoRef}
+                        autoPlay
+                        playsInline
+                        className="w-[300px] h-[225px] bg-black"
+                    />
+                </div>
+            </div>
+
+            <div className="flex gap-2">
+                {/* เปิดกล้อง */}
+                <button
+                    onClick={handleStart}
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
+                >
+                    Start
+                </button>
+                {/* วางสาย */}
+                <button
+                    onClick={handleHangup}
+                    disabled={isHangupButtonDisabled}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-gray-300"
+                >
+                    Hang Up
+                </button>
+            </div>
+            {/* รับสาย */}
+            {incomingOffer && (
+                <div className="flex items-center gap-2 bg-yellow-100 p-2 rounded border border-yellow-300">
+                    <span className="text-sm font-bold text-yellow-800 animate-pulse">
+                        📞 Incoming Call...
+                    </span>
+                    <button
+                        onClick={handleAnswer}
+                        className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                        Answer
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
