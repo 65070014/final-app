@@ -10,6 +10,7 @@ export default function VideoCallDoctorPage() {
   const [isHangupButtonDisabled, setIsHangupButtonDisabled] = useState(true);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
   const ROOM_ID = "room-123"; 
   const peerConnectionConfig = {
         iceServers: [
@@ -38,7 +39,7 @@ export default function VideoCallDoctorPage() {
     };
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3001");
+    socketRef.current = io(SOCKET_URL);
     socketRef.current.emit("join_room", ROOM_ID);
     socketRef.current.on("answer", async (answer) => {
       console.log("Received Answer via Socket");

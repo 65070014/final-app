@@ -13,6 +13,7 @@ export default function VideoCallPatientPage() {
     const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
     const socketRef = useRef<Socket | null>(null);
     const ROOM_ID = "room-123"; //อันนี้เป็นเลขห้อง (fix ไว้ก่อนเพื่อ test)
+    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
     const peerConnectionConfig = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -41,7 +42,7 @@ export default function VideoCallPatientPage() {
 
     useEffect(() => {
         //ต้องต่อพอร์ต Server Port 3001
-        socketRef.current = io("http://localhost:3001");
+        socketRef.current = io(SOCKET_URL);
 
         //จอยห้องตอนเปิดเว็ป
         socketRef.current.emit("join_room", ROOM_ID);
