@@ -181,6 +181,7 @@ export default function VideoCallDoctorPage() {
             ref={remoteVideoRef}
             autoPlay
             playsInline
+            muted
             className="w-[300px] h-[225px] bg-black"
           />
         </div>
