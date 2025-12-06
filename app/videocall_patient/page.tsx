@@ -19,7 +19,7 @@ export default function VideoCallPatientPage() {
             { urls: 'stun:stun.l.google.com:19302' },
             {
                 urls: 'turn:global.relay.metered.ca:80',
-                username: '3b0efcf4646682be82fda725', 
+                username: '3b0efcf4646682be82fda725',
                 credential: 'yo7yr1EvL5Ob1g8r',
             },
             {
@@ -58,6 +58,7 @@ export default function VideoCallPatientPage() {
                 await peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(candidate));
             }
         });
+        console.log("peerConnectionConfig:", peerConnectionConfig);
 
         return () => {
             socketRef.current?.disconnect();
@@ -95,8 +96,29 @@ export default function VideoCallPatientPage() {
         console.log('Answering call...');
         peerConnectionRef.current = new RTCPeerConnection(peerConnectionConfig);
         peerConnectionRef.current.ontrack = (event) => {
+            console.log("ได้รับภาพจากฝั่งหมอแล้ว", event.streams[0]);
             if (remoteVideoRef.current) {
                 remoteVideoRef.current.srcObject = event.streams[0];
+            } else {
+                console.error("หา remoteVideoRef ไม่เจอ");
+            }
+        };
+
+        peerConnectionRef.current.oniceconnectionstatechange = () => {
+            const state = peerConnectionRef.current?.iceConnectionState;
+            console.log("ICE Connection State Changed:", state);
+
+            if (state === 'failed' || state === 'disconnected') {
+                console.error("Disconnected");
+            }
+            if (state === 'connected') {
+                console.log("Connected");
+            }
+        };
+
+        peerConnectionRef.current.onsignalingstatechange = () => {
+            if (peerConnectionRef.current) {
+                console.log("Signaling State:", peerConnectionRef.current.signalingState);
             }
         };
 

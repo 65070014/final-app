@@ -1,6 +1,6 @@
-'use client' 
+'use client'
 import { useEffect, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client'; 
+import { io, Socket } from 'socket.io-client';
 export default function VideoCallDoctorPage() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -11,32 +11,32 @@ export default function VideoCallDoctorPage() {
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-  const ROOM_ID = "room-123"; 
+  const ROOM_ID = "room-123";
   const peerConnectionConfig = {
-        iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            {
-                urls: 'turn:global.relay.metered.ca:80',
-                username: '3b0efcf4646682be82fda725', 
-                credential: 'yo7yr1EvL5Ob1g8r',
-            },
-            {
-                urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
-            {
-                urls: "turn:global.relay.metered.ca:443",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
-            {
-                urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
-        ]
-    };
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      {
+        urls: 'turn:global.relay.metered.ca:80',
+        username: '3b0efcf4646682be82fda725',
+        credential: 'yo7yr1EvL5Ob1g8r',
+      },
+      {
+        urls: "turn:global.relay.metered.ca:80?transport=tcp",
+        username: "3b0efcf4646682be82fda725",
+        credential: "yo7yr1EvL5Ob1g8r",
+      },
+      {
+        urls: "turn:global.relay.metered.ca:443",
+        username: "3b0efcf4646682be82fda725",
+        credential: "yo7yr1EvL5Ob1g8r",
+      },
+      {
+        urls: "turns:global.relay.metered.ca:443?transport=tcp",
+        username: "3b0efcf4646682be82fda725",
+        credential: "yo7yr1EvL5Ob1g8r",
+      },
+    ]
+  };
 
   useEffect(() => {
     socketRef.current = io(SOCKET_URL);
@@ -79,11 +79,30 @@ export default function VideoCallDoctorPage() {
 
     //สร้าง Peer
     peerConnectionRef.current = new RTCPeerConnection(peerConnectionConfig);
+    peerConnectionRef.current.oniceconnectionstatechange = () => {
+      const state = peerConnectionRef.current?.iceConnectionState;
+      console.log("ICE Connection State Changed:", state);
 
+      if (state === 'failed' || state === 'disconnected') {
+        console.error("Disconnected");
+      }
+      if (state === 'connected') {
+        console.log("Connected");
+      }
+    };
+
+    peerConnectionRef.current.onsignalingstatechange = () => {
+      if (peerConnectionRef.current) {
+        console.log("Signaling State:", peerConnectionRef.current.signalingState);
+      }
+    };
     //เอาจอคนไข้มาใส่ไว้
     peerConnectionRef.current.ontrack = (event) => {
+      console.log("ได้รับภาพจากฝั่งคนไข้แล้ว", event.streams[0]);
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
+      } else {
+        console.error("หา remoteVideoRef ไม่เจอ");
       }
     };
 
@@ -150,7 +169,7 @@ export default function VideoCallDoctorPage() {
             ref={localVideoRef}
             autoPlay
             playsInline
-            muted 
+            muted
             className="w-[300px] h-[225px] bg-black"
           />
         </div>
