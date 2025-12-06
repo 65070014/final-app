@@ -22,21 +22,6 @@ export default function VideoCallPatientPage() {
                 username: '3b0efcf4646682be82fda725',
                 credential: 'yo7yr1EvL5Ob1g8r',
             },
-            {
-                urls: "turn:global.relay.metered.ca:80?transport=tcp",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
-            {
-                urls: "turn:global.relay.metered.ca:443",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
-            {
-                urls: "turns:global.relay.metered.ca:443?transport=tcp",
-                username: "3b0efcf4646682be82fda725",
-                credential: "yo7yr1EvL5Ob1g8r",
-            },
         ]
     };
 
