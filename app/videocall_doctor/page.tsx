@@ -12,10 +12,30 @@ export default function VideoCallDoctorPage() {
   const socketRef = useRef<Socket | null>(null);
   const ROOM_ID = "room-123"; 
   const peerConnectionConfig = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' }
-    ]
-  };
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            {
+                urls: 'turn:global.relay.metered.ca:80',
+                username: '3b0efcf4646682be82fda725', 
+                credential: 'yo7yr1EvL5Ob1g8r',
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
+            {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
+        ]
+    };
 
   useEffect(() => {
     socketRef.current = io("http://localhost:3001");
