@@ -99,8 +99,17 @@ export default function VideoCallPatientPage() {
         peerConnectionRef.current = new RTCPeerConnection(peerConnectionConfig);
         peerConnectionRef.current.ontrack = (event) => {
             console.log("ได้รับภาพจากฝั่งหมอแล้ว", event.streams[0]);
+
             if (remoteVideoRef.current) {
+                // 1. ใส่ Stream เข้าไปใน video tag
                 remoteVideoRef.current.srcObject = event.streams[0];
+
+                // 2. สั่งเล่นทันทีด้วยคำสั่ง .play()
+                // และดัก Error เผื่อ Browser บล็อก (เช่น ผู้ใช้ยังไม่ได้กดปุ่มใดๆ ในหน้าเว็บ)
+                remoteVideoRef.current.play().catch(e => {
+                    console.error("Autoplay failed (Browser blocked):", e);
+                    // ทริค: ถ้า Autoplay ไม่ได้ อาจจะขึ้นปุ่มให้ User กด "Play Video" เอง
+                });
             } else {
                 console.error("หา remoteVideoRef ไม่เจอ");
             }
@@ -190,7 +199,6 @@ export default function VideoCallPatientPage() {
                         ref={localVideoRef}
                         autoPlay
                         playsInline
-                        muted
                         className="w-[300px] h-[225px] bg-black"
                     />
                 </div>
