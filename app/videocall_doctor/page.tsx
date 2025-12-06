@@ -100,20 +100,13 @@ export default function VideoCallDoctorPage() {
     };
     //เอาจอคนไข้มาใส่ไว้
     peerConnectionRef.current.ontrack = (event) => {
-    console.log("ได้รับภาพจากฝั่งคนไข้แล้ว", event.streams[0]);
-    
-    if (remoteVideoRef.current) {
-        // 1. ใส่ Stream เข้าไป
+      console.log("ได้รับภาพจากฝั่งคนไข้แล้ว", event.streams[0]);
+      if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = event.streams[0];
-
-        // 2. สั่ง Play ทันที และดัก Error เผื่อ Browser บล็อก
-        remoteVideoRef.current.play().catch(e => {
-            console.error("Autoplay failed (User interaction needed):", e);
-        });
-    } else {
+      } else {
         console.error("หา remoteVideoRef ไม่เจอ");
-    }
-};
+      }
+    };
 
     //ICE เจอ ip ฝั่งนี้แล้วก็ส่ง candidate ไปหาอีกฝั่งผ่าน socket
     peerConnectionRef.current.onicecandidate = (event) => {
@@ -196,6 +189,7 @@ export default function VideoCallDoctorPage() {
             ref={remoteVideoRef}
             autoPlay
             playsInline
+            muted
             className="w-[300px] h-[225px] bg-black"
           />
         </div>
