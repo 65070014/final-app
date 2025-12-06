@@ -11,14 +11,15 @@ export default function VideoCallDoctorPage() {
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const ROOM_ID = "room-123"; 
+  const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
   const peerConnectionConfig = {
     iceServers: [
       { urls: 'stun:stun.l.google.com:19302' }
     ]
   };
-
+  
   useEffect(() => {
-    socketRef.current = io("http://localhost:3001");
+    socketRef.current = io(SOCKET_URL);
     socketRef.current.emit("join_room", ROOM_ID);
     socketRef.current.on("answer", async (answer) => {
       console.log("Received Answer via Socket");
@@ -35,7 +36,7 @@ export default function VideoCallDoctorPage() {
     return () => {
       socketRef.current?.disconnect();
     };
-  }, []);
+  }, [SOCKET_URL]);
   const handleStart = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
