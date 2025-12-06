@@ -16,7 +16,27 @@ export default function VideoCallPatientPage() {
     const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
     const peerConnectionConfig = {
         iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' } //ใช้ stun เพื่อแปลง localhost เป็น ip
+            { urls: 'stun:stun.l.google.com:19302' },
+            {
+                urls: 'turn:global.relay.metered.ca:80',
+                username: '3b0efcf4646682be82fda725', 
+                credential: 'yo7yr1EvL5Ob1g8r',
+            },
+            {
+                urls: "turn:global.relay.metered.ca:80?transport=tcp",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
+            {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
+            {
+                urls: "turns:global.relay.metered.ca:443?transport=tcp",
+                username: "3b0efcf4646682be82fda725",
+                credential: "yo7yr1EvL5Ob1g8r",
+            },
         ]
     };
 
