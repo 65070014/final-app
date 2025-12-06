@@ -8,7 +8,9 @@ export default function VideoCallDoctorPage() {
   const localStreamRef = useRef<MediaStream | null>(null);
   const [isCallButtonDisabled, setIsCallButtonDisabled] = useState(true);
   const [isHangupButtonDisabled, setIsHangupButtonDisabled] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
+
   const socketRef = useRef<Socket | null>(null);
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
   const ROOM_ID = "room-123";
@@ -142,6 +144,12 @@ export default function VideoCallDoctorPage() {
     };
   }, []);
 
+  const toggleAudio = () => {
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.muted = !remoteVideoRef.current.muted;
+      setIsMuted(remoteVideoRef.current.muted);
+    }
+  };
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Realtime communication with WebRTC</h1>
@@ -171,7 +179,16 @@ export default function VideoCallDoctorPage() {
           />
         </div>
       </div>
-
+      <button
+        onClick={toggleAudio}
+        className="absolute bottom-2 right-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-full opacity-70 hover:opacity-100 flex items-center gap-1"
+      >
+        {isMuted ? (
+          <>🔇 เปิดเสียง</>
+        ) : (
+          <>🔊 ปิดเสียง</>
+        )}
+      </button>
       <div className="flex gap-2">
         <button
           onClick={handleStart}

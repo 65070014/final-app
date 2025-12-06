@@ -10,10 +10,12 @@ export default function VideoCallPatientPage() {
     const localStreamRef = useRef<MediaStream | null>(null);
     const [isCallButtonDisabled, setIsCallButtonDisabled] = useState(true);
     const [isHangupButtonDisabled, setIsHangupButtonDisabled] = useState(true);
+    const [isMuted, setIsMuted] = useState(true); // เริ่มต้นเป็น true (ปิดเสียง)
     const [incomingOffer, setIncomingOffer] = useState<RTCSessionDescriptionInit | null>(null);
     const socketRef = useRef<Socket | null>(null);
     const ROOM_ID = "room-123"; //อันนี้เป็นเลขห้อง (fix ไว้ก่อนเพื่อ test)
     const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+
     const peerConnectionConfig = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -141,7 +143,14 @@ export default function VideoCallPatientPage() {
             console.error("Error answering call:", err);
         }
     };
-
+    const toggleAudio = () => {
+        if (remoteVideoRef.current) {
+            // สลับค่า muted ของ Video Tag (จริง)
+            remoteVideoRef.current.muted = !remoteVideoRef.current.muted;
+            // อัปเดต State เพื่อเปลี่ยนหน้าตาปุ่ม
+            setIsMuted(remoteVideoRef.current.muted);
+        }
+    };
     //ปิดกล้องตอนปิดหน้าเว็บ
     useEffect(() => {
         return () => {
@@ -183,7 +192,16 @@ export default function VideoCallPatientPage() {
                     />
                 </div>
             </div>
-
+            <button
+                onClick={toggleAudio}
+                className="absolute bottom-2 right-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-full opacity-70 hover:opacity-100 flex items-center gap-1"
+            >
+                {isMuted ? (
+                    <>🔇 เปิดเสียง</>
+                ) : (
+                    <>🔊 ปิดเสียง</>
+                )}
+            </button>
             <div className="flex gap-2">
                 {/* เปิดกล้อง */}
                 <button
