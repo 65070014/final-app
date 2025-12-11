@@ -88,10 +88,6 @@ export default function VideoCallDoctorPage() {
     peerConnectionRef.current.oniceconnectionstatechange = () => {
       const state = peerConnectionRef.current?.iceConnectionState;
       console.log("ICE Connection State Changed:", state);
-
-      if (state === 'failed') {
-        console.error("Disconnected");
-      }
       if (state === 'connected') {
         console.log("Connected");
       }
