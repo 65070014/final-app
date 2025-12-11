@@ -13,16 +13,35 @@ export default function VideoCallDoctorPage() {
 
   const socketRef = useRef<Socket | null>(null);
   const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+  const TURN_USERNAME = process.env.NEXT_PUBLIC_METERED_USERNAME;
+  const TURN_PASSWORD = process.env.NEXT_PUBLIC_METERED_PASSWORD;
   const ROOM_ID = "room-123";
   const peerConnectionConfig = {
-    iceServers: [
-      { urls: 'stun:stun.l.google.com:19302' },
+     iceServers: [
       {
-        urls: 'turn:global.relay.metered.ca:80',
-        username: '3b0efcf4646682be82fda725',
-        credential: 'yo7yr1EvL5Ob1g8r',
+        urls: "stun:stun.relay.metered.ca:80",
       },
-    ]
+      {
+        urls: "turn:standard.relay.metered.ca:80",
+        username: TURN_USERNAME,
+        credential: TURN_PASSWORD,
+      },
+      {
+        urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+        username: TURN_USERNAME,
+        credential: TURN_PASSWORD,
+      },
+      {
+        urls: "turn:standard.relay.metered.ca:443",
+        username: TURN_USERNAME,
+        credential: TURN_PASSWORD,
+      },
+      {
+        urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+        username: TURN_USERNAME,
+        credential: TURN_PASSWORD,
+      },
+  ]
   };
 
   useEffect(() => {
@@ -70,7 +89,7 @@ export default function VideoCallDoctorPage() {
       const state = peerConnectionRef.current?.iceConnectionState;
       console.log("ICE Connection State Changed:", state);
 
-      if (state === 'failed' || state === 'disconnected') {
+      if (state === 'failed') {
         console.error("Disconnected");
       }
       if (state === 'connected') {
