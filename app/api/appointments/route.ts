@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
 import { ResultSetHeader } from 'mysql2/promise';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -95,7 +96,8 @@ export async function POST(request: Request) {
             appointmentDateTime,
             appointmentData.status,
             appointmentData.patient_status,
-            appointmentData.symptoms
+            appointmentData.symptoms,
+            uuidv4()
         ];
 
 
@@ -104,8 +106,8 @@ export async function POST(request: Request) {
 
         const sqlPrimary = `
             INSERT INTO Appointment (
-                patient_id,medical_personnel_id,department,apdate,status,patient_status,symptoms
-            ) VALUES (?, ?, ?, ?, ?,?,?)
+                patient_id,medical_personnel_id,department,apdate,status,patient_status,symptoms,meeting_id
+            ) VALUES (?, ?, ?, ?, ?,?,?,?)
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);

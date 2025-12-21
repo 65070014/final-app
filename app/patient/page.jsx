@@ -141,7 +141,7 @@ const PatientDashboard = () => {
                     </>
                   ) : (
                     <Link
-                      href={`patient/videocall`}
+                      href={`patient/videocall/${nextAppt.meeting_id}`}
                     >
                       <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2">
                         <Video size={18} />

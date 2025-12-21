@@ -82,6 +82,7 @@ export interface Appointment {
 }
 
 export interface AppointmentList {
+  meeting_id: string
   id: string;
   patient: string;
   date: string;

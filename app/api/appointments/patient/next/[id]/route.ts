@@ -16,7 +16,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 a.status,
                 a.patient_status,
                 CONCAT(p.fname, ' ', p.lname) AS patient,
-                a.department, 
+                a.department,
+                a.meeting_id, 
                 CONCAT( 
                     CASE 
                         WHEN d.position = 1 THEN (CASE WHEN d.gender = 1 THEN 'นพ. ' ELSE 'พญ. ' END) 

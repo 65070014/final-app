@@ -16,6 +16,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 DATE_FORMAT(a.apdate, '%H:%i น.') AS time,
                 a.department,
                 a.symptoms,
+                a.meeting_id,
                 CONCAT(
                     CASE 
                         WHEN p.gender = 1 THEN 'นาย ' 

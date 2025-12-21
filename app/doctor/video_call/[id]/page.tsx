@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import { Menu, X, Video, FileEdit, User } from 'lucide-react';
 import { AppointmentList, PatientVitalSummary } from "@/lib/types"
 import { DiagnosisSection } from '@/components/doctor/medical_record/diagnosis_section';
 import { MedicationSection } from '@/components/doctor/medical_record/medication_section';
 import Link from 'next/link';
+import { io, Socket } from 'socket.io-client';
 
 
 export default function VideoConsultationPage() {
@@ -22,6 +23,175 @@ export default function VideoConsultationPage() {
     const [isDiagnosPanelOpen, setIsDiagnosPanelOpen] = useState(true);
     const [patient, setPatient] = useState<PatientVitalSummary>()
 
+    const localVideoRef = useRef<HTMLVideoElement>(null);
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+    const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+    const localStreamRef = useRef<MediaStream | null>(null);
+    const socketRef = useRef<Socket | null>(null);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isCameraOff, setIsCameraOff] = useState(false);
+
+    const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
+    const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+
+    const [connectionStatus, setConnectionStatus] = useState("Ready to call");
+    const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
+    const [isCallStarted, setIsCallStarted] = useState(false);
+    const TURN_USERNAME = process.env.NEXT_PUBLIC_METERED_USERNAME;
+    const TURN_PASSWORD = process.env.NEXT_PUBLIC_METERED_PASSWORD;
+
+
+    const peerConnectionConfig = {
+        iceServers: [
+            {
+                urls: "stun:stun.relay.metered.ca:80",
+            },
+            {
+                urls: "turn:standard.relay.metered.ca:80",
+                username: TURN_USERNAME,
+                credential: TURN_PASSWORD,
+            },
+            {
+                urls: "turn:standard.relay.metered.ca:80?transport=tcp",
+                username: TURN_USERNAME,
+                credential: TURN_PASSWORD,
+            },
+            {
+                urls: "turn:standard.relay.metered.ca:443",
+                username: TURN_USERNAME,
+                credential: TURN_PASSWORD,
+            },
+            {
+                urls: "turns:standard.relay.metered.ca:443?transport=tcp",
+                username: TURN_USERNAME,
+                credential: TURN_PASSWORD,
+            },
+        ]
+    };
+
+    useEffect(() => {
+        if (!currentRoomId) return;
+
+        // 🔒 สร้างตัวแปร Local เพื่อคุมการเกิด/ดับ ของ Effect รอบนี้โดยเฉพาะ
+        const socket = io(SOCKET_URL);
+        const pc = new RTCPeerConnection({
+            iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+        });
+
+        // อัปเดต Ref ให้คนอื่นใช้ (แต่เราจะไม่ใช้ Ref ในการ Cleanup)
+        socketRef.current = socket;
+        peerConnectionRef.current = pc;
+
+        const initWebRTC = async () => {
+            try {
+                // 1. Prepare Stream
+                let stream = localStreamRef.current;
+                if (!stream) {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                    localStreamRef.current = stream;
+                }
+                if (pc.signalingState === 'closed') {
+                    console.warn("⚠️ Connection closed while loading camera. Aborting.");
+                    return;
+                }
+
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = stream;
+                }
+
+                // ใส่ Stream เข้า PC
+                stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+                // 2. Setup Events
+                socket.emit("join_room", currentRoomId); // ใช้ตัวแปร socket local
+
+                // ---------------- Events ----------------
+
+                // เมื่อมีคนอื่นเข้ามา -> เราเป็นคนโทร (Offerer)
+                socket.on("user_joined", async (userId) => {
+                    //  กันตัวเอง: ถ้า userId คือตัวเราเอง ให้ข้าม (เผื่อ Server เอ๋อ)
+                    if (userId === socket.id) return;
+
+                    console.log("🔔 User Joined -> I am calling.");
+
+                    // เช็คว่า PC พร้อมไหม
+                    if (pc.signalingState !== "stable") return;
+
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+                    socket.emit("offer", { offer, roomId: currentRoomId });
+                });
+
+                // เมื่อได้รับ Offer -> เราเป็นคนรับ (Answerer)
+                socket.on("offer", async (offer) => {
+                    // 🛡️ ถ้าเราเป็นคนโทรออกเองอยู่แล้ว (Glare) ให้หยุด หรือ Reset
+                    if (pc.signalingState !== "stable") {
+                        console.warn("⚠️ Collision detected. Ignore/Reset.");
+                        return;
+                    }
+
+                    console.log("📩 Received Offer -> Answering.");
+                    await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                    const answer = await pc.createAnswer();
+                    await pc.setLocalDescription(answer);
+                    socket.emit("answer", { answer, roomId: currentRoomId });
+                });
+
+                socket.on("answer", async (answer) => {
+                    console.log("✅ Received Answer");
+                    if (pc.signalingState !== "stable") { // เช็คก่อน set
+                        await pc.setRemoteDescription(new RTCSessionDescription(answer));
+                    }
+                });
+
+                socket.on("candidate", async (candidate) => {
+                    if (pc.remoteDescription) {
+                        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+                    }
+                });
+
+                // PC Events
+                pc.ontrack = (event) => {
+                    console.log("🎥 Stream Received");
+                    if (remoteVideoRef.current) {
+                        remoteVideoRef.current.srcObject = event.streams[0];
+                    }
+                    setHasRemoteVideo(true);
+                };
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        socket.emit("candidate", { candidate: event.candidate, roomId: currentRoomId });
+                    }
+                };
+
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        initWebRTC();
+
+        // 🧹 CLEANUP (จุดสำคัญที่สุด!)
+        return () => {
+            console.log("🧹 Cleanup old connection...");
+
+            // สั่งปิดตัวแปร Local ที่สร้างในรอบนี้แน่ๆ
+            socket.disconnect();
+            pc.close();
+
+            // (Optional) ล้าง Ref
+            // socketRef.current = null;
+        };
+    }, [currentRoomId]);
+
+    useEffect(() => {
+        // ถ้าเริ่มโทรแล้ว และเรามี Stream กล้องเก็บไว้ในตัวแปร ref
+        if (isCallStarted && localVideoRef.current && localStreamRef.current) {
+            console.log("Re-attaching stream to new video element");
+            localVideoRef.current.srcObject = localStreamRef.current;
+        }
+    }, [isCallStarted]);
 
     const [isPanelOpen, setIsPanelOpen] = useState(true);
     const [diagnosisNote, setDiagnosisNote] = useState({
@@ -89,7 +259,7 @@ export default function VideoConsultationPage() {
         fetchPatientVitals();
     }, [selectedAppointmentId]);
 
-    const handleSwitchQueue = useCallback((newAppointmentId: string) => {
+    const handleSwitchQueue = useCallback((newAppointmentId: string, meeting_id: string) => {
         if (newAppointmentId === selectedAppointmentId) {
             setIsPanelOpen(false);
             return;
@@ -98,7 +268,7 @@ export default function VideoConsultationPage() {
         const params = new URLSearchParams(searchParams.toString());
         params.set('appointmentId', newAppointmentId);
         router.replace(`?${params.toString()}`);
-
+        setCurrentRoomId(meeting_id);
         setIsPanelOpen(false);
     }, [router, searchParams, selectedAppointmentId]);
 
@@ -154,7 +324,7 @@ export default function VideoConsultationPage() {
                                         appointment.map((appt) => (
                                             <div
                                                 key={appt.id}
-                                                onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id)}
+                                                onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id, appt.meeting_id)}
                                                 className={`p-3 rounded-lg border cursor-pointer transition-colors 
                                             ${appt.id === selectedAppointmentId ? 'bg-blue-100 border-blue-400 shadow-md' : 'bg-white hover:bg-gray-50'}
                                             ${appt.patient_status === 'Canceled' ? 'opacity-50' : ''}
@@ -188,13 +358,68 @@ export default function VideoConsultationPage() {
                     </button>
                 )}
 
-                <div
-                    className={`w-full h-2/3 min-h-[150px] bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0 transition-all duration-300`}
-                >
-                    <span className="text-white text-2xl absolute inset-0 flex items-center justify-center">วีดีโอคอล (คนไข้)</span>
-                    <div className="absolute top-4 right-4 w-64 h-40 bg-gray-700 rounded-md border-2 border-white flex items-center justify-center z-10">
-                        <User className='w-6 h-6 text-white/70' />
-                    </div>
+                <div className={`w-full h-2/3 min-h-[150px] bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0`}>
+
+                    <span className="text-white text-2xl absolute inset-0 flex items-center justify-center">
+                        {
+                            !currentRoomId ? (
+                                <div className="flex flex-col items-center text-white-400">
+                                    <p className="text-3xl font-medium">กรุณาเลือกผู้ป่วย</p>
+                                    <p className="text-xl">จากรายการด้านซ้ายเพื่อเริ่มตรวจ</p>
+                                </div>
+                            ) : (
+                                <div className="relative w-full h-full flex flex-row bg-gray-900">
+
+                                    {/*กล้องคนไข้ */}
+                                    <div className="flex-1 relative h-full bg-black overflow-hidden">
+                                        {!hasRemoteVideo && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-900 z-10">
+                                                <div className="text-center">
+                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+                                                    <p className="text-gray-400 italic text-sm">Waiting for patient...</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <video
+                                            ref={remoteVideoRef}
+                                            autoPlay
+                                            playsInline
+                                            onCanPlay={() => setHasRemoteVideo(true)}
+                                            onWaiting={() => setHasRemoteVideo(false)}
+                                            className={`w-full h-full object-cover transition-opacity duration-500 ${hasRemoteVideo ? 'opacity-100' : 'opacity-0'
+                                                }`}
+                                        />
+                                        <div className="absolute bottom-2 left-2 text-[12px] bg-black/50 px-2 py-0.5 rounded text-white z-20">
+                                            Patient
+                                        </div>
+                                    </div>
+
+                                    {/* หมอ*/}
+                                    <div className="w-48 md:w-64 h-full justify-center bg-slate-800 border-l border-slate-700 flex flex-col z-20">
+
+                                        <div className="w-full aspect-video bg-black relative shadow-lg">
+                                            {!isCameraOff ? (
+                                                <video
+                                                    ref={localVideoRef}
+                                                    autoPlay
+                                                    playsInline
+                                                    muted
+                                                    className="w-full h-full object-cover transform -scale-x-100"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center flex-col text-slate-500">
+                                                    <span className="text-xs">Camera Off</span>
+                                                </div>
+                                            )}
+                                            <div className="absolute bottom-1 left-1 text-[10px] bg-black/50 px-2 py-0.5 rounded text-white">
+                                                You
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            )}
+                    </span>
                 </div>
 
                 <div className="flex-1 overflow-y-auto pr-2">
