@@ -224,7 +224,8 @@ export default function VideoCallPage() {
           </div>
 
           {/* -------------------- 2. ฝั่งเรา (Local) -------------------- */}
-          <div className="flex-1 aspect-video relative bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg">
+          <div
+            className="relative bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg w-full aspect-video md:absolute md:w-[260px] md:bottom-6 md:right-6 md:z-20 lg:w-[320px] lg:bottom-8 lg:right-8">
             {!isCameraOff ? (
               <video
                 ref={localVideoRef}

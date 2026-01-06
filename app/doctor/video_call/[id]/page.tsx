@@ -395,8 +395,7 @@ export default function VideoConsultationPage() {
                                     </div>
 
                                     {/* หมอ*/}
-                                    <div className="w-48 md:w-64 h-full justify-center bg-slate-800 border-l border-slate-700 flex flex-col z-20">
-
+                                    <div className="relative bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg w-full aspect-video md:absolute md:w-[260px] md:bottom-6 md:right-6 md:z-20 lg:w-[320px] lg:bottom-8 lg:right-8">
                                         <div className="w-full aspect-video bg-black relative shadow-lg">
                                             {!isCameraOff ? (
                                                 <video
@@ -431,7 +430,7 @@ export default function VideoConsultationPage() {
                 </div>
             </div>
 
-            <div className="w-[480px] flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10">
+            <div className="w-[480px] flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10  relative">
                 <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {patient ? patient.patient : 'ไม่ได้เลือก'}</h3>
 
                 {selectedAppointmentId && (
