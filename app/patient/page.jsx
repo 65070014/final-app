@@ -24,6 +24,14 @@ const PatientDashboard = () => {
   const [isVitalOpen, setIsVitalOpen] = useState(false);
   const router = useRouter()
 
+  const handleJoinVideo = () => {
+  if (nextAppt.is_vitals_filled) {
+    router.push(`patient/videocall/${nextAppt.meeting_id}`);
+  } else {
+    setIsVitalOpen(true);
+  }
+};
+
   useEffect(() => {
     if (status === 'loading') return;
 
@@ -145,7 +153,7 @@ const PatientDashboard = () => {
                   ) : (
                       <button 
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2"
-                      onClick={() => setIsVitalOpen(true)}>
+                      onClick={handleJoinVideo}>
                         <Video size={18} />
                         เข้าร่วมวิดีโอคอล
                       </button>

@@ -89,6 +89,7 @@ export interface AppointmentList {
   time: string;
   patient_status:string
   symptoms: string
+  is_vitals_filled:boolean
 }
 
 export interface Notification{
