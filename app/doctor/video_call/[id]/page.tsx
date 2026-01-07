@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
-import { Menu, X, Video, FileEdit, User } from 'lucide-react';
 import { AppointmentList, PatientVitalSummary } from "@/lib/types"
 import { DiagnosisSection } from '@/components/doctor/medical_record/diagnosis_section';
 import { MedicationSection } from '@/components/doctor/medical_record/medication_section';
 import Link from 'next/link';
 import { io, Socket } from 'socket.io-client';
+import { Menu, X, Video, FileEdit, User, Mic, MicOff, VideoOff, PhoneOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 
 export default function VideoConsultationPage() {
@@ -39,6 +40,26 @@ export default function VideoConsultationPage() {
     const [isCallStarted, setIsCallStarted] = useState(false);
     const TURN_USERNAME = process.env.NEXT_PUBLIC_METERED_USERNAME;
     const TURN_PASSWORD = process.env.NEXT_PUBLIC_METERED_PASSWORD;
+
+    const toggleMic = () => {
+        const stream = localStreamRef.current;
+        if (stream) {
+            stream.getAudioTracks().forEach(track => {
+                track.enabled = !track.enabled;
+            });
+            setIsMuted(!isMuted);
+        }
+    };
+
+    const toggleCamera = () => {
+        const stream = localStreamRef.current;
+        if (stream) {
+            stream.getVideoTracks().forEach(track => {
+                track.enabled = !track.enabled;
+            });
+            setIsCameraOff(!isCameraOff);
+        }
+    };
 
 
     const peerConnectionConfig = {
@@ -74,9 +95,7 @@ export default function VideoConsultationPage() {
 
         // 🔒 สร้างตัวแปร Local เพื่อคุมการเกิด/ดับ ของ Effect รอบนี้โดยเฉพาะ
         const socket = io(SOCKET_URL);
-        const pc = new RTCPeerConnection({
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-        });
+        const pc = new RTCPeerConnection(peerConnectionConfig);
 
         // อัปเดต Ref ให้คนอื่นใช้ (แต่เราจะไม่ใช้ Ref ในการ Cleanup)
         socketRef.current = socket;
@@ -397,17 +416,18 @@ export default function VideoConsultationPage() {
                                     {/* หมอ*/}
                                     <div className="relative bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg w-full aspect-video md:absolute md:w-[260px] md:bottom-6 md:right-6 md:z-20 lg:w-[320px] lg:bottom-8 lg:right-8">
                                         <div className="w-full aspect-video bg-black relative shadow-lg">
-                                            {!isCameraOff ? (
-                                                <video
-                                                    ref={localVideoRef}
-                                                    autoPlay
-                                                    playsInline
-                                                    muted
-                                                    className="w-full h-full object-cover transform -scale-x-100"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center flex-col text-slate-500">
-                                                    <span className="text-xs">Camera Off</span>
+                                            <video
+                                                ref={localVideoRef}
+                                                autoPlay
+                                                playsInline
+                                                muted
+                                                className={`w-full h-full object-cover ${isCameraOff ? 'hidden' : 'block'}`}
+                                            />
+
+                                            {isCameraOff && (
+                                                <div className="w-full h-full bg-slate-800 flex items-center justify-center flex-col">
+                                                    <VideoOff className="h-12 w-12 text-red-500 mb-2" />
+                                                    <span className="text-sm text-slate-500">กล้องปิดอยู่</span>
                                                 </div>
                                             )}
                                             <div className="absolute bottom-1 left-1 text-[10px] bg-black/50 px-2 py-0.5 rounded text-white">
@@ -419,6 +439,23 @@ export default function VideoConsultationPage() {
                                 </div>
                             )}
                     </span>
+                    {/* Bottom Control Bar */}
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-slate-900/90 backdrop-blur-md px-6 py-3 rounded-2xl border border-slate-700 shadow-2xl">
+                        <ControlButton
+                            active={isMuted}
+                            onClick={toggleMic}
+                            onIcon={<MicOff />}
+                            offIcon={<Mic />}
+                            danger={isMuted}
+                        />
+                        <ControlButton
+                            active={isCameraOff}
+                            onClick={toggleCamera}
+                            onIcon={<VideoOff />}
+                            offIcon={<Video />}
+                            danger={isCameraOff}
+                        />
+                    </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto pr-2">
@@ -535,3 +572,15 @@ export default function VideoConsultationPage() {
         </div>
     );
 }
+
+const ControlButton = ({ active, onClick, onIcon, offIcon, danger }) => (
+    <Button
+        variant={danger ? "destructive" : "secondary"}
+        size="icon"
+        className={`rounded-full h-12 w-12 transition-all duration-200 ${!danger && active ? 'bg-slate-700 text-white' : ''
+            } ${!danger && !active ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : ''}`}
+        onClick={onClick}
+    >
+        {active ? onIcon : offIcon}
+    </Button>
+);

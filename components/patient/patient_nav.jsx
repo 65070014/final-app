@@ -51,10 +51,6 @@ export function PatientNav() {
               hover:bg-blue-700 xl:hover:bg-blue-600 xl:cursor-default
             `}
           >
-             {/* Logic ไอคอน: 
-                 - Mobile/iPad: สลับระหว่าง Menu (3ขีด) กับ X 
-                 - PC: โชว์ตัว T เสมอ
-             */}
              <span className="block xl:hidden">
                 {isOpen ? <X size={20} /> : <Menu size={20} />}
              </span>

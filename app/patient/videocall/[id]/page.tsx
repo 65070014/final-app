@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { io, Socket } from 'socket.io-client';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function VideoCallPage() {
   const [isMuted, setIsMuted] = useState(false);
@@ -33,6 +34,44 @@ export default function VideoCallPage() {
   const TURN_PASSWORD = process.env.NEXT_PUBLIC_METERED_PASSWORD;
   const [connectionStatus, setConnectionStatus] = useState("Initializing...");
   const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
+  const router = useRouter();
+
+  const toggleMic = () => {
+    const stream = localStreamRef.current;
+    if (stream) {
+      stream.getAudioTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const toggleCamera = () => {
+    const stream = localStreamRef.current;
+    if (stream) {
+      stream.getVideoTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setIsCameraOff(!isCameraOff);
+    }
+  };
+
+  const endCall = () => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
+    }
+
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+    }
+
+    router.push('/patient/appointment');
+  };
 
   const peerConnectionConfig = {
     iceServers: [
@@ -67,9 +106,7 @@ export default function VideoCallPage() {
 
     // 🔒 สร้างตัวแปร Local เพื่อคุมการเกิด/ดับ ของ Effect รอบนี้โดยเฉพาะ
     const socket = io(SOCKET_URL);
-    const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-    });
+    const pc = new RTCPeerConnection(peerConnectionConfig);
 
     // อัปเดต Ref ให้คนอื่นใช้ (แต่เราจะไม่ใช้ Ref ในการ Cleanup)
     socketRef.current = socket;
@@ -226,15 +263,15 @@ export default function VideoCallPage() {
           {/* -------------------- 2. ฝั่งเรา (Local) -------------------- */}
           <div
             className="relative bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-lg w-full aspect-video md:absolute md:w-[260px] md:bottom-6 md:right-6 md:z-20 lg:w-[320px] lg:bottom-8 lg:right-8">
-            {!isCameraOff ? (
-              <video
-                ref={localVideoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-            ) : (
+            <video
+              ref={localVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover ${isCameraOff ? 'hidden' : 'block'}`}
+            />
+
+            {isCameraOff && (
               <div className="w-full h-full bg-slate-800 flex items-center justify-center flex-col">
                 <VideoOff className="h-12 w-12 text-red-500 mb-2" />
                 <span className="text-sm text-slate-500">กล้องปิดอยู่</span>
@@ -252,14 +289,14 @@ export default function VideoCallPage() {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-slate-900/90 backdrop-blur-md px-6 py-3 rounded-2xl border border-slate-700 shadow-2xl">
           <ControlButton
             active={isMuted}
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={toggleMic}
             onIcon={<MicOff />}
             offIcon={<Mic />}
             danger={isMuted}
           />
           <ControlButton
             active={isCameraOff}
-            onClick={() => setIsCameraOff(!isCameraOff)}
+            onClick={toggleCamera}
             onIcon={<VideoOff />}
             offIcon={<Video />}
             danger={isCameraOff}
@@ -269,18 +306,12 @@ export default function VideoCallPage() {
 
           <Button
             size="lg"
+            onClick={endCall}
             className="rounded-full h-12 w-16 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-900/20"
           >
             <PhoneOff className="h-6 w-6" />
           </Button>
 
-          <div className="w-px h-8 bg-slate-700 mx-2"></div>
-
-          <ControlButton
-            active={false}
-            onClick={() => { }}
-            offIcon={<Settings />}
-          />
         </div>
 
       </div>

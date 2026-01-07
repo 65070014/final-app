@@ -14,23 +14,31 @@ import { VitalSign } from '@/lib/types'
 interface VitalsSignsModalProps {
   appointmentId: string;
   onSuccess?: () => void;
+  isOpen?: boolean; 
+  onClose?: (open: boolean) => void;
 }
 
-export function VitalsSignsModal({ appointmentId, onSuccess }: VitalsSignsModalProps) {
-  const [open, setOpen] = useState(false);
+export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose }: VitalsSignsModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
   const router = useRouter()
   const { data: session } = useSession();
+  
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const initialFormData: VitalSign = {
     sbp: 0, dbp: 0, pr: 0, rr: 0, temperature: 0, weight: 0, height: 0,
     patientId: session?.user?.id ?? "",
     timestamp: new Date()
   };
-
   const [formData, setFormData] = useState<VitalSign>(initialFormData);
+
+  // ✅ LOGIC เลือกโหมด: ถ้ามี isOpen ส่งมา ให้ใช้ค่าจากข้างนอก ถ้าไม่มี ให้ใช้ internalOpen
+  const isControlled = isOpen !== undefined;
+  const showModal = isControlled ? isOpen : internalOpen;
+  const setShowModal = isControlled ? onClose : setInternalOpen;
+
 
   const handleChange = (field: string, value: string) => {
     const numValue = value === "" ? 0 : parseFloat(value);
@@ -82,8 +90,8 @@ export function VitalsSignsModal({ appointmentId, onSuccess }: VitalsSignsModalP
         const errorData = await response.json();
         throw new Error(errorData.error || 'ไม่สามารถบันทึกข้อมูลได้');
       }
+      if (setShowModal) setShowModal(false);
 
-      setOpen(false);
       setFormData(initialFormData);
       if (onSuccess) onSuccess();
       router.refresh();
@@ -98,13 +106,15 @@ export function VitalsSignsModal({ appointmentId, onSuccess }: VitalsSignsModalP
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-sm">
-          <Stethoscope size={18} />
-          บันทึกสัญญาณชีพ
-        </Button>
-      </DialogTrigger>
+    <Dialog open={showModal} onOpenChange={setShowModal}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-sm">
+            <Stethoscope size={18} />
+            บันทึกสัญญาณชีพ
+            </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -247,7 +257,7 @@ export function VitalsSignsModal({ appointmentId, onSuccess }: VitalsSignsModalP
           </div>
 
           <DialogFooter className="pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={() => setShowModal && setShowModal(false)}>
               ยกเลิก
             </Button>
             <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 min-w-[120px]">

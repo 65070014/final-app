@@ -4,6 +4,7 @@ import { FileText, Video, Clock, Activity, Heart, Scale, Calendar, AlertCircle }
 import { useSession } from "next-auth/react";
 import { PatientNav } from "@/components/patient/patient_nav"
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { AppointmentForm } from "@/components/patient/appointment/appointment_form"
@@ -20,6 +21,8 @@ const PatientDashboard = () => {
   const [history, setHistory] = useState([])
   const nextAppt = appointments[0];
   const isPending = nextAppt?.patient_status === 'Pending';
+  const [isVitalOpen, setIsVitalOpen] = useState(false);
+  const router = useRouter()
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -140,16 +143,23 @@ const PatientDashboard = () => {
                       <button className="flex-1 md:flex-none px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap">ยืนยันนัด</button>
                     </>
                   ) : (
-                    <Link
-                      href={`patient/videocall/${nextAppt.meeting_id}`}
-                    >
-                      <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2">
+                      <button 
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2"
+                      onClick={() => setIsVitalOpen(true)}>
                         <Video size={18} />
                         เข้าร่วมวิดีโอคอล
                       </button>
-                    </Link>
                   )}
                 </div>
+                <VitalsSignsModal
+                  appointmentId={nextAppt.id}
+                  isOpen={isVitalOpen}
+                  onClose={setIsVitalOpen}
+                  onSuccess={() => {
+                    // Redirect ไปหน้า Video
+                    router.push(`patient/videocall/${nextAppt.meeting_id}`);
+                  }}
+                />
               </div>
             )}
 
