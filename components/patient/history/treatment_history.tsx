@@ -86,7 +86,7 @@ export function TreatmentHistory() {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center text-sm text-gray-600 bg-white/50 p-2 rounded-md border border-blue-100">
+                  <div className="flex items-center text-gray-600 bg-white/50 p-2 rounded-md border border-blue-100">
                     <Clock className="h-4 w-4 mr-2 text-blue-500 shrink-0" />
                     <span className="mr-1">วันที่เข้ารับการรักษา:</span>
                     <span className="font-semibold text-gray-800">
@@ -101,25 +101,25 @@ export function TreatmentHistory() {
 
                 <div className="p-4 space-y-4">
 
-                  <div className="flex items-center text-sm text-gray-700">
+                  <div className="flex items-center  text-gray-700">
                     <User className="h-4 w-4 mr-2 text-gray-500 shrink-0" />
                     <span className="text-gray-500 mr-1">แพทย์ผู้รักษา:</span>
                     <span className="font-semibold text-gray-900">{record.doctorname}</span>
                   </div>
 
                   <div className="border border-gray-100 bg-gray-50 rounded-lg p-3">
-                    <h5 className="text-sm font-semibold text-gray-700 flex items-center mb-1">
+                    <h5 className="font-semibold text-gray-700 flex items-center mb-1">
                       <Stethoscope className="h-4 w-4 mr-2 text-green-600 shrink-0" />
                       การวินิจฉัยโรค
                     </h5>
-                    <p className="text-sm text-gray-600 ml-6 leading-relaxed">
+                    <p className=" text-gray-600 ml-6 leading-relaxed">
                       {record.diag_name}
                     </p>
                   </div>
 
                   <div className="pt-2 border-t border-gray-100">
                     <Link href={`treatment_record/${record.appointment_id}`} className="block">
-                      <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-lg text-sm font-medium transition-colors group">
+                      <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 rounded-lg font-medium transition-colors group">
                         <FileText className="h-4 w-4" />
                         ดูรายละเอียดการรักษาและใบรับรองแพทย์
                         <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

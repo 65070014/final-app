@@ -157,7 +157,7 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
 
           <Card>
             <CardHeader className="flex flex-row justify-between items-center">
-              <CardTitle className="text-lg">บันทึกเพิ่มเติมและการติดตาม</CardTitle>
+              <CardTitle className="text-lg">บันทึกเพิ่มเติมและการติดตาม</CardTitle> 
               <Link href={`/patient/vitals_track/${treatment.appointment_id}`}>
                 <Button variant="outline" size="sm">
                   <Plus className="h-4 w-4 mr-2" />

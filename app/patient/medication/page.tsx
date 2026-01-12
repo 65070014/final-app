@@ -69,7 +69,7 @@ export default function DispensingHistoryPage() {
                                         </div>
                                         <h1 className="text-2xl font-bold text-slate-800">ประวัติการรับยา</h1>
                                     </div>
-                                    <p className="text-slate-500 text-sm mt-1 ml-11">
+                                    <p className="text-slate-500  mt-1 ml-11">
                                         รายการใบสั่งยาและการจ่ายยาที่ท่านได้รับทั้งหมด
                                     </p>
                                 </div>

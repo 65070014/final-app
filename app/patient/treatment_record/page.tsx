@@ -19,7 +19,7 @@ export default function HistoryPage() {
                   </div>
                   <div>
                     <h1 className="text-2xl font-bold text-slate-800">ประวัติการรักษา</h1>
-                    <p className="text-slate-500 text-sm mt-1">
+                    <p className="text-slate-500  mt-1 ">
                       บันทึกการวินิจฉัย, ผลการตรวจ, และรายละเอียดการรักษาทั้งหมด
                     </p>
                   </div>

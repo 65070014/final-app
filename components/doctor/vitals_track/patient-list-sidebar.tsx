@@ -10,19 +10,19 @@ import { cn } from "@/lib/utils"
 
 interface PatientListSidebarProps {
   patients: Patient[]
-  selectedPatientId: string | null
+  selectedPatientDiagId: string | null
   onSelectPatient: (patientId: string) => void
 }
 
 
-export function PatientListSidebar({ patients, selectedPatientId, onSelectPatient }: PatientListSidebarProps) {
+export function PatientListSidebar({ patients, selectedPatientDiagId, onSelectPatient }: PatientListSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredPatients = patients.filter((patient) => {
     // Search filter
     const matchesSearch =
       patient.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      String(patient.id).includes(searchQuery)
+      String(patient.diag_id).includes(searchQuery)
 
 
     return matchesSearch
@@ -60,11 +60,11 @@ export function PatientListSidebar({ patients, selectedPatientId, onSelectPatien
         <div className="space-y-2 p-4">
           {filteredPatients.map((patient) => {
             {/*const daysRemaining = getDaysRemaining(patient.monitoringEndDate)*/}
-            const isSelected = patient.id === selectedPatientId
+            const isSelected = patient.diag_id === selectedPatientDiagId
 
             return (
               <button
-                key={patient.id}
+                key={`${patient.id}-${patient.app_id}`}
                 onClick={() => onSelectPatient(patient.id)}
                 className={cn(
                   "w-full rounded-lg border p-3 text-left transition-colors",

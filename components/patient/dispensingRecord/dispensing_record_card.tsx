@@ -7,12 +7,12 @@ export function DispensingRecordCard({ record }: { record: DispensingRecord }) {
     return (
         <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
             <div className="p-4 bg-blue-50 border-b border-blue-200">
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between items-center ">
                     <span className="font-bold text-lg text-blue-800">
                         ใบสั่งยา #{record.prescription_id}
                     </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
+                <div className="grid grid-cols-2 gap-2 mt-2 ">
                     <div className="flex items-center text-gray-600">
                         <Clock className="h-4 w-4 mr-2 shrink-0" />
                         วันที่รับยา: <span className='font-semibold ml-1'>{record.appointment_date}</span>
@@ -34,18 +34,18 @@ export function DispensingRecordCard({ record }: { record: DispensingRecord }) {
                                     <Pill className="h-4 w-4 mr-2 text-blue-500 shrink-0" />
                                     {item.medicine_name}
                                 </h5>
-                                <span className="text-sm px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 flex items-center">
+                                <span className=" px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 flex items-center">
                                     <Package className="h-3 w-3 mr-1" />
                                     {item.quantity} เม็ด
                                 </span>
                             </div>
-                            <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
+                            <div className="grid grid-cols-2 gap-2 mt-2 ">
                                 <span className="text-gray-500">ขนาดใช้: <span className="text-gray-800 font-medium">{item.dosage}</span></span>
                                 <span className="text-gray-500">วิธีใช้: <span className="text-green-700 font-medium">{item.usage}</span></span>
                             </div>
                             {item.note && (
-                                <p className="text-xs text-red-600 mt-1 flex items-start">
-                                    <AlertCircle className="h-3 w-3 mr-1 mt-0.5 shrink-0" />
+                                <p className=" text-red-600 mt-1 flex items-start">
+                                    <AlertCircle className="h-3 w-3 mr-1 mt-2.5 shrink-0" />
                                     หมายเหตุ: {item.note}
                                 </p>
                             )}

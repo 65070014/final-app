@@ -1,22 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { PatientReferencePanel } from "@/components/doctor/medical_record/patient_panel"
 import { DiagnosisSection } from "@/components/doctor/medical_record/diagnosis_section"
 import { MedicationSection } from "@/components/doctor/medical_record/medication_section"
 import { MonitoringSection } from "@/components/doctor/medical_record/monitoring_section"
 import { Button } from "@/components/ui/button"
 import { Save } from "lucide-react"
-import { useParams } from 'next/navigation';
+import { useParams, useRouter} from 'next/navigation';
+
 
 export default function MedicalRecordForm() {
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  const socketRef = useRef<any>(null);
   const params = useParams();
+  const router = useRouter();
+
   const { id: appointmentId } = params;
   const getInitialData = () => {
     if (typeof window !== 'undefined') {
       const diagItem = sessionStorage.getItem('initialDiagnosisNote');
       const medsItem = sessionStorage.getItem('initialMedications');
-      
+
       sessionStorage.removeItem('initialDiagnosisNote');
       sessionStorage.removeItem('initialMedications');
 
@@ -39,6 +45,19 @@ export default function MedicalRecordForm() {
   })
 
   const handleSaveRecord = async () => {
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+      localStreamRef.current = null;
+    }
+
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+    }
+
     const payload = {
       appointmentId,
       diagnosisNote,
@@ -62,7 +81,7 @@ export default function MedicalRecordForm() {
 
       alert("บันทึกเวชระเบียนเรียบร้อยแล้ว");
 
-      window.close();
+      router.push('/doctor/vitals_track/1');
 
     } catch (err) {
       const errorMessage = (err as Error).message;

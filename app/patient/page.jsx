@@ -136,7 +136,7 @@ const PatientDashboard = () => {
                     <p className="text-gray-600 mt-1">
                       กับ <span className="font-semibold">{nextAppt.doctorname}</span> ({nextAppt.department})
                     </p>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-2 mt-2  text-gray-500">
                       <Clock size={16} />
                       <span>
                         {nextAppt.date ? format(new Date(nextAppt.date), "dd MMM yyyy", { locale: th }) : "ไม่ระบุวันที่"}, {nextAppt.time}
@@ -147,7 +147,7 @@ const PatientDashboard = () => {
                 <div className="flex gap-3 w-full md:w-auto">
                   {isPending ? (
                     <>
-                      <button className="flex-1 md:flex-none px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 text-sm font-medium whitespace-nowrap">ขอยกเลิก</button>
+                      <button className="flex-1 md:flex-none px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50  font-medium whitespace-nowrap">ขอยกเลิก</button>
                       <button className="flex-1 md:flex-none px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap">ยืนยันนัด</button>
                     </>
                   ) : (
@@ -179,7 +179,7 @@ const PatientDashboard = () => {
                 </h3>
                 <Link
                   href="/patient/appointment"
-                  className="text-sm text-blue-600 hover:underline"
+                  className=" text-blue-600 hover:underline"
                 >
                   ดูนัดหมายทั้งหมด
                 </Link>
@@ -218,7 +218,7 @@ const PatientDashboard = () => {
                 <h3 className="font-bold text-gray-800">ประวัติล่าสุด</h3>
                 <Link
                   href="/patient/treatment_record"
-                  className="text-sm text-blue-600 hover:underline"
+                  className=" text-blue-600 hover:underline"
                 >
                   ดูนัดหมายทั้งหมด
                 </Link>
@@ -278,7 +278,7 @@ const RecordItem = ({ date, title, doctor }) => (
       </div>
       <div>
         <h4 className="font-medium text-gray-800">{title}</h4>
-        <p className="text-sm text-gray-500">{doctor}</p>
+        <p className=" text-gray-500">{doctor}</p>
       </div>
     </div>
     <button className="text-gray-400 hover:text-blue-600"><FileText size={18} /></button>
@@ -289,7 +289,7 @@ const MedItem = ({ name, desc }) => (
   <li className="flex gap-3 items-start pb-3 border-b border-gray-100 last:border-0">
     <div className="w-2 h-2 mt-2 rounded-full bg-green-500 shrink-0"></div>
     <div>
-      <p className="text-sm font-medium text-gray-800">{name}</p>
+      <p className=" font-medium text-gray-800">{name}</p>
       <p className="text-xs text-gray-500">{desc}</p>
     </div>
   </li>

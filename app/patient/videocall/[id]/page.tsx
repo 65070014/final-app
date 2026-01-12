@@ -70,7 +70,7 @@ export default function VideoCallPage() {
       socketRef.current.disconnect();
     }
 
-    router.push('/patient/appointment');
+    router.push('/patient/treatment_record');
   };
 
   const peerConnectionConfig = {
@@ -215,7 +215,7 @@ export default function VideoCallPage() {
   }, [ROOM_ID]);
 
   return (
-    <div className="flex h-screen bg-slate-950 overflow-hidden font-sans text-slate-100">
+    <div className="flex h-screen w-screen bg-slate-950 overflow-hidden font-sans text-slate-100">
 
       <div className="flex-1 flex flex-col relative">
         <div className="absolute top-0 left-0 right-0 p-4 z-10 bg-gradient-to-b from-black/70 to-transparent flex justify-between items-start">

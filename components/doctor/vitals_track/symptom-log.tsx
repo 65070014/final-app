@@ -42,7 +42,7 @@ export function SymptomLog({ vitalSigns }: SymptomLogProps) {
           ) : (
             sortedSymptoms.map((symptom) => (
               <div
-                key={symptom.id}
+                key={`${symptom.id}-${symptom.date}-${symptom.time}`}
                 className={cn(
                   "flex gap-3 rounded-lg border p-4 transition-colors",
                 )}
