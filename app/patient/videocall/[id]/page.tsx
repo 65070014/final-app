@@ -214,6 +214,10 @@ export default function VideoCallPage() {
     };
   }, [ROOM_ID]);
 
+
+  useEffect(() => {
+    window.scrollTo(0, 1);
+  }, []);
   return (
     <div className="flex h-screen w-screen bg-slate-950 overflow-hidden font-sans text-slate-100">
 
