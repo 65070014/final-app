@@ -57,6 +57,9 @@ export default function VideoCallPage() {
   };
 
   const endCall = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => { });
+    }
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
       peerConnectionRef.current = null;

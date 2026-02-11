@@ -301,70 +301,68 @@ export default function VideoConsultationPage() {
 
 
     return (
-        <div className="min-h-screen bg-gray-300 flex overflow-hidden">
-            <div className="min-h-screen bg-gray-50 flex overflow-hidden">
-                {!isPanelOpen && (
-                    <button
-                        onClick={() => setIsPanelOpen(true)}
-                        className="fixed top-4 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        <div className="min-h-screen bg-gray-300 flex flex-col lg:flex-row overflow-hidden">
+            {!isPanelOpen && (
+                <button
+                    onClick={() => setIsPanelOpen(true)}
+                    className="fixed top-4 left-4 z-50 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
+            )}
+            {isPanelOpen && (
+                <div className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300"
+                    onClick={() => setIsPanelOpen(false)}
+                >
+                    <div
+                        className="absolute left-0 top-0 bottom-0 w-96 flex-shrink-0 bg-gray-100 p-4 border-r border-gray-300 shadow-xl z-50"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <Menu className="w-6 h-6" />
-                    </button>
-                )}
-                {isPanelOpen && (
-                    <div className="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300"
-                        onClick={() => setIsPanelOpen(false)}
-                    >
-                        <div
-                            className="absolute left-0 top-0 bottom-0 w-96 flex-shrink-0 bg-gray-100 p-4 border-r border-gray-300 shadow-xl z-50"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                                    <Video className="w-5 h-5 mr-2 text-blue-600" /> รายการคิววันนี้
-                                </h3>
-                                <button
-                                    onClick={() => setIsPanelOpen(false)}
-                                    className="p-1 rounded-full text-gray-600 hover:bg-gray-200"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                                <Video className="w-5 h-5 mr-2 text-blue-600" /> รายการคิววันนี้
+                            </h3>
+                            <button
+                                onClick={() => setIsPanelOpen(false)}
+                                className="p-1 rounded-full text-gray-600 hover:bg-gray-200"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
 
-                            <div className="space-y-2 max-h-[90vh] overflow-y-auto pr-2">
-                                {isloading ? (
-                                    <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
+                        <div className="space-y-2 max-h-[90vh] overflow-y-auto pr-2">
+                            {isloading ? (
+                                <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
+                            ) : (
+                                appointment.length === 0 ? (
+                                    <div className="text-center py-6 text-gray-500 bg-white p-4 rounded-lg border border-dashed border-gray-300">
+                                        <p className="font-medium">วันนี้ไม่มีนัดหมาย</p>
+                                    </div>
                                 ) : (
-                                    appointment.length === 0 ? (
-                                        <div className="text-center py-6 text-gray-500 bg-white p-4 rounded-lg border border-dashed border-gray-300">
-                                            <p className="font-medium">วันนี้ไม่มีนัดหมาย</p>
-                                        </div>
-                                    ) : (
-                                        appointment.map((appt) => (
-                                            <div
-                                                key={appt.id}
-                                                onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id, appt.meeting_id)}
-                                                className={`p-3 rounded-lg border cursor-pointer transition-colors 
+                                    appointment.map((appt) => (
+                                        <div
+                                            key={appt.id}
+                                            onClick={() => appt.patient_status !== 'Canceled' && handleSwitchQueue(appt.id, appt.meeting_id)}
+                                            className={`p-3 rounded-lg border cursor-pointer transition-colors 
                                             ${appt.id === selectedAppointmentId ? 'bg-blue-100 border-blue-400 shadow-md' : 'bg-white hover:bg-gray-50'}
                                             ${appt.patient_status === 'Canceled' ? 'opacity-50' : ''}
                                         `}
-                                            >
-                                                <div className="font-bold">{appt.time} - {appt.patient}</div>
-                                                <div className="text-sm text-gray-600 truncate">{appt.symptoms}</div>
-                                                <div className="mt-1 text-xs">
-                                                    <span className={`px-2 py-0.5 rounded-full ${appt.id === selectedAppointmentId ? 'bg-blue-600 text-white' : 'bg-green-200 text-green-800'}`}>
-                                                        {appt.id === selectedAppointmentId ? 'กำลังตรวจ' : appt.patient_status}
-                                                    </span>
-                                                </div>
+                                        >
+                                            <div className="font-bold">{appt.time} - {appt.patient}</div>
+                                            <div className="text-sm text-gray-600 truncate">{appt.symptoms}</div>
+                                            <div className="mt-1 text-xs">
+                                                <span className={`px-2 py-0.5 rounded-full ${appt.id === selectedAppointmentId ? 'bg-blue-600 text-white' : 'bg-green-200 text-green-800'}`}>
+                                                    {appt.id === selectedAppointmentId ? 'กำลังตรวจ' : appt.patient_status}
+                                                </span>
                                             </div>
-                                        ))
-                                    )
-                                )}
-                            </div>
+                                        </div>
+                                    ))
+                                )
+                            )}
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
             <div className={`flex-grow flex flex-col p-6 space-y-4 transition-all duration-300 ${isDiagnosPanelOpen ? 'lg:ml-0' : 'ml-0'}`}>
 
@@ -377,7 +375,7 @@ export default function VideoConsultationPage() {
                     </button>
                 )}
 
-                <div className={`w-full h-2/3 min-h-[150px] bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0`}>
+                <div className={`w-full h-[65vh] lg:h-2/3 min-h-[150px] bg-black rounded-lg shadow-xl relative overflow-hidden flex-shrink-0`}>
 
                     <span className="text-white text-2xl absolute inset-0 flex items-center justify-center">
                         {
@@ -467,7 +465,9 @@ export default function VideoConsultationPage() {
                 </div>
             </div>
 
-            <div className="w-[480px] flex-shrink-0 bg-white border-l border-gray-200 p-4 space-y-6 shadow-lg z-10  relative">
+            <div className="w-full lg:w-[300px] xl:w-[420px] flex-shrink-0 bg-white border-l lg:border-l border-t lg:border-t-0
+            border-gray-200 
+            p-4 space-y-6 shadow-lg z-10 relative">
                 <h3 className="text-xl font-bold border-b pb-2 text-gray-800">ผู้ป่วย: {patient ? patient.patient : 'ไม่ได้เลือก'}</h3>
 
                 {selectedAppointmentId && (
