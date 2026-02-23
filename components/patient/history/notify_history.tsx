@@ -26,7 +26,7 @@ const formatTimeAgo = (dateString: string) => {
   return new Intl.DateTimeFormat('th-TH', { month: 'short', day: 'numeric' }).format(date);
 };
 
-export function NotificationPopup() {
+export function NotificationPopup({ role }: { role: string }) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true);
@@ -35,10 +35,17 @@ export function NotificationPopup() {
   useEffect(() => {
     async function fetchNotification() {
       if (status !== 'authenticated' || !session?.user?.id) return;
+      let response;
 
       try {
         const patientId = session.user.id;
-        const response = await fetch(`/api/notification?id=${patientId}&role=Patient&t=${Date.now()}`);
+        if (role == "Patient") {
+          response = await fetch(`/api/notification?id=${patientId}&role=Patient&t=${Date.now()}`);
+        }
+        else if (role == "Nurse") {
+          response = await fetch(`/api/notification?role=Nurse&t=${Date.now()}`);
+        }
+
         if (response.ok) {
           const data = await response.json();
           setNotifications(data);
@@ -59,8 +66,37 @@ export function NotificationPopup() {
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
+  const handleOpenChange = async (newOpenState: boolean) => {
+    setIsOpen(newOpenState);
+
+    if (newOpenState === true && unreadCount > 0) {
+      try {
+        setNotifications(prevNotifications =>
+          prevNotifications.map(notification => ({
+            ...notification,
+            is_read: true
+          }))
+        );
+
+        // 2. ยิง API ไปบอกหลังบ้าน
+        await fetch('/api/notification', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: session.user.id,
+            role: role
+          }),
+        });
+
+      } catch (error) {
+        console.error("Failed to mark as read:", error);
+        // ถ้า Error อาจจะเขียนโค้ดดึงข้อมูล GET /api/notifications ใหม่อีกรอบ เพื่อให้หน้าเว็บตรงกับ Database 
+      }
+    }
+  };
+
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
           className={`

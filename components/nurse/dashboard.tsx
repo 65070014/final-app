@@ -4,6 +4,7 @@ import { ClipboardList, PlusCircle } from "lucide-react"
 import Link from "next/link"
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { NotificationPopup } from '@/components/patient/history/notify_history'
 
 interface RecentAppointment {
   id: number;
@@ -41,6 +42,7 @@ export default function NurseDashboard() {
   return (
     <div className="min-h-screen  p-8  bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg shadow-lg">
       <div className="max-w-6xl mx-auto">
+        <NotificationPopup role="Nurse"/>
 
         <div className="bg-blue-900 text-white rounded-lg p-6 mb-6 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Nurse Dashboard</h1>

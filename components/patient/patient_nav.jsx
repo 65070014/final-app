@@ -11,11 +11,6 @@ export function PatientNav() {
 
   return (
     <>
-      {/* ❌ ลบปุ่มลอยตรงนี้ออกแล้วครับ 
-          ตอนนี้ใช้ปุ่มตรง Logo ด้านในแทนทั้งหมด
-      */}
-
-      {/* 2. Backdrop: บังหลังเฉพาะตอนเปิดเมนู (บน Mobile/iPad) */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[40] xl:hidden"
@@ -37,8 +32,8 @@ export function PatientNav() {
 
         /* --- Logic การยืดหด (สำหรับ Mobile/iPad) --- */
         ${isOpen 
-          ? 'w-64 md:w-64 translate-x-0 shadow-2xl' /* ✅ ใส่ md:w-64 ให้แล้ว เพื่อให้ iPad กางสุด */
-          : '-translate-x-full md:translate-x-0 md:w-20' /* ตอนปิด: Mobile ซ่อน, iPad เหลือ 20 */
+          ? 'w-64 md:w-64 translate-x-0 shadow-2xl'
+          : '-translate-x-full md:translate-x-0 md:w-20'
         }
       `}>
         
@@ -78,7 +73,7 @@ export function PatientNav() {
         {/* Bottom Section */}
         <div className="p-4 border-t border-gray-200">
           <div className={`transition-all duration-300 mb-2 ${isOpen ? 'block' : 'hidden xl:block'}`}>
-             <NotificationPopup />
+             <NotificationPopup role="Patient"/>
           </div>
           <NavItem icon={<LogOut size={20} />} text="ออกจากระบบ" color="text-red-500 hover:bg-red-50" isOpen={isOpen} />
         </div>

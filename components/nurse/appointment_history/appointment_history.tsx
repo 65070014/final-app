@@ -122,7 +122,7 @@ export default function NurseDashboard() {
             const res = await fetch(`/api/appointments/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: selectedDate, time: selectedTime, patient_status: "Pending" })
+                body: JSON.stringify({ date: selectedDate, time: selectedTime, patient_status: "Pending",status:"Confirmed" })
             });
             if (!res.ok) throw new Error('เลื่อนนัดไม่สำเร็จ');
 
