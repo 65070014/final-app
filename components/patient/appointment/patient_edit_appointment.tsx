@@ -83,9 +83,9 @@ export function Patient_Edit_Appointment({
   const handleReschedule = async (record: number) => {
     try {
       const response = await fetch(`/api/appointments/${record}`, {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({selectedDate, selectedTime}),
+        body: JSON.stringify({date:selectedDate, time:selectedTime,patient_status: "Confirmed",status:"Pending"}),
       });
 
       if (!response.ok) {

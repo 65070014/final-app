@@ -14,7 +14,7 @@ export async function createNotification(
                 recipient_id, 
                 recipient_type,
                 notification_type, 
-                message,
+                message_text,
                 link_url,
                 create_at
             ) VALUES (?, ?, ?, ?,?,NOW());

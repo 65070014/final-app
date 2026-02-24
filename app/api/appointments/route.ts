@@ -1,7 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db';
-import { ResultSetHeader } from 'mysql2/promise';
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { v4 as uuidv4 } from 'uuid';
+import { createNotification } from '@/utils/notification';
+import { createEmail } from '@/utils/email_send';
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -88,6 +93,7 @@ export async function POST(request: Request) {
         const appointmentData = await request.json();
         const dateTimeString = `${appointmentData.date}T${appointmentData.time}:00`;
         const appointmentDateTime = new Date(dateTimeString);
+        const creator_type = appointmentData.patient_status === "Confirmed" ? 'Nurse' : 'Patient'
 
         const now = new Date();
         if (appointmentDateTime <= now) {
@@ -107,7 +113,6 @@ export async function POST(request: Request) {
             uuidv4()
         ];
 
-
         db = await dbPool.getConnection();
 
 
@@ -119,7 +124,42 @@ export async function POST(request: Request) {
             )
         `;
 
-        const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);
+        const [resultPrimary] = await db.execute(sqlPrimary, patientvalues) as [ResultSetHeader, any];;
+        console.log(resultPrimary)
+        const appointment_id = resultPrimary.insertId;
+        const thaiTime = format(new Date(appointmentDateTime), "dd MMM yyyy", { locale: th })
+        await createNotification(
+            db,
+            appointmentData.patientId,
+            creator_type,
+            'APPOINTMENT_CREATED',
+            creator_type === 'Nurse'
+                ? `มีนัดหมายใหม่จากผู้ป่วยวันที่ ${thaiTime} โปรดตรวจสอบและยืนยัน`
+                : `คุณมีนัดหมายใหม่วันที่ ${thaiTime} โปรดทำการยืนยันการนัดหมาย`,
+            creator_type === 'Nurse'
+                ? `/nurse/appointment_history`
+                : `/patient/appointments?selected=${appointment_id}`
+        );
+
+        const sqlGetEmail = `SELECT email FROM Patient WHERE patient_id = ?`;
+        const [patientRows] = await db.execute(sqlGetEmail, [appointmentData.patientId]) as [RowDataPacket[], any];
+
+        //เช็คก่อนว่าเจอข้อมูลคนไข้ไหม และเขามีอีเมลในระบบหรือเปล่า
+        if (patientRows.length > 0 && patientRows[0].email) {
+            const patientEmail = patientRows[0].email;
+
+            //ส่ง Email
+            await createEmail(
+                patientEmail,
+                "🏥 แจ้งเตือนการนัดหมายใหม่ (Telemedicine)",
+                creator_type === 'Nurse'
+                    ? `เจ้าหน้าที่ได้ทำการนัดหมายให้ท่านในวันที่ ${thaiTime} โปรดตรวจสอบรายละเอียดในระบบ`
+                    : `คุณได้สร้างนัดหมายสำเร็จสำหรับวันที่ ${thaiTime} โปรดรอเจ้าหน้าที่ยืนยัน`
+            );
+            console.log(`ส่งอีเมลแจ้งเตือนไปที่ ${patientEmail} สำเร็จ!`);
+        } else {
+            console.log(`ข้ามการส่งอีเมล: ไม่พบข้อมูลอีเมลของ Patient ID ${appointmentData.patientId}`);
+        }
         const resultHeader = resultPrimary as ResultSetHeader;
         const patientId = resultHeader.insertId;
 
