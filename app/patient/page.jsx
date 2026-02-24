@@ -98,14 +98,6 @@ const PatientDashboard = () => {
             <h1 className="text-2xl font-bold text-gray-800">สวัสดี, คุณ{session?.user?.name || 'ผู้ใช้'}</h1>
             <p className="text-gray-500">ยินดีต้อนรับเข้าสู่ระบบดูแลสุขภาพของคุณ</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-              {(() => {
-                const names = (session?.user?.name || "").trim().split(' ');
-                return names[0].charAt(0) + (names[1] ? names[1].charAt(0) : '');
-              })()}
-            </div>
-          </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -270,8 +262,8 @@ const StatCardSmall = ({ label, value, unit, color, icon: Icon }) => (
         <Icon size={18} />
       </div>
       <div>
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className="font-bold text-gray-800">{value} <span className="text-xs font-normal text-gray-400">{unit}</span></p>
+        <p className=" text-gray-800">{label}</p>
+        <p className="font-bold text-gray-800">{value} <span className="font-normal text-gray-800">{unit}</span></p>
       </div>
     </div>
     <div className={`h-2 w-2 rounded-full bg-${color}-500`}></div>
@@ -298,8 +290,8 @@ const MedItem = ({ name, desc }) => (
   <li className="flex gap-3 items-start pb-3 border-b border-gray-100 last:border-0">
     <div className="w-2 h-2 mt-2 rounded-full bg-green-500 shrink-0"></div>
     <div>
-      <p className=" font-medium text-gray-800">{name}</p>
-      <p className="text-xs text-gray-500">{desc}</p>
+      <p className="  text-gray-800">{name}</p>
+      <p className=" text-gray-500">{desc}</p>
     </div>
   </li>
 );

@@ -44,7 +44,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                     a.appointment_id, a.apdate, a.status, a.patient_status, 
                     p.fname, p.lname, a.department, d.position, d.gender, d.fname, d.lname
                 ORDER BY 
-                a.apdate ASC;`,
+                a.apdate DESC;`,
             [patientId]
         );
         return NextResponse.json(rows);
