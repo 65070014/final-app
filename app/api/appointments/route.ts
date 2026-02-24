@@ -89,6 +89,13 @@ export async function POST(request: Request) {
         const dateTimeString = `${appointmentData.date}T${appointmentData.time}:00`;
         const appointmentDateTime = new Date(dateTimeString);
 
+        const now = new Date();
+        if (appointmentDateTime <= now) {
+            return NextResponse.json({
+                error: 'ไม่สามารถนัดหมายในวันที่ผ่านมาแล้วได้'
+            }, { status: 400 });
+        }
+
         const patientvalues = [
             appointmentData.patientId,
             appointmentData.doctorId,
@@ -107,7 +114,9 @@ export async function POST(request: Request) {
         const sqlPrimary = `
             INSERT INTO Appointment (
                 patient_id,medical_personnel_id,department,apdate,status,patient_status,symptoms,meeting_id
-            ) VALUES (?, ?, ?, ?, ?,?,?,?)
+            ) VALUES (
+             ?, ?, ?, ?, ?,?,?,?
+            )
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);

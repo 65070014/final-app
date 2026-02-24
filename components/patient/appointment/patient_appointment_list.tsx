@@ -93,13 +93,13 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
         switch (status) {
             case 'UPCOMING':
             case 'Confirmed':
-                return <Badge className="bg-green-500 hover:bg-green-600">ยืนยันแล้ว</Badge>;
+                return <Badge className="bg-green-500 hover:bg-green-600 text-sm">ยืนยันแล้ว</Badge>;
             case 'Complete':
                 return <Badge variant="secondary">เสร็จสิ้น</Badge>;
             case 'Cancelled':
-                return <Badge variant="destructive">ยกเลิกแล้ว</Badge>;
+                return <Badge variant="destructive" className="text-sm">ยกเลิกแล้ว</Badge>;
             default:
-                return <Badge variant="outline">รอการตรวจสอบ</Badge>;
+                return <Badge variant="outline" className="bg-yellow-500 hover:bg-yellow-600 text-sm">รอการตรวจสอบ</Badge>;
         }
     };
 

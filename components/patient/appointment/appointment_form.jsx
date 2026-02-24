@@ -135,6 +135,7 @@ export function AppointmentForm() {
                 id="date"
                 value={formData.date}
                 onChange={handleChange}
+                min={new Date().toISOString().split('T')[0]}
                 required
               />
             </div>
