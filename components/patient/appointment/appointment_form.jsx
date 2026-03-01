@@ -122,10 +122,10 @@ export function AppointmentForm() {
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
 
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-blue-700">สร้างนัดหมายใหม่</DialogTitle>
+          <DialogTitle className="text-[1.50rem] font-bold text-blue-700">สร้างนัดหมายใหม่</DialogTitle>
         </DialogHeader>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 ">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">

@@ -114,7 +114,7 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
     });
     return (
         <div className="space-y-4">
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-500 ">{error}</p>}
             {isLoading ? (
                 <p className="text-center text-gray-500 py-10">กำลังโหลดรายการนัดหมาย...</p>
             ) : (
@@ -125,16 +125,16 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                         <Card key={record.id} className="p-4 space-y-3 shadow-md hover:shadow-lg transition-shadow">
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
-                                    <h2 className="font-bold text-xl text-gray-700">นัดหมายกับ {record.doctorname}</h2>
-                                    <p className="text-sm text-muted-foreground">{record.department}</p>
+                                    <h2 className="font-bold text-[1.25rem] text-gray-700">นัดหมายกับ {record.doctorname}</h2>
+                                    <p className=" text-[1.25rem]">{record.department}</p>
                                 </div>
                                 {getStatusBadge(record.status)}
                             </div>
 
-                            <div className="flex items-center gap-4 text-sm">
+                            <div className="flex items-center gap-4">
                                 <Clock className="h-4 w-4 text-indigo-500" />
-                                <span className="font-semibold text-base">{format(new Date(record.date), "dd MMM yyyy", { locale: th })}</span>
-                                <span className="text-gray-600">เวลา {record.time}</span>
+                                <span className="font-semibold text-[1.25rem]">{format(new Date(record.date), "dd MMM yyyy", { locale: th })}</span>
+                                <span className="font-semibold text-[1.25rem]">เวลา {record.time}</span>
                             </div>
 
                             <div className="flex justify-end gap-3 pt-3 border-t mt-3">

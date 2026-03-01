@@ -18,8 +18,8 @@ export default function AppointmentPage() {
         <Card className="p-6 w-full shadow-sm border border-slate-300 rounded-xl bg-white">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">การนัดหมาย</h1>
-              <p className="text-slate-500 text-sm mt-1">จัดการตารางนัดหมายและการจองคิวของคุณ</p>
+              <h1 className="text-[1.50rem] font-bold text-slate-800">การนัดหมาย</h1>
+              <p className=" mt-1">จัดการตารางนัดหมายและการจองคิวของคุณ</p>
             </div>
             <AppointmentForm />
           </div>
@@ -30,14 +30,14 @@ export default function AppointmentPage() {
           <Button
             onClick={() => setActiveTab('upcoming')}
             variant={activeTab === 'upcoming' ? 'secondary' : 'ghost'}
-            className={`text-sm ${activeTab === 'upcoming' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500'}`}
+            className={` ${activeTab === 'upcoming' ? 'bg-blue-50 text-blue-700 shadow-sm text-[1.25rem]' : ' text-gray-500'}`}
           >
             นัดหมายที่กำลังจะมาถึง
           </Button>
           <Button
             onClick={() => setActiveTab('history')}
             variant={activeTab === 'history' ? 'secondary' : 'ghost'}
-            className={`text-sm ${activeTab === 'history' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500'}`}
+            className={` ${activeTab === 'history' ? 'bg-blue-50 text-blue-700 shadow-sm text-[1.25rem]' : 'text-[1.25rem] text-gray-500'}`}
           >
             ประวัติการนัดหมาย
           </Button>

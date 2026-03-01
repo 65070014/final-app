@@ -128,22 +128,22 @@ export function CalendarDashboard() {
         }
     };
     return (
-        <div className="space-y-4 text-black border rounded-lg p-4 bg-gray-50 shadow-sm">
-            <div className="flex justify-between items-center bg-white p-2 rounded border">
+        <div className="space-y-4 text-black border rounded-lg p-4 bg-gray-50 shadow-sm ">
+            <div className="flex justify-between items-center bg-white p-2 rounded border ">
                 <button
                     onClick={() => setCurrentDate(addMonths(currentDate, -1))}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors "
                 >
-                    <ChevronLeft className="w-6 h-6 text-gray-600" />
+                    <ChevronLeft className="w-6 h-6 text-gray-600 " />
                 </button>
 
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 items-center ">
                     {/* เลือกเดือน */}
                     <Select
                         value={currentDate.getMonth().toString()}
                         onValueChange={handleMonthChange}
                     >
-                        <SelectTrigger className="w-[140px] font-bold text-gray-800 border-none shadow-none hover:bg-gray-100 focus:ring-0">
+                        <SelectTrigger className="w-[140px] font-bold text-gray-800 border-none shadow-none hover:bg-gray-100 focus:ring-0 text-xl">
                             <SelectValue>{months[currentDate.getMonth()]}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
@@ -158,7 +158,7 @@ export function CalendarDashboard() {
                         value={currentDate.getFullYear().toString()}
                         onValueChange={handleYearChange}
                     >
-                        <SelectTrigger className="w-[100px] font-bold text-gray-800 border-none shadow-none hover:bg-gray-100 focus:ring-0">
+                        <SelectTrigger className="w-[100px] font-bold text-gray-800 border-none shadow-none hover:bg-gray-100 focus:ring-0 text-xl">
                             <SelectValue>{currentDate.getFullYear()}</SelectValue>
                         </SelectTrigger>
                         <SelectContent>
@@ -171,7 +171,7 @@ export function CalendarDashboard() {
 
                 <button
                     onClick={() => setCurrentDate(addMonths(currentDate, 1))}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors "
                 >
                     <ChevronRight className="w-6 h-6 text-gray-600" />
                 </button>

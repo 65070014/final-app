@@ -20,6 +20,9 @@ export default {
       phone: { max: '639px' },
     },
     extend: {
+      fontFamily: {
+        sans: ["Kanit", "sans-serif"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

@@ -57,7 +57,7 @@ export function AppointmentCalendar({ appointments, deleteAppointment, confirmAp
 
     return (
         <div>
-            <div className="grid grid-cols-7 text-center font-semibold bg-blue-50 border border-blue-100 rounded-t-lg py-3">
+            <div className="grid grid-cols-7 text-center font-semibold bg-blue-50 border border-blue-100 rounded-t-lg py-3 ">
                 {["จันทร์", "อังคาร", "พุธ", "พฤหัส", "ศุกร์", "เสาร์", "อาทิตย์"].map((d) => (
                     <div key={d} className="text-blue-800">{d}</div>
                 ))}
@@ -87,13 +87,13 @@ export function AppointmentCalendar({ appointments, deleteAppointment, confirmAp
                             <div
                                 key={idx}
                                 className={`
-                                    border-r border-t p-2 min-h-[120px] text-xs relative flex flex-col gap-1 transition-colors
+                                    border-r border-t p-2 min-h-[120px] relative flex flex-col gap-1 transition-colors 
                                     ${!isCurrentMonth ? "bg-gray-50/50 text-gray-400" : "bg-white"}
-                                    hover:bg-blue-50/30
+                                    hover:bg-blue-50/30 
                                 `}
                             >
                                 <div className={`
-                                    font-medium mb-1 w-7 h-7 flex items-center justify-center rounded-full
+                                   text-xl  mb-1 w-7 h-7 flex items-center justify-center rounded-full
                                     ${isToday ? "bg-blue-600 text-white shadow-sm" : ""}
                                 `}>
                                     {format(day, "d")}

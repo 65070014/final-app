@@ -59,7 +59,7 @@
   }
 
   p {
-    @apply text-lg;
+    @apply text-xl;
   }
 }
 

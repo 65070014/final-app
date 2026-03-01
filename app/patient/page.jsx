@@ -95,7 +95,7 @@ const PatientDashboard = () => {
       <main className="flex-1 overflow-y-auto p-8">
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">สวัสดี, คุณ{session?.user?.name || 'ผู้ใช้'}</h1>
+            <h1 className="text-[1.50rem] font-bold text-gray-800">สวัสดี, คุณ {session?.user?.name || 'ผู้ใช้'}</h1>
             <p className="text-gray-500">ยินดีต้อนรับเข้าสู่ระบบดูแลสุขภาพของคุณ</p>
           </div>
         </header>
@@ -125,20 +125,20 @@ const PatientDashboard = () => {
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-lg font-bold text-gray-800">
+                      <h3 className="text-[1.5rem] font-bold text-gray-800">
                         {isPending ? 'กรุณายืนยันนัดหมาย' : 'นัดหมายถัดไป (Video Call)'}
                       </h3>
                       {isPending && (
-                        <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full font-bold animate-pulse">
+                        <span className=" bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full font-bold animate-pulse">
                           รอการยืนยัน
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 mt-1">
+                    <p className=" mt-1 text-[1.25rem]">
                       กับ <span className="font-semibold">{nextAppt.doctorname}</span> ({nextAppt.department})
                     </p>
-                    <div className="flex items-center gap-2 mt-2  text-gray-500">
-                      <Clock size={16} />
+                    <div className="flex items-center gap-2 mt-2  ">
+                      <Clock size={15} />
                       <span>
                         {nextAppt.date ? format(new Date(nextAppt.date), "dd MMM yyyy", { locale: th }) : "ไม่ระบุวันที่"}, {nextAppt.time}
                       </span>
@@ -174,7 +174,7 @@ const PatientDashboard = () => {
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <h3 className="text-[1.25rem] font-bold text-gray-800 flex items-center gap-2">
                   <Calendar size={24} className="text-blue-600" />
                   ปฏิทินนัดหมาย
                 </h3>
@@ -241,7 +241,7 @@ const PatientDashboard = () => {
                   ))
                 ) : (
                   <div className="text-center py-6 border border-dashed border-gray-200 rounded-lg bg-gray-50">
-                    <p className="text-gray-500 text-xs">ไม่พบประวัติล่าสุด</p>
+                    <p className=" ">ไม่พบประวัติล่าสุด</p>
                   </div>
                 )}
               </div>
@@ -274,15 +274,15 @@ const RecordItem = ({ date, title, doctor }) => (
   <div className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors">
     <div className="flex gap-4">
       <div className="bg-blue-50 w-12 h-12 rounded-lg flex flex-col items-center justify-center text-blue-600">
-        <span className="text-xs font-bold">{date.split(' ')[0]}</span>
-        <span className="text-[10px]">{date.split(' ')[1]}</span>
+        <span className="font-bold">{date.split(' ')[0]}</span>
+        <span className="text-[1rem]">{date.split(' ')[1]}</span>
       </div>
       <div>
         <h4 className="font-medium text-gray-800">{title}</h4>
-        <p className=" text-gray-500">{doctor}</p>
+        <p className=" ">{doctor}</p>
       </div>
     </div>
-    <button className="text-gray-400 hover:text-blue-600"><FileText size={18} /></button>
+    <button className=" hover:text-blue-600"><FileText size={18} /></button>
   </div>
 );
 
@@ -290,8 +290,8 @@ const MedItem = ({ name, desc }) => (
   <li className="flex gap-3 items-start pb-3 border-b border-gray-100 last:border-0">
     <div className="w-2 h-2 mt-2 rounded-full bg-green-500 shrink-0"></div>
     <div>
-      <p className="  text-gray-800">{name}</p>
-      <p className=" text-gray-500">{desc}</p>
+      <p className="  ">{name}</p>
+      <p className=" ">{desc}</p>
     </div>
   </li>
 );
