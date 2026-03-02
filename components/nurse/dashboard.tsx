@@ -185,10 +185,10 @@ export default function NurseDashboard() {
                 <div className="p-8">
 
                   {/* ปุ่มสร้างผู้ป่วยใหม่ */}
-                  <Link href="/nurse/patients/new" className="block w-full">
+                  <Link href="/register" className="block w-full">
                     <button className="w-full flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl font-bold text-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
                       <UserPlus className="w-6 h-6" />
-                      เพิ่มประวัติผู้ป่วยใหม่
+                      ลงทะเบียนผู้ป่วยใหม่
                     </button>
                   </Link>
 
