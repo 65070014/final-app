@@ -10,9 +10,8 @@ import { useRouter } from "next/navigation"
 import { Label } from "@radix-ui/react-label"
 import { Plus } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar"
-import { format } from "date-fns"
+import { format, parse, isValid, isBefore, startOfDay } from "date-fns"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon } from "lucide-react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export function AppointmentForm() {
@@ -34,6 +33,8 @@ export function AppointmentForm() {
   const [doctorError, setDoctorError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [inputValue, setInputValue] = useState("")
+
   useEffect(() => {
     async function fetchDoctors() {
       try {
@@ -63,6 +64,7 @@ export function AppointmentForm() {
     "13:00", "13:30", "14:00", "14:30", "15:00", "15:30",
     "16:00", "16:30",
   ]
+
 
   const handleChange = (e) => {
     setFormData({
@@ -114,6 +116,40 @@ export function AppointmentForm() {
     }
   }
 
+  const today = startOfDay(new Date())
+
+  const handleInputChange = (value) => {
+    setError("")
+
+    const numbers = value.replace(/\D/g, "").slice(0, 8)
+
+    let formatted = numbers
+
+    if (numbers.length > 4) {
+      formatted = `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4)}`
+    } else if (numbers.length > 2) {
+      formatted = `${numbers.slice(0, 2)}/${numbers.slice(2)}`
+    }
+
+    setInputValue(formatted)
+
+    if (numbers.length === 8) {
+      const parsed = parse(formatted, "dd/MM/yyyy", new Date())
+
+      if (!isValid(parsed)) {
+        setError("รูปแบบวันที่ไม่ถูกต้อง")
+        return
+      }
+
+      if (isBefore(parsed, today)) {
+        setError("ไม่สามารถเลือกวันย้อนหลังได้")
+        return
+      }
+
+      setSelectedDate(parsed)
+    }
+  }
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen} modal={false}>
@@ -136,27 +172,26 @@ export function AppointmentForm() {
               <Label htmlFor="date">วันที่นัดหมาย</Label>
               <Popover modal={false}>
                 <PopoverTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate
-                      ? format(selectedDate, "dd/MM/yyyy")
-                      : "เลือกวันที่"}
-                  </Button>
+                  <div className="w-full">
+                    <Input
+                      placeholder="dd/mm/yyyy"
+                      value={inputValue}
+                      onChange={(e) => handleInputChange(e.target.value)}
+                    />
+                  </div>
                 </PopoverTrigger>
 
                 <PopoverContent
                   className="w-auto p-0 z-[9999]"
                   align="start"
                 >
+
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={(date) => {
                       setSelectedDate(date)
+                      setInputValue(format(date, "dd/MM/yyyy"))
                       if (date) {
                         setFormData({
                           ...formData,
@@ -179,7 +214,7 @@ export function AppointmentForm() {
                     classNames={{
                       months: "space-y-4",
                       month: "space-y-4",
-                      
+
                       caption_label:
                         "text-base font-semibold text-gray-800",
 
@@ -285,6 +320,6 @@ export function AppointmentForm() {
 
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   )
 }
