@@ -27,8 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             FROM Appointment a
             JOIN Patient p ON a.patient_id = p.patient_id
             WHERE a.medical_personnel_id = ?
-            AND DATE(a.apdate) >= CURDATE()
-            AND DATE(a.apdate) < DATE_ADD(CURDATE(), INTERVAL 24 HOUR)
+            AND DATE(a.apdate) = DATE(DATE_ADD(NOW(), INTERVAL 7 HOUR))
             GROUP BY 
                 a.appointment_id, a.status, a.patient_status, a.department,
                 p.fname, p.lname, p.gender,a.apdate
