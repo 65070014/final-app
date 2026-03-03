@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { FileText, Video, Clock, Activity, Heart, Scale, Calendar, AlertCircle } from 'lucide-react';
+import { FileText, Video, Clock, Activity, Heart, Scale, Thermometer, Calendar, AlertCircle } from 'lucide-react';
 import { useSession } from "next-auth/react";
 import { PatientNav } from "@/components/patient/patient_nav"
 import { useEffect, useState } from "react";
@@ -19,6 +19,10 @@ const PatientDashboard = () => {
   const [error, setError] = useState(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(true)
   const [history, setHistory] = useState([])
+  const [isPrescriptionsLoading, setIsPrescriptionsLoading] = useState(true)
+  const [prescriptions, setPrescriptions] = useState([])
+  const [latestVitals, setLatestVitals] = useState(null);
+  const [isLoadingVitals, setIsLoadingVitals] = useState(true);
   const nextAppt = appointments[0];
   const isPending = nextAppt?.patient_status === 'Pending';
   const [isVitalOpen, setIsVitalOpen] = useState(false);
@@ -84,8 +88,44 @@ const PatientDashboard = () => {
       }
     };
 
+    const fetchPrescriptions = async () => {
+      setIsPrescriptionsLoading(true);
+
+      try {
+        const response = await fetch(`/api/patients/dispensing_history/${patientId}`);
+        if (!response.ok) throw new Error('ไม่สามารถดึงประวัติการยาได้');
+        const data = await response.json();
+        setPrescriptions(data);
+      } catch (error) {
+        console.error("Error fetching history:", error);
+        setError(error.message);
+      } finally {
+        setIsPrescriptionsLoading(false);
+      }
+    };
+
+    const fetchVitals = async () => {
+      setIsLoadingVitals(true);
+
+      try {
+        const response = await fetch(`/api/patients/vitals_track/?patientId=${patientId}`);
+        if (!response.ok) throw new Error('ไม่สามารถดึงประวัติการได้');
+        const data = await response.json();
+        if (data && data.length > 0) {
+          setLatestVitals(data[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching history:", error);
+        setError(error.message);
+      } finally {
+        setIsLoadingVitals(false);
+      }
+    };
+
     fetchAppointments();
     fetchHistory();
+    fetchPrescriptions();
+    fetchVitals();
 
   }, [session, status]);
 
@@ -192,31 +232,95 @@ const PatientDashboard = () => {
 
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-800">ข้อมูลสุขภาพ</h3>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-[1.5rem] font-bold text-gray-800">ข้อมูลสุขภาพ</h3>
+                  {!isLoadingVitals && latestVitals && (
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      ล่าสุด: {latestVitals.date} ({latestVitals.time})
+                    </p>
+                  )}
+                </div>
                 <VitalsSignsModal
                   appointmentId={""}
                   onSuccess={() => console.log("Recorded!")}
                 />
               </div>
+
               <div className="space-y-3">
-                <StatCardSmall label="ความดัน" value="120/80" unit="mmHg" color="green" icon={Activity} />
-                <StatCardSmall label="ชีพจร" value="72" unit="bpm" color="red" icon={Heart} />
-                <StatCardSmall label="น้ำหนัก" value="65.5" unit="kg" color="orange" icon={Scale} />
+                {isLoadingVitals ? (
+                  <div className="space-y-3 animate-pulse">
+                    <div className="h-16 bg-gray-50 rounded-xl"></div>
+                    <div className="h-16 bg-gray-50 rounded-xl"></div>
+                    <div className="h-16 bg-gray-50 rounded-xl"></div>
+                  </div>
+                ) : latestVitals ? (
+                  <>
+                    <StatCardSmall
+                      label="ความดัน"
+                      value={`${latestVitals.systolic}/${latestVitals.diastolic}`}
+                      unit="mmHg"
+                      color="green"
+                      icon={Activity}
+                    />
+                    <StatCardSmall
+                      label="น้ำหนัก"
+                      value={latestVitals.weight}
+                      unit="kg"
+                      color="orange"
+                      icon={Scale}
+                    />
+                    <StatCardSmall
+                      label="อุณหภูมิ"
+                      value={latestVitals.temp}
+                      unit="°C"
+                      color="red"
+                      icon={Thermometer}
+                    />
+                  </>
+                ) : (
+                  <div className="text-center py-8 border border-dashed border-gray-100 rounded-xl">
+                    <p className="text-sm text-gray-400 italic">ยังไม่มีบันทึกข้อมูลสุขภาพ</p>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-800 mb-4">ยาปัจจุบัน</h3>
+              <h3 className="text-[1.5rem] font-bold text-gray-800 mb-4 flex items-center gap-2">
+                💊 ยาปัจจุบัน
+                {prescriptions.length > 0 && (
+                  <span className="text-xs font-normal text-gray-400">
+                    (ล่าสุดเมื่อ: {prescriptions[0].appointment_date})
+                  </span>
+                )}
+              </h3>
+
               <ul className="space-y-3">
-                <MedItem name="Paracetamol" desc="1 เม็ด (เช้า-เย็น)" />
-                <MedItem name="Vitamin C" desc="1 เม็ด (เช้า)" />
+                {isPrescriptionsLoading ? (
+                  <div className="animate-pulse space-y-2">
+                    <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                    <div className="h-10 bg-gray-100 rounded-lg w-full"></div>
+                  </div>
+                ) : prescriptions.length > 0 && prescriptions[0].items.length > 0 ? (
+                  prescriptions[0].items.map((item, idx) => (
+                    <MedItem
+                      key={idx}
+                      name={item.medicine_name}
+                      desc={`${item.dosage} | ${item.usage}`}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-6 border border-dashed border-gray-200 rounded-lg bg-gray-50">
+                    <p className=" ">ไม่มีประวัติการรับยาปัจจุบัน</p>
+                  </div>
+                )}
               </ul>
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-800">ประวัติล่าสุด</h3>
+                <h3 className="text-[1.5rem] font-bold text-gray-800">ประวัติล่าสุด</h3>
                 <Link
                   href="/patient/treatment_record"
                   className=" text-blue-600 hover:underline"
