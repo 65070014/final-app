@@ -91,15 +91,31 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'UPCOMING':
             case 'Confirmed':
-                return <Badge className="bg-green-500 hover:bg-green-600 text-sm">ยืนยันแล้ว</Badge>;
+                return <Badge variant="outline">ยืนยันแล้ว</Badge>;
+            case 'Pending':
+                return <Badge variant="outline">รอการตรวจสอบ</Badge>;
             case 'Complete':
                 return <Badge variant="secondary">เสร็จสิ้น</Badge>;
             case 'Cancelled':
-                return <Badge variant="destructive" className="text-sm">ยกเลิกแล้ว</Badge>;
+                return <Badge variant="destructive" className="opacity-70">ยกเลิกแล้ว</Badge>;
             default:
-                return <Badge variant="outline" className="bg-yellow-500 hover:bg-yellow-600 text-sm">รอการตรวจสอบ</Badge>;
+                return null;
+        }
+    };
+
+    const getCardStyle = (status: string) => {
+        switch (status) {
+            case 'Confirmed':
+                return 'bg-green-100 border-green-500';
+            case 'Pending':
+                return 'bg-yellow-100 border-yellow-500';
+            case 'Complete':
+                return 'bg-blue-100 border-blue-500';
+            case 'Cancelled':
+                return 'bg-red-100 border-red-500';
+            default:
+                return 'bg-white';
         }
     };
 
@@ -122,94 +138,106 @@ export function PatientAppointmentList({ activeTab }: PatientAppointmentListProp
                     <p className="text-center text-gray-500 py-10">ไม่พบรายการนัดหมายในหมวดหมู่นี้</p>
                 ) : (
                     filteredRecords.map((record) => (
-                        <Card key={record.id} className="p-4 space-y-3 shadow-md hover:shadow-lg transition-shadow">
-                            <div className="flex justify-between items-start">
-                                <div className="space-y-1">
-                                    <h2 className="font-bold text-[1.25rem] text-gray-700">นัดหมายกับ {record.doctorname}</h2>
-                                    <p className=" text-[1.25rem]">{record.department}</p>
+                        <Card key={record.id} className={`flex overflow-hidden border rounded-xl max-w-2xl mx-auto ${getCardStyle(record.status)}`}>
+
+                            <div className="bg-indigo-600 text-white px-5 py-4 flex flex-col items-center justify-center">
+                                <span className="text-2xl font-bold">
+                                    {format(new Date(record.date), "dd")}
+                                </span>
+                                <span className="text-[1.5rem]">
+                                    {format(new Date(record.date), "MMM", { locale: th })}
+                                </span>
+                            </div>
+
+                            <div className="flex-1 p-5 space-y-10">
+                                <div className="flex justify-between">
+                                    <div>
+                                        <h2 className="font-semibold text-[1.5rem]">
+                                            นัดหมายกับ {record.doctorname}
+                                        </h2>
+                                        <p className="text-gray-600">
+                                            {record.department}
+                                        </p>
+                                    </div>
+                                    {getStatusBadge(record.status)}
                                 </div>
-                                {getStatusBadge(record.status)}
-                            </div>
 
-                            <div className="flex items-center gap-4">
-                                <Clock className="h-4 w-4 text-indigo-500" />
-                                <span className="font-semibold text-[1.25rem]">{format(new Date(record.date), "dd MMM yyyy", { locale: th })}</span>
-                                <span className="font-semibold text-[1.25rem]">เวลา {record.time}</span>
-                            </div>
+                                <div className="flex gap-2 pt-2 border-t mt-2">
+                                    {(record.status === 'Pending' || record.status === 'Confirmed') && (
+                                        <>
+                                            {(record.patient_status === 'Pending') && (
+                                                <Button
+                                                    className="bg-blue-600 text-white rounded hover:bg-blue-700 text-[1.1rem]"
+                                                    onClick={() => handleConfirm(record.id)}
+                                                    size="lg"
+                                                >
+                                                    ยืนยันเข้ารับ
+                                                </Button>
+                                            )}
 
-                            <div className="flex justify-end gap-3 pt-3 border-t mt-3">
+                                            {record.is_vitals_filled ? (
+                                                <Button
+                                                    className=" text-[1.1rem]"
+                                                    variant="outline"
+                                                    size="lg"
+                                                    disabled={true}
+                                                >
+                                                    <Stethoscope className="h-4 w-4 mr-2" />
+                                                    {'กรอกข้อมูลแล้ว'}
+                                                </Button>
+                                            ) : (
+                                                <VitalsSignsModal
+                                                    appointmentId={String(record.id)}
+                                                    onSuccess={() => {
+                                                        console.log("Recorded!");
+                                                    }}
+                                                />
 
-                                {(record.status === 'Pending' || record.status === 'Confirmed') && (
-                                    <>
-                                        {(record.patient_status === 'Pending') && (
+                                            )}
+
                                             <Button
-                                                className="bg-blue-600 text-white rounded hover:bg-blue-700"
-                                                onClick={() => handleConfirm(record.id)}
-                                                size="sm"
+                                                className=" text-[1.1rem]"
+                                                onClick={() => setIsDialogOpen(true)}
+                                                variant="destructive"
+                                                size="lg"
                                             >
-                                                ยืนยันเข้ารับ
+                                                เลื่อน / ยกเลิก
                                             </Button>
-                                        )}
-
-                                        {record.is_vitals_filled ? (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                disabled={true}
-                                            >
-                                                <Stethoscope className="h-4 w-4 mr-2" />
-                                                {'กรอกข้อมูลแล้ว'}
-                                            </Button>
-                                        ) : (
-                                            <VitalsSignsModal
-                                                appointmentId={String(record.id)}
-                                                onSuccess={() => {
-                                                    console.log("Recorded!");
-                                                }}
+                                            <Patient_Edit_Appointment
+                                                open={isDialogOpen}
+                                                onOpenChange={setIsDialogOpen}
+                                                appointmentData={record}
                                             />
+                                        </>
+                                    )}
 
-                                        )}
-
-                                        <Button
-                                            onClick={() => setIsDialogOpen(true)}
-                                            variant="destructive"
-                                            size="sm"
-                                        >
-                                            เลื่อน / ยกเลิก
-                                        </Button>
-                                        <Patient_Edit_Appointment
-                                            open={isDialogOpen}
-                                            onOpenChange={setIsDialogOpen}
-                                            appointmentData={record}
-                                        />
-                                    </>
-                                )}
-
-                                {record.status === 'Complete' && (
-                                    <>
-                                        <Link href={`/patient/treatment_record/${record.id}`} passHref>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
+                                    {record.status === 'Complete' && (
+                                        <>
+                                            <Link href={`/patient/treatment_record/${record.id}`} passHref>
+                                                <Button
+                                                    className=" text-[1.1rem]"
+                                                    variant="outline"
+                                                    size="lg"
+                                                >
+                                                    ดูรายละเอียดการรักษา
+                                                </Button>
+                                            </Link>
+                                            <button
+                                                onClick={() => openPaymentModal(record)}
+                                                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                                             >
-                                                ดูรายละเอียดการรักษา
-                                            </Button>
-                                        </Link>
-                                        <button
-                                            onClick={() => openPaymentModal(record)}
-                                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                        >
-                                            <DollarSign className="w-5 h-5 mr-2" />
-                                            จ่ายเงิน
-                                        </button>
-                                    </>
-                                )}
+                                                <DollarSign className="w-5 h-5 mr-2" />
+                                                จ่ายเงิน
+                                            </button>
+                                        </>
+                                    )}
 
-                                {record.status === 'Cancelled' && (
-                                    <Button variant="ghost" size="sm" disabled>
-                                        นัดหมายนี้ถูกยกเลิกแล้ว
-                                    </Button>
-                                )}
+                                    {record.status === 'Cancelled' && (
+                                        <Button variant="ghost" size="lg" disabled>
+                                            นัดหมายนี้ถูกยกเลิกแล้ว
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </Card>
                     ))

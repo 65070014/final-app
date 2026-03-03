@@ -9,6 +9,11 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Label } from "@radix-ui/react-label"
 import { Plus } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon } from "lucide-react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export function AppointmentForm() {
   const { data: session, status } = useSession()
@@ -28,7 +33,7 @@ export function AppointmentForm() {
   const [isDoctorsLoading, setIsDoctorsLoading] = useState(true);
   const [doctorError, setDoctorError] = useState(null);
   const [open, setOpen] = useState(false);
-
+  const [selectedDate, setSelectedDate] = useState(null);
   useEffect(() => {
     async function fetchDoctors() {
       try {
@@ -111,7 +116,7 @@ export function AppointmentForm() {
 
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} modal={false}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2 h-11 px-8 text-base">
           <Plus size={20} />
@@ -119,8 +124,7 @@ export function AppointmentForm() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-visible">
         <DialogHeader>
           <DialogTitle className="text-[1.50rem] font-bold text-blue-700">สร้างนัดหมายใหม่</DialogTitle>
         </DialogHeader>
@@ -130,14 +134,71 @@ export function AppointmentForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <Label htmlFor="date">วันที่นัดหมาย</Label>
-              <Input
-                type="date"
-                id="date"
-                value={formData.date}
-                onChange={handleChange}
-                min={new Date().toISOString().split('T')[0]}
-                required
-              />
+              <Popover modal={false}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate
+                      ? format(selectedDate, "dd/MM/yyyy")
+                      : "เลือกวันที่"}
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent
+                  className="w-auto p-0 z-[9999]"
+                  align="start"
+                >
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(date) => {
+                      setSelectedDate(date)
+                      if (date) {
+                        setFormData({
+                          ...formData,
+                          date: format(date, "yyyy-MM-dd"),
+                        })
+                      }
+                    }}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                    }
+                    components={{
+                      IconLeft: () => (
+                        <ChevronLeft className="h-4 w-4" />
+                      ),
+                      IconRight: () => (
+                        <ChevronRight className="h-4 w-4" />
+                      ),
+                    }}
+                    className="rounded-xl border shadow-md p-3"
+                    classNames={{
+                      months: "space-y-4",
+                      month: "space-y-4",
+                      
+                      caption_label:
+                        "text-base font-semibold text-gray-800",
+
+                      table: "w-full border-collapse",
+                      head_row: "flex",
+                      head_cell:
+                        "text-gray-500 rounded-md w-9 font-medium text-[0.8rem]",
+                      row: "flex w-full mt-2",
+                      cell: "h-9 w-9 text-center text-sm p-0 relative",
+                      day: "h-9 w-9 p-0 font-normal hover:bg-blue-100 rounded-md transition",
+                      day_selected:
+                        "bg-blue-600 text-white hover:bg-blue-600 focus:bg-blue-600",
+                      day_today: "border border-blue-500",
+                      day_disabled: "text-gray-300 opacity-50",
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-1">

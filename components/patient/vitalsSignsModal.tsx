@@ -109,7 +109,7 @@ export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose }: 
     <Dialog open={showModal} onOpenChange={setShowModal}>
       {!isControlled && (
         <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-sm">
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-sm text-[1.1rem]" size='lg'>
             <Stethoscope size={18} />
             บันทึกสัญญาณชีพ
             </Button>
