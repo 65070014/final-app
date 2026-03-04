@@ -71,7 +71,7 @@ export async function GET(request: Request) {
             sql += ` WHERE ${whereClauses.join(' AND ')}`;
         }
 
-        sql += ` ORDER BY a.apdate ASC`;
+        sql += ` ORDER BY a.apdate DESC`;
 
         const [rows] = await db.query(sql, queryParams);
         return NextResponse.json(rows);
@@ -115,6 +115,14 @@ export async function POST(request: Request) {
 
         db = await dbPool.getConnection();
 
+        const sqlCheckApptConfirm = `SELECT 1 FROM Appointment WHERE status = 'Confirmed' AND apdate = ? AND medical_personnel_id = ?`;
+        const [existing] = await db.execute(sqlCheckApptConfirm, [appointmentDateTime, appointmentData.doctorId]) as [RowDataPacket[], any];
+
+        if (existing.length > 0) {
+            return NextResponse.json({
+                error: 'ช่วงเวลานี้มีผู้จองแล้ว กรุณาเลือกเวลาอื่น'
+            }, { status: 400 });
+        }
 
         const sqlPrimary = `
             INSERT INTO Appointment (
@@ -162,6 +170,9 @@ export async function POST(request: Request) {
         }
         const resultHeader = resultPrimary as ResultSetHeader;
         const patientId = resultHeader.insertId;
+
+
+
 
         return NextResponse.json({
             message: 'นัดหมายสำเร็จ',

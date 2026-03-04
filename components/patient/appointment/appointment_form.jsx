@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export function AppointmentForm() {
+  const [bookedTimes, setBookedTimes] = useState([])
   const { data: session, status } = useSession()
   const router = useRouter()
   const [formData, setFormData] = useState({
@@ -100,9 +101,11 @@ export function AppointmentForm() {
         body: JSON.stringify(appointmentData),
       })
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'ไม่สามารถบันทึกนัดหมายได้');
+        setError(data.error || 'ไม่สามารถบันทึกนัดหมายได้');
+        return;
       }
 
       alert("บันทึกนัดหมายสำเร็จ!");
@@ -150,6 +153,32 @@ export function AppointmentForm() {
     }
   }
 
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    const fetchBooked = async () => {
+      try {
+        const res = await fetch(
+          `/api/appointments/confirmapt?date=${format(selectedDate, "yyyy-MM-dd")}&doctorId=${formData.doctorId}`
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setBookedTimes([]);
+          return;
+        }
+
+        setBookedTimes(data.map(item => item.time));
+
+      } catch (err) {
+        setBookedTimes([]);
+      }
+    };
+
+    fetchBooked();
+  }, [selectedDate, formData.doctorId]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen} modal={false}>
@@ -201,6 +230,7 @@ export function AppointmentForm() {
                     }}
                     disabled={(date) =>
                       date < new Date(new Date().setHours(0, 0, 0, 0))
+
                     }
                     components={{
                       IconLeft: () => (
@@ -248,7 +278,11 @@ export function AppointmentForm() {
                 </SelectTrigger>
                 <SelectContent>
                   {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>{time} น.</SelectItem>
+                    <SelectItem
+                      key={time}
+                      value={time}
+                      disabled={bookedTimes.includes(time)}
+                    >{time} น.</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

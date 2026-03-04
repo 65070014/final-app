@@ -87,7 +87,7 @@ export default function NurseDashboard() {
       <div className="max-w-6xl mx-auto">
 
         <div className="bg-blue-900 text-white rounded-lg p-6 mb-8 flex justify-between items-center shadow-lg">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-wide">Nurse Dashboard</h1>
+          <h1 className="text-2xl md:text-[1.75rem] font-bold tracking-wide">Nurse Dashboard</h1>
           <div className="flex items-center gap-4 md:gap-6">
             <span className="text-sm md:text-base font-medium bg-blue-800/80 px-4 py-2 rounded-full shadow-inner hidden md:block">
               ยินดีต้อนรับ, พยาบาล
@@ -133,11 +133,11 @@ export default function NurseDashboard() {
                 <div key={appt.id} className="p-4 border dark:border-gray-700 rounded-lg flex justify-between items-center">
                   <div>
                     <p className="font-extrabold text-2xl text-gray-900 dark:text-white mb-3"> คุณ {appt.patient}</p>
-                    <p className="text-sm  dark:text-gray-400">📅 {format(new Date(appt.date), "dd MMM yyyy", { locale: th })} | ⏰ {appt.time} | 🩺 {appt.department}</p>
+                    <p className="text-[1.1rem]  dark:text-gray-400">📅 {format(new Date(appt.date), "dd MMM yyyy", { locale: th })} | ⏰ {appt.time} | 🩺 {appt.department}</p>
                   </div>
                   <div className="flex items-center gap-2 text-center">
                     <div className="flex flex-col items-start lg:items-end w-1/2 lg:w-auto">
-                      <p className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">สถานะคนไข้</p>
+                      <p className="text-[0.9rem] font-bold text-gray-500 mb-2 uppercase tracking-wide">สถานะคนไข้</p>
                       <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-full text-sm font-extrabold text-white shadow-md w-full lg:w-auto transition-colors ${appt.patient_status === "Confirmed"
                         ? "bg-emerald-500 border border-emerald-600 shadow-emerald-200"
                         : "bg-amber-500 border border-amber-600 shadow-amber-200"
@@ -147,7 +147,7 @@ export default function NurseDashboard() {
                       </div>
                     </div>
                     <div className="flex flex-col items-start lg:items-end w-1/2 lg:w-auto">
-                      <p className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">สถานะแพทย์</p>
+                      <p className="text-[0.9rem] font-bold text-gray-500 mb-2 uppercase tracking-wide">สถานะแพทย์</p>
                       <div className={`flex items-center justify-center gap-2 px-5 py-2 rounded-full text-sm font-extrabold text-white shadow-md w-full lg:w-auto transition-colors ${appt.status === "Confirmed" || appt.status === "Complete"
                         ? "bg-blue-600 border border-blue-700 shadow-blue-200"
                         : "bg-orange-500 border border-orange-600 shadow-orange-200"
