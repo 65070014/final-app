@@ -15,11 +15,10 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
-import { Video, Calendar, CheckCircle, Save } from "lucide-react"
+import { Calendar, CheckCircle, Save } from "lucide-react"
 import type { Patient } from "@/lib/types"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
-import { toast } from "sonner"
 
 interface DoctorActionsProps {
   patient: Patient
@@ -118,25 +117,8 @@ export function DoctorActions({ patient }: DoctorActionsProps) {
     }
   }
 
-  const handleContactPatient = (type: "video" | "chat") => {
-    toast(type === "video" ? "เริ่มการโทรวิดีโอ" : "เปิดแชท", {
-      description: `กำลังเชื่อมต่อกับ ${patient.name}...`,
-    })
-  }
-
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">ติดต่อผู้ป่วย</CardTitle>
-        </CardHeader>
-        <CardContent className="flex gap-2">
-          <Button onClick={() => handleContactPatient("video")} className="flex-1" variant="default">
-            <Video className="mr-2 h-4 w-4" />
-            โทรวิดีโอ
-          </Button>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardHeader>

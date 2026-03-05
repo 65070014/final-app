@@ -145,9 +145,5 @@ export const validateVitalSigns = (formData: VitalSign): { [key: string]: string
         newErrors.weight = "น้ำหนักตัวต้องเป็นค่าบวกและไม่เกิน 300 kg";
     }
     
-    // ส่วนสูง
-    if (formData.height <= 0 || formData.height > 250) {
-        newErrors.height = "ส่วนสูงต้องเป็นค่าบวกและไม่เกิน 250 cm";
-    }
     return newErrors;
 };

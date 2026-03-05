@@ -11,6 +11,7 @@ import { AppointmentForm } from "@/components/patient/appointment/appointment_fo
 import { VitalsSignsModal } from '@/components/patient/vitalsSignsModal';
 import { CalendarDashboard } from '@/components/patient/calendar_dashboard';
 import Link from 'next/link';
+import { Alert } from '@/components/ui/alert';
 
 const PatientDashboard = () => {
   const { data: session, status } = useSession();
@@ -243,7 +244,7 @@ const PatientDashboard = () => {
                 </div>
                 <VitalsSignsModal
                   appointmentId={""}
-                  onSuccess={() => console.log("Recorded!")}
+                  onSuccess={() => Alert("Recorded!")}
                 />
               </div>
 

@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Home, Calendar, FileText, Activity, LogOut, Menu, X } from 'lucide-react';
+import { Home, Calendar, FileText, Activity, LogOut,HeartPulse, Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { NotificationPopup } from '@/components/patient/history/notify_history'
 
@@ -68,6 +68,7 @@ export function PatientNav() {
           <NavItem href="/patient/appointment" icon={<Calendar size={20} />} text="นัดหมายแพทย์" isOpen={isOpen} />
           <NavItem href="/patient/treatment_record" icon={<FileText size={20} />} text="ประวัติการรักษา" isOpen={isOpen} />
           <NavItem href="/patient/medication" icon={<Activity size={20} />} text="ใบสั่งยา" isOpen={isOpen} />
+          <NavItem href="/patient/health" icon={<HeartPulse size={20} />} text="ข้อมูลสุขภาพ" isOpen={isOpen} />
         </nav>
 
         {/* Bottom Section */}

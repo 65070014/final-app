@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server';
 import { getDbPool } from '@/lib/db'
 import { ResultSetHeader } from 'mysql2/promise';
@@ -18,18 +19,22 @@ export async function GET(request: Request) {
 
         db = await dbPool.getConnection();
 
-        let whereClause = `a.patient_id = ?`;
-        const params: (string | null)[] = [patientId];
+        let whereClause = `vs.patient_id = ?`; 
+        const params: any[] = [patientId];
 
-        if (appointmentId) {
+        if (appointmentId && appointmentId !== "0") {
             whereClause += ` AND vs.appointment_id = ?`;
             params.push(appointmentId);
         }
+
         const sql = `
             SELECT 
+                vs.vital_signs_id, -- เพิ่ม ID ของสัญญาณชีพไปด้วย
                 vs.appointment_id, 
                 vs.sbp as systolic, 
                 vs.dbp as diastolic, 
+                vs.pr, -- เพิ่มชีพจร
+                vs.rr, -- เพิ่มการหายใจ
                 vs.weight, 
                 vs.temp, 
                 DATE_FORMAT(vs.record_date, '%e %b %Y') AS date,
@@ -37,19 +42,18 @@ export async function GET(request: Request) {
                 vs.note as notes
             FROM 
                 Vital_Signs vs
-            JOIN 
+            -- 🌟 ใช้ LEFT JOIN เพื่อให้ข้อมูลที่ไม่มีนัดหมาย (null) ยังแสดงผลอยู่
+            LEFT JOIN 
                 Appointment a ON vs.appointment_id = a.appointment_id
             WHERE 
                 ${whereClause} 
             ORDER BY 
-                vs.record_date DESC, a.apdate DESC
+                vs.record_date DESC -- เอาอันใหม่ล่าสุดขึ้นก่อน
         `;
 
         const [rows] = await db.query(sql, params);
-        const vitalSignsHistory = rows;
-        console.log(vitalSignsHistory);
+        return NextResponse.json(rows);
 
-        return NextResponse.json(vitalSignsHistory);
     } catch (error) {
         console.error("Error fetching vital signs history:", error);
         return NextResponse.json(
@@ -57,9 +61,7 @@ export async function GET(request: Request) {
             { status: 500 }
         );
     } finally {
-        if (db) {
-            db.release();
-        }
+        if (db) db.release();
     }
 }
 
@@ -77,7 +79,8 @@ export async function POST(request: Request) {
             vitalsSignsData.weight ?? null,
             vitalsSignsData.temp ?? null,
             new Date(),
-            vitalsSignsData.notes ?? null
+            vitalsSignsData.notes ?? null,
+            vitalsSignsData.patientId
         ];
 
         db = await dbPool.getConnection();
@@ -87,8 +90,6 @@ export async function POST(request: Request) {
             FROM Appointment 
             WHERE appointment_id = ? AND patient_id = ?;
         `;
-        console.log(vitalsSignsData.appointmentId, vitalsSignsData.patientId)
-        console.log(vitalsSignsValues)
 
         const [rows] = await db.query(checkSql, [vitalsSignsData.appointmentId, vitalsSignsData.patientId]);
         const checkRows = rows as RowDataPacket[];
@@ -99,8 +100,8 @@ export async function POST(request: Request) {
 
         const sqlPrimary = `
             INSERT INTO Vital_Signs (
-                appointment_id,sbp,dbp,weight,temp,record_date,note
-            ) VALUES (?, ?, ?, ?, ?, ? ,?)
+                appointment_id,sbp,dbp,weight,temp,record_date,note,patient_id
+            ) VALUES (?, ?, ?, ?, ?, ? ,? ,?)
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, vitalsSignsValues);

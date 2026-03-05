@@ -21,6 +21,7 @@ export interface VitalSign {
   weight: number
   height: number
   temperature: number
+  note?: string
 }
 
 export interface Symptom {
@@ -147,6 +148,8 @@ export type VitalRecord = {
   diastolic?: number
   weight?: number
   temp?: number
+  pr?: number
+  rr?: number
   notes?: string
 }
 

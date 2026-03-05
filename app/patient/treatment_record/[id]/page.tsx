@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { FileText, Printer, ArrowLeft, Plus } from "lucide-react";
@@ -8,12 +9,11 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState, use } from "react";
 import { TreatmentDetail } from "@/lib/types";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
+import { PatientNav } from "@/components/patient/patient_nav"
 
 export default function SingletreatmentPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(true)
   const [treatment, setTreatment] = useState<TreatmentDetail>({
@@ -54,7 +54,6 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
         setTreatment(data);
         console.log(data)
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error("Error fetching appointments:", error);
         setError(error.message);
@@ -69,113 +68,118 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
   }, [id, session, status]);
 
   const handlePrint = () => {
-    router.push(`/doctor/medical_certificate/${id}?print=true`)
+    window.open(`/doctor/medical_certificate/${id}?print=true`, '_blank');
   };
 
   const handlePrintMedic = () => {
-    router.push(`/doctor/prescription/${id}?print=true`)
+    window.open(`/doctor/prescription/${id}?print=true`, '_blank');
   };
 
   return (
-    <div className="p-6 md:p-10 space-y-6 max-w-4xl mx-auto">
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {isLoading ? (
-        <p className="text-center text-gray-500 py-10">กำลังโหลดรายการ...</p>
-      ) : (
-        <>
-          <header className="flex justify-between items-center pb-4 border-b">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-6 w-6 text-gray-700" />
-              <h1 className="text-2xl font-bold">บันทึกการรักษา: {treatment.appointment_id}</h1>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={() => window.history.back()}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                กลับ
-              </Button>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-2" />
-                พิมพ์
-              </Button>
-            </div>
-          </header>
+    <div className="flex h-screen bg-slate-200 font-sans">
+      <PatientNav />
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">ข้อมูลผู้ป่วยและวันรักษา</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 lg:grid-cols-4 gap-y-4 text-sm">
-              <DetailItem label="ชื่อผู้ป่วย" value={treatment.patient} />
-              <DetailItem label="แพทย์ผู้บันทึก" value={treatment.doctorname} />
-              <DetailItem label="วันที่" value={format(new Date(treatment.date), "dd MMM yyyy", { locale: th })} />
-              <DetailItem label="เวลา" value={treatment.time} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">การวินิจฉัยและบันทึกการรักษา</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-1">
-                <p className="font-medium text-gray-500">ชื่อการวินิจฉัย (ICD-10: {treatment.diag_code})</p>
-                <p className="text-base font-semibold text-red-700">{treatment.diag_name}</p>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        {error && <p className="text-red-500 text-[1.1rem] text-center">{error}</p>}
+        {isLoading ? (
+          <p className="text-center text-gray-500 py-10 text-[1.2rem]">กำลังโหลดรายการ...</p>
+        ) : (
+          /* 🌟 บีบความกว้างด้วย max-w-5xl และจัดให้อยู่กึ่งกลางด้วย mx-auto */
+          <div className="max-w-5xl mx-auto space-y-6 pb-10">
+            <header className="flex justify-between items-center pb-4 border-b border-gray-300">
+              <div className="flex items-center space-x-3">
+                <FileText className="h-8 w-8 text-gray-700" />
+                <h1 className="text-[1.8rem] font-bold text-gray-900">บันทึกการรักษา: {treatment.appointment_id}</h1>
               </div>
-              <Separator />
-              <div className="space-y-1">
-                <p className="font-medium text-gray-500">บันทึกการรักษา (Treatment Note)</p>
-                <div className="p-3 bg-gray-50 rounded-md whitespace-pre-wrap text-sm border">
-                  {treatment.diag_note}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex justify-between items-center">
-                <span>รายการยาที่สั่งจ่าย</span>
-                <Button variant="secondary" size="sm" onClick={handlePrintMedic}>
-                  <Printer className="h-4 w-4 mr-2" /> พิมพ์ใบสั่งยา
+              <div className="flex space-x-3">
+                <Button variant="outline" className="text-[1rem] px-4 py-2" onClick={() => window.history.back()}>
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  กลับ
                 </Button>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {treatment.medications.map((med, index) => (
-                <div key={index} className="border-b last:border-b-0 py-3 grid grid-cols-4 gap-4">
-                  <div className="col-span-4 font-semibold text-base text-blue-700">
-                    {index + 1}. {med.medicine_name}
+                <Button variant="outline" className="text-[1rem] px-4 py-2" onClick={handlePrint}>
+                  <Printer className="h-5 w-5 mr-2" />
+                  พิมพ์
+                </Button>
+              </div>
+            </header>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-[1.4rem] font-bold">ข้อมูลผู้ป่วยและวันรักษา</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 lg:grid-cols-4 gap-y-6 gap-x-4">
+                <DetailItem label="ชื่อผู้ป่วย" value={treatment.patient} />
+                <DetailItem label="แพทย์ผู้บันทึก" value={treatment.doctorname} />
+                <DetailItem label="วันที่" value={format(new Date(treatment.date), "dd MMM yyyy", { locale: th })} />
+                <DetailItem label="เวลา" value={treatment.time} />
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-[1.4rem] font-bold">การวินิจฉัยและบันทึกการรักษา</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="space-y-2">
+                  <p className="font-medium text-gray-500 text-[1.1rem]">ชื่อการวินิจฉัย (ICD-10: {treatment.diag_code})</p>
+                  <p className="text-[1.5rem] font-bold text-red-700">{treatment.diag_name}</p>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <p className="font-medium text-gray-500 text-[1.1rem]">บันทึกการรักษา (Treatment Note)</p>
+                  <div className="p-4 bg-gray-50 rounded-lg whitespace-pre-wrap text-[1.15rem] leading-relaxed border border-gray-200 text-gray-800">
+                    {treatment.diag_note}
                   </div>
-                  <DetailItem label="ขนาด/ความแรง" value={med.dosage} />
-                  <DetailItem label="วิธีการใช้" value={med.usage} />
-                  <DetailItem label="จำนวนที่จ่าย" value={med.quantity} />
-                  <DetailItem label="เพิ่มเติม" value={med.note} />
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row justify-between items-center">
-              <CardTitle className="text-lg">บันทึกเพิ่มเติมและการติดตาม</CardTitle> 
-              <Link href={`/patient/vitals_track/${treatment.appointment_id}`}>
-                <Button variant="outline" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  เพิ่มบันทึก
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-1 pb-4">
-                <p className="font-medium text-gray-500">สถานะการติดตามผู้ป่วย</p>
-                <p className={`font-semibold ${treatment.monitoringStatus === "อยู่ระหว่างติดตาม" ? "text-yellow-600" : "text-green-600"}`}>
-                  {treatment.monitoringStatus}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-[1.4rem] font-bold flex justify-between items-center">
+                  <span>รายการยาที่สั่งจ่าย</span>
+                  <Button variant="secondary" size="sm" className="text-[1rem] py-5" onClick={handlePrintMedic}>
+                    <Printer className="h-5 w-5 mr-2" /> พิมพ์ใบสั่งยา
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {treatment.medications.map((med, index) => (
+                  <div key={index} className="border-b border-gray-100 last:border-b-0 py-5 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="col-span-2 lg:col-span-4 font-bold text-[1.3rem] text-blue-700 pb-1">
+                      {index + 1}. {med.medicine_name}
+                    </div>
+                    <DetailItem label="ขนาด/ความแรง" value={med.dosage} />
+                    <DetailItem label="วิธีการใช้" value={med.usage} />
+                    <DetailItem label="จำนวนที่จ่าย" value={med.quantity} />
+                    <DetailItem label="เพิ่มเติม" value={med.note} />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-sm">
+              <CardHeader className="flex flex-row justify-between items-center">
+                <CardTitle className="text-[1.4rem] font-bold">บันทึกเพิ่มเติมและการติดตาม</CardTitle>
+                <Link href={`/patient/vitals_track/${treatment.appointment_id}`}>
+                  <Button variant="outline" size="sm" className="text-[1rem] py-5">
+                    <Plus className="h-5 w-5 mr-2" />
+                    เพิ่มบันทึก
+                  </Button>
+                </Link>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2 pb-4">
+                  <p className="font-medium text-gray-500 text-[1.1rem]">สถานะการติดตามผู้ป่วย</p>
+                  <p className={`font-bold text-[1.3rem] ${treatment.monitoringStatus === "อยู่ระหว่างติดตาม" ? "text-yellow-600" : "text-green-600"}`}>
+                    {treatment.monitoringStatus}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
@@ -184,9 +188,10 @@ interface DetailItemProps {
   label: string;
   value: string | number;
 }
+/* 🌟 อัปเดตขนาด Component ย่อยที่ใช้แสดงข้อมูลด้วย */
 const DetailItem: React.FC<DetailItemProps> = ({ label, value }) => (
   <div className="space-y-1">
-    <p className="font-medium text-gray-500">{label}</p>
-    <p className="text-sm font-medium">{value}</p>
+    <p className="font-medium text-gray-500 text-[1.1rem]">{label}</p>
+    <p className="text-[1.2rem] font-bold text-gray-900">{value}</p>
   </div>
 );
