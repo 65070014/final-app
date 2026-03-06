@@ -68,8 +68,8 @@ export default function PatientHealthDashboard() {
                 <Activity className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-black text-black">ติดตามสุขภาพของฉัน</h1>
-                <p className="text-gray-500 font-bold text-sm italic">ติดตามแนวโน้มและบันทึกสัญญาณชีพรายวัน</p>
+                <h1 className="text-[1.5rem] font-black text-black">ติดตามสุขภาพของฉัน</h1>
+                <p className=" font-bold text-[1.1rem] italic">ติดตามแนวโน้มและบันทึกสัญญาณชีพรายวัน</p>
               </div>
             </div>
             
@@ -105,17 +105,18 @@ export default function PatientHealthDashboard() {
                 <div className="space-y-6 animate-in fade-in duration-500">
                   
                   {/* --- Quick Stats --- */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 ">
                     <StatCard
                       title="ความดันโลหิต"
                       value={latest ? `${latest.systolic}/${latest.diastolic}` : "--/--"}
                       unit="mmHg"
                       icon={<Heart className="text-red-500" />}
                       status={latest?.systolic > targets.systolicMax ? "warning" : "normal"}
+                      className="text-[1.25rem] font-black text-black"
                     />
-                    <StatCard title="ชีพจร" value={latest?.pr || "--"} unit="bpm" icon={<Activity className="text-rose-500" />} />
-                    <StatCard title="อุณหภูมิ" value={latest?.temp || "--"} unit="°C" icon={<Thermometer className="text-orange-500" />} />
-                    <StatCard title="น้ำหนัก" value={latest?.weight || "--"} unit="kg" icon={<Weight className="text-slate-500" />} />
+                    <StatCard title="ชีพจร" value={latest?.pr || "--"} unit="bpm" icon={<Activity className="text-rose-500" />} className="text-[1.25rem] font-black text-black" />
+                    <StatCard title="อุณหภูมิ" value={latest?.temp || "--"} unit="°C" icon={<Thermometer className="text-orange-500" />} className="text-[1.25rem] font-black text-black" />
+                    <StatCard title="น้ำหนัก" value={latest?.weight || "--"} unit="kg" icon={<Weight className="text-slate-500" />} className="text-[1.25rem] font-black text-black" />
                   </div>
 
                   {/* --- Main Content (แบ่งซ้าย 2 ส่วน / ขวา 1 ส่วน) --- */}
