@@ -112,100 +112,103 @@ export default function VideoCallPage() {
     const pc = new RTCPeerConnection(peerConnectionConfig);
 
     // อัปเดต Ref ให้คนอื่นใช้ (แต่เราจะไม่ใช้ Ref ในการ Cleanup)
-    socketRef.current = socket;
+    socketRef.current = io("https://app.telemedicproject.dpdns.org", {
+      path: "/socket.io",
+      transports: ["websocket"],
+    });
     peerConnectionRef.current = pc;
 
-    const initWebRTC = async () => {
-      try {
-        // 1. Prepare Stream
-        let stream = localStreamRef.current;
-        if (!stream) {
-          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-          localStreamRef.current = stream;
-        }
-        if (pc.signalingState === 'closed') {
-          console.warn("⚠️ Connection closed while loading camera. Aborting.");
-          return;
-        }
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-
-        // ใส่ Stream เข้า PC
-        stream.getTracks().forEach(track => pc.addTrack(track, stream));
-
-        // 2. Setup Events
-        socket.emit("join_room", ROOM_ID); // ใช้ตัวแปร socket local
-
-        // ---------------- Events ----------------
-
-        // เมื่อมีคนอื่นเข้ามา -> เราเป็นคนโทร (Offerer)
-        socket.on("user_joined", async (userId) => {
-          // 🛡️ กันตัวเอง: ถ้า userId คือตัวเราเอง ให้ข้าม (เผื่อ Server เอ๋อ)
-          if (userId === socket.id) return;
-
-          console.log("🔔 User Joined -> I am calling.");
-
-          // เช็คว่า PC พร้อมไหม
-          if (pc.signalingState !== "stable") return;
-
-          const offer = await pc.createOffer();
-          await pc.setLocalDescription(offer);
-          socket.emit("offer", { offer, roomId: ROOM_ID });
-        });
-
-        // เมื่อได้รับ Offer -> เราเป็นคนรับ (Answerer)
-        socket.on("offer", async (offer) => {
-          // 🛡️ ถ้าเราเป็นคนโทรออกเองอยู่แล้ว (Glare) ให้หยุด หรือ Reset
-          if (pc.signalingState !== "stable") {
-            console.warn("⚠️ Collision detected. Ignore/Reset.");
+      const initWebRTC = async () => {
+        try {
+          // 1. Prepare Stream
+          let stream = localStreamRef.current;
+          if (!stream) {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localStreamRef.current = stream;
+          }
+          if (pc.signalingState === 'closed') {
+            console.warn("⚠️ Connection closed while loading camera. Aborting.");
             return;
           }
-
-          console.log("📩 Received Offer -> Answering.");
-          await pc.setRemoteDescription(new RTCSessionDescription(offer));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          socket.emit("answer", { answer, roomId: ROOM_ID });
-        });
-
-        socket.on("answer", async (answer) => {
-          console.log("✅ Received Answer");
-          if (pc.signalingState !== "stable") { // เช็คก่อน set
-            await pc.setRemoteDescription(new RTCSessionDescription(answer));
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
           }
-        });
 
-        socket.on("candidate", async (candidate) => {
-          if (pc.remoteDescription) {
-            await pc.addIceCandidate(new RTCIceCandidate(candidate));
-          }
-        });
+          // ใส่ Stream เข้า PC
+          stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-        // PC Events
-        pc.ontrack = (event) => {
-          console.log("🎥 Stream Received");
-          if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = event.streams[0];
-          }
-          setHasRemoteVideo(true);
-        };
+          // 2. Setup Events
+          socket.emit("join_room", ROOM_ID); // ใช้ตัวแปร socket local
 
-        pc.onicecandidate = (event) => {
-          if (event.candidate) {
-            socket.emit("candidate", { candidate: event.candidate, roomId: ROOM_ID });
-          }
-        };
+          // ---------------- Events ----------------
 
-      } catch (err) {
-        console.error(err);
-      }
-    };
+          // เมื่อมีคนอื่นเข้ามา -> เราเป็นคนโทร (Offerer)
+          socket.on("user_joined", async (userId) => {
+            // 🛡️ กันตัวเอง: ถ้า userId คือตัวเราเอง ให้ข้าม (เผื่อ Server เอ๋อ)
+            if (userId === socket.id) return;
 
-    initWebRTC();
+            console.log("🔔 User Joined -> I am calling.");
+
+            // เช็คว่า PC พร้อมไหม
+            if (pc.signalingState !== "stable") return;
+
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            socket.emit("offer", { offer, roomId: ROOM_ID });
+          });
+
+          // เมื่อได้รับ Offer -> เราเป็นคนรับ (Answerer)
+          socket.on("offer", async (offer) => {
+            // 🛡️ ถ้าเราเป็นคนโทรออกเองอยู่แล้ว (Glare) ให้หยุด หรือ Reset
+            if (pc.signalingState !== "stable") {
+              console.warn("⚠️ Collision detected. Ignore/Reset.");
+              return;
+            }
+
+            console.log("📩 Received Offer -> Answering.");
+            await pc.setRemoteDescription(new RTCSessionDescription(offer));
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            socket.emit("answer", { answer, roomId: ROOM_ID });
+          });
+
+          socket.on("answer", async (answer) => {
+            console.log("✅ Received Answer");
+            if (pc.signalingState !== "stable") { // เช็คก่อน set
+              await pc.setRemoteDescription(new RTCSessionDescription(answer));
+            }
+          });
+
+          socket.on("candidate", async (candidate) => {
+            if (pc.remoteDescription) {
+              await pc.addIceCandidate(new RTCIceCandidate(candidate));
+            }
+          });
+
+          // PC Events
+          pc.ontrack = (event) => {
+            console.log("🎥 Stream Received");
+            if (remoteVideoRef.current) {
+              remoteVideoRef.current.srcObject = event.streams[0];
+            }
+            setHasRemoteVideo(true);
+          };
+
+          pc.onicecandidate = (event) => {
+            if (event.candidate) {
+              socket.emit("candidate", { candidate: event.candidate, roomId: ROOM_ID });
+            }
+          };
+
+        } catch (err) {
+          console.error(err);
+        }
+      };
+
+      initWebRTC();
 
     // 🧹 CLEANUP (จุดสำคัญที่สุด!)
-    return () => {
+    return() => {
       console.log("🧹 Cleanup old connection...");
 
       // สั่งปิดตัวแปร Local ที่สร้างในรอบนี้แน่ๆ
