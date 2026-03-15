@@ -106,9 +106,11 @@ export function AppointmentCalendar({ appointments, deleteAppointment, confirmAp
                                             <div
                                                 className={`
                                                     px-2 py-1.5 rounded mb-0.5 truncate cursor-pointer shadow-sm border flex items-center gap-1
-                                                    ${(type === 'Patient' ? a.patient_status : a.status) === 'Confirmed'
-                                                        ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                                                        : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                                    ${a.status === 'Complete'
+                                                        ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                                        : a.status === 'Confirmed' && a.patient_status === 'Confirmed'
+                                                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                                                            : 'bg-yellow-200 text-yellow-800 border-yellow-200 hover:bg-yellow-100'
                                                     }`}
 
                                             >
@@ -122,8 +124,18 @@ export function AppointmentCalendar({ appointments, deleteAppointment, confirmAp
                                                     <span className="font-bold flex items-center gap-2">
                                                         <Clock className="w-4 h-4" /> {a.time} น.
                                                     </span>
-                                                    <span className={`text-xs px-2 py-1 rounded ${(type === 'Patient' ? a.patient_status : a.status) === 'Confirmed' ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'}`}>
-                                                        {type === 'Patient' ? a.patient_status : a.status}
+                                                    <span className={`text-xs px-2 py-1 rounded ${a.status === 'Confirmed' && a.patient_status === 'Confirmed'
+                                                        ? 'bg-green-200 text-green-800'
+                                                        : 'bg-yellow-200 text-yellow-800'
+                                                        }`}>
+                                                        {a.status === 'Confirmed' && a.patient_status === 'Confirmed'
+                                                            ? 'ยืนยันแล้ว'
+                                                            : a.status !== 'Confirmed' && a.patient_status !== 'Confirmed'
+                                                                ? 'รอยืนยัน (พยาบาลและผู้ป่วย)'
+                                                                : a.status !== 'Confirmed'
+                                                                    ? 'รอพยาบาลยืนยัน'
+                                                                    : 'รอผู้ป่วยยืนยัน'
+                                                        }
                                                     </span>
                                                 </div>
 

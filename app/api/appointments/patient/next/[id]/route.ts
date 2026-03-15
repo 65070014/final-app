@@ -56,7 +56,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 LIMIT 1`,
             [patientId]
         );
-        console.log(rows)
         return NextResponse.json(rows);
 
     } catch (error) {

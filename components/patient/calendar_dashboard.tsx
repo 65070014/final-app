@@ -29,11 +29,11 @@ export function CalendarDashboard() {
     const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
 
-    const fetchAppointments = async () => {
+    const fetchAppointments = async (isSilent = false) => {
+        if (!isSilent) setIsLoading(true);
         if (status !== "authenticated" || !session?.user?.id) {
             return;
         }
-        setIsLoading(true);
 
         const monthStart = startOfMonth(currentDate);
         const monthEnd = endOfMonth(currentDate);
@@ -69,7 +69,14 @@ export function CalendarDashboard() {
     useEffect(() => {
         if (status === "authenticated") {
             fetchAppointments();
+
+            const interval = setInterval(() => {
+                fetchAppointments(true);
+            }, 5000);
+
+            return () => clearInterval(interval);
         }
+
     }, [currentDate, status]);
 
 

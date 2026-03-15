@@ -26,8 +26,22 @@ const PatientDashboard = () => {
   const [isLoadingVitals, setIsLoadingVitals] = useState(true);
   const nextAppt = appointments[0];
   const isPending = nextAppt?.patient_status === 'Pending';
+  const isNursePending = nextAppt?.status === 'Pending';
   const [isVitalOpen, setIsVitalOpen] = useState(false);
   const router = useRouter()
+
+  let isNotReady = false;
+
+  if (nextAppt && nextAppt.date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const appointmentDate = new Date(nextAppt.date);
+    appointmentDate.setHours(0, 0, 0, 0);
+
+    isNotReady = today < appointmentDate;
+  }
+
 
   const handleJoinVideo = () => {
     const handleFirstClick = () => {
@@ -57,9 +71,9 @@ const PatientDashboard = () => {
 
     const patientId = session.user.id;
 
-    const fetchAppointments = async () => {
-      setIsLoadingAppointments(true);
-
+    const fetchAppointments = async (isSilent = false) => {
+    if (!isSilent) setIsLoadingAppointments(true);
+      
       try {
         const response = await fetch(`/api/appointments/patient/next/${patientId}`);
         if (!response.ok) throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
@@ -128,7 +142,14 @@ const PatientDashboard = () => {
     fetchPrescriptions();
     fetchVitals();
 
+    const interval = setInterval(() => {
+      fetchAppointments(true);
+    }, 5000);
+    return () => clearInterval(interval);
+
   }, [session, status]);
+
+
 
   return (
     <div className="flex h-screen bg-slate-200 font-sans">
@@ -161,24 +182,49 @@ const PatientDashboard = () => {
           `}>
 
                 <div className="flex items-start gap-4">
-                  <div className={`p-3 rounded-full shrink-0 ${isPending ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600'}`}>
-                    {isPending ? <AlertCircle size={24} /> : <Video size={24} />}
+                  <div className={`p-3 rounded-full shrink-0 ${isPending ? 'bg-orange-100 text-orange-600'
+                    : isNursePending ? 'bg-purple-100 text-purple-600'
+                      : !nextAppt.is_vitals_filled ? 'bg-amber-100 text-amber-600'
+                        : 'bg-blue-100 text-blue-600'
+                    }`}>
+                    {isPending ? <AlertCircle size={24} />
+                      : isNursePending ? <Clock size={24} />
+                        : !nextAppt.is_vitals_filled ? <AlertCircle size={24} />
+                          : <Video size={24} />}
                   </div>
+
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="text-[1.5rem] font-bold text-gray-800">
-                        {isPending ? 'กรุณายืนยันนัดหมาย' : 'นัดหมายถัดไป (Video Call)'}
+                        {isPending ? 'กรุณายืนยันนัดหมาย'
+                          : isNursePending ? 'รอพยาบาลยืนยันนัดหมาย'
+                            : !nextAppt.is_vitals_filled ? 'กรุณากรอกข้อมูลก่อนพบแพทย์'
+                              : 'นัดหมายถัดไป (Video Call)'}
                       </h3>
-                      {isPending && (
-                        <span className=" bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full font-bold animate-pulse">
-                          รอการยืนยัน
+
+                      {isPending ? (
+                        <span className="bg-orange-200 text-orange-800 px-2 py-0.5 rounded-full text-sm font-bold">
+                          รอคุณยืนยัน
+                        </span>
+                      ) : isNursePending ? (
+                        <span className="bg-purple-200 text-purple-800 px-2 py-0.5 rounded-full text-sm font-bold">
+                          รอพยาบาลยืนยัน
+                        </span>
+                      ) : !nextAppt.is_vitals_filled ? (
+                        <span className="bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full text-sm font-bold">
+                          รอข้อมูลสัญญาณชีพ
+                        </span>
+                      ) : (
+                        <span className="bg-green-200 text-green-800 px-2 py-0.5 rounded-full text-sm font-bold">
+                          พร้อมเข้าร่วม
                         </span>
                       )}
                     </div>
-                    <p className=" mt-1 text-[1.25rem]">
+
+                    <p className="mt-1 text-[1.25rem]">
                       กับ <span className="font-semibold">{nextAppt.doctorname}</span> ({nextAppt.department})
                     </p>
-                    <div className="flex items-center gap-2 mt-2  ">
+                    <div className="flex items-center gap-2 mt-2">
                       <Clock size={15} />
                       <span>
                         {nextAppt.date ? format(new Date(nextAppt.date), "dd MMM yyyy", { locale: th }) : "ไม่ระบุวันที่"}, {nextAppt.time}
@@ -186,18 +232,28 @@ const PatientDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-3 w-full md:w-auto">
+
+                <div className="flex gap-3 w-full md:w-auto mt-4">
                   {isPending ? (
                     <>
-                      <button className="flex-1 md:flex-none px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50  font-medium whitespace-nowrap">ขอยกเลิก</button>
+                      <button className="flex-1 md:flex-none px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 font-medium whitespace-nowrap">ขอยกเลิก</button>
                       <button className="flex-1 md:flex-none px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap">ยืนยันนัด</button>
                     </>
+                  ) : isNursePending ? (
+                    null
+                  ) : !nextAppt.is_vitals_filled ? (
+                    <VitalsSignsModal
+                      appointmentId={nextAppt.id}
+                      onSuccess={() => alert("บันทึกข้อมูลสำเร็จ!")}
+                      buttonClassName="bg-orange-500 hover:bg-orange-600 text-white rounded-[0.75rem] font-bold shadow-sm transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-[0.5rem] text-[1.4rem] py-[2.2rem] px-[1.5rem]"
+                    />
                   ) : (
                     <button
-                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2"
+                      disabled={isNotReady}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap w-full md:w-auto flex items-center justify-center gap-2"
                       onClick={handleJoinVideo}>
                       <Video size={18} />
-                      เข้าร่วมวิดีโอคอล
+                      {isNotReady ? 'ยังไม่ถึงวันนัดหมาย' : 'เข้าร่วมวิดีโอคอล'}
                     </button>
                   )}
                 </div>

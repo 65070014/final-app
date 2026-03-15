@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Kanit } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Providers } from './providers';
 import "./globals.css";
@@ -14,10 +14,11 @@ export const metadata: Metadata = {
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  display: "swap",
-  subsets: ["latin"],
+const kanit = Kanit({
+  weight: ['300', '400', '500', '600'],
+  subsets: ['latin', 'thai'],
+  variable: '--font-kanit',
+  display: 'swap',
 });
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.className} antialiased bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-400 min-h-screen`}
+        className={`${kanit.className} antialiased bg-gradient-to-br from-blue-400 via-blue-500 to-cyan-400 min-h-screen`}
       >
         <ThemeProvider
           attribute="class"

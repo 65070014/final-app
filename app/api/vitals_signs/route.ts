@@ -23,7 +23,7 @@ export async function POST(request: Request) {
             vitalsSignsData.temperature,
             new Date(),
             vitalsSignsData.patientId,
-            vitalsSignsData.note
+            vitalsSignsData.note || null
         ];
 
         db = await dbPool.getConnection();

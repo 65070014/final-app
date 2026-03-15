@@ -17,9 +17,10 @@ interface VitalsSignsModalProps {
   onSuccess?: () => void;
   isOpen?: boolean;
   onClose?: (open: boolean) => void;
+  buttonClassName?: string
 }
 
-export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose }: VitalsSignsModalProps) {
+export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose, buttonClassName }: VitalsSignsModalProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const router = useRouter()
   const { data: session } = useSession();
@@ -113,7 +114,7 @@ export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose }: 
     <Dialog open={showModal} onOpenChange={setShowModal}>
       {!isControlled && (
         <DialogTrigger asChild>
-          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-[0.5rem] shadow-sm text-[1.1rem] py-[1.2rem] px-[1.5rem] rounded-[0.75rem]" size='lg'>
+          <Button className={`${buttonClassName || 'text-white gap-[0.5rem] shadow-sm text-[1.1rem] rounded-[0.75rem] bg-emerald-600 hover:bg-emerald-700 py-[1.2rem] px-[1.5rem]'}`} size='lg'>
             <Stethoscope size={22} />
             <span className="font-bold">บันทึกสัญญาณชีพ</span>
           </Button>
