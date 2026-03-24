@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -35,6 +36,8 @@ export default function VideoCallPage() {
   const [connectionStatus, setConnectionStatus] = useState("Initializing...");
   const [hasRemoteVideo, setHasRemoteVideo] = useState(false);
   const router = useRouter();
+  const [doctor, setDoctor] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleMic = () => {
     const stream = localStreamRef.current;
@@ -217,6 +220,36 @@ export default function VideoCallPage() {
     };
   }, [ROOM_ID]);
 
+  useEffect(() => {
+    const fetchDoctorData = async () => {
+      try {
+
+        setIsLoading(true);
+        // เรียก API ที่เราเพิ่งสร้างไป (เปลี่ยน path ให้ตรงกับไฟล์ของคุณด้วยนะครับ)
+        const res = await fetch(`/api/roomData/${ROOM_ID}`);
+
+        // ถ้า API ตอบกลับมาว่าพัง (เช่น 404 ไม่พบข้อมูล หรือ 500 error)
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'ไม่สามารถดึงข้อมูลได้');
+        }
+
+        // ถ้าสำเร็จ เอาข้อมูลไปใส่ใน State
+        const data = await res.json();
+        setDoctor(data);
+
+      } catch (err: any) {
+        console.error("Fetch error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (ROOM_ID) {
+      fetchDoctorData();
+    }
+  }, [ROOM_ID]);
+
 
   useEffect(() => {
     window.scrollTo(0, 1);
@@ -234,12 +267,12 @@ export default function VideoCallPage() {
               </Avatar>
             </div>
             <div>
-              <h2 className="font-bold text-lg text-white drop-shadow-md">นพ. วิชัย ใจดี</h2>
+              <h2 className="font-bold text-lg text-white drop-shadow-md">{isLoading ? 'กำลังโหลด...' : `${doctor.doctorname}`}</h2>
+              
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="bg-green-500/80 text-white hover:bg-green-500 border-0">
                   Online
                 </Badge>
-                <span className="text-xs text-slate-300 drop-shadow-md">00:12:45</span>
               </div>
             </div>
           </div>
