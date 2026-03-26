@@ -74,9 +74,14 @@ export function PatientLoginForm() {
 
       <div className="text-center pt-2">
         <p className="text-sm text-gray-500 mb-2">ยังไม่มีบัญชีใช่ไหม?</p>
-        <Link href="/register" passHref>
-          <Button variant="outline" className="w-full">สมัครสมาชิก</Button>
-        </Link>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={() => alert("🏥 กรุณาติดต่อเจ้าหน้าที่พยาบาลเพื่อทำการยืนยันตัวตนและสร้างบัญชีผู้ใช้งานครับ/ค่ะ")}
+        >
+          ติดต่อสมัครสมาชิก
+        </Button>
       </div>
 
     </form>

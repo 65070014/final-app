@@ -36,11 +36,11 @@ export function DispensingRecordCard({ record }: { record: DispensingRecord }) {
                                 </h5>
                                 <span className=" px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 flex items-center">
                                     <Package className="h-3 w-3 mr-1" />
-                                    {item.quantity} เม็ด
+                                    {item.dosage ? item.dosage.replace(/[\d\.]+/g, '').trim() : '-'}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2 gap-2 mt-2 ">
-                                <span className="text-gray-500">ขนาดใช้: <span className="text-gray-800 font-medium">{item.dosage}</span></span>
+                                <span className="text-gray-500">จำนวนที่จ่าย: <span className="text-gray-800 font-medium">{item.dosage}</span></span>
                                 <span className="text-gray-500">วิธีใช้: <span className="text-green-700 font-medium">{item.usage}</span></span>
                             </div>
                             {item.note && (

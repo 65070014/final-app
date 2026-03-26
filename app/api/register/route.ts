@@ -4,9 +4,10 @@ import { NextResponse } from 'next/server';
 import { hashPassword } from '@/utils/security';
 import { getDbPool } from '@/lib/db'
 import { ResultSetHeader } from 'mysql2/promise';
+import { createEmail } from '@/utils/email_send';
 
 export async function POST(request: Request) {
-    const dbPool = getDbPool(); 
+    const dbPool = getDbPool();
     let db = null;
 
     try {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
 
         db = await dbPool.getConnection();
-        await db.execute('START TRANSACTION'); 
+        await db.execute('START TRANSACTION');
 
         const sqlPrimary = `
             INSERT INTO Patient (
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
         `;
 
         const [resultPrimary] = await db.execute(sqlPrimary, patientvalues);
-        const resultHeader = resultPrimary as ResultSetHeader; 
+        const resultHeader = resultPrimary as ResultSetHeader;
         const patientId = resultHeader.insertId;
 
         const medicalvalues = [
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
         `;
 
         const [resultMedical] = await db.execute(sqlMedical, medicalvalues);
-        const resultHeader2 = resultMedical as ResultSetHeader; 
+        const resultHeader2 = resultMedical as ResultSetHeader;
         const MedicalId = resultHeader2.insertId;
 
         const addressvalues = [
@@ -78,7 +79,23 @@ export async function POST(request: Request) {
         `;
 
         await db.execute(sqlAddress, addressvalues);
-        await db.execute('COMMIT'); 
+        await db.execute('COMMIT');
+
+        await createEmail(
+            patientData.email,
+            "🏥 ข้อมูลบัญชีผู้ใช้งานสำหรับระบบโทรเวชกรรม (Telemedicine)",
+            `เรียน ผู้รับบริการ,
+
+บัญชีผู้ใช้งานของคุณได้รับการยืนยันตัวตนและลงทะเบียนโดยเจ้าหน้าที่พยาบาลเรียบร้อยแล้ว 
+คุณสามารถใช้ข้อมูลด้านล่างนี้เพื่อเข้าสู่ระบบนัดหมายและพบแพทย์ออนไลน์ได้ทันที:
+
+ข้อมูลการเข้าสู่ระบบ:
+อีเมล (Username): ${patientData.email}
+รหัสผ่าน (Password): ${patientData.password}
+
+📍 ลิงก์สำหรับเข้าสู่ระบบ: https://app.telemedicproject.dpdns.org/patient/login
+`
+        );
 
 
         return NextResponse.json({
@@ -86,10 +103,12 @@ export async function POST(request: Request) {
             insertId: patientId
         }, { status: 201 });
 
+
+
     } catch (error) {
         console.error("TRANSACTION FAILED:", error);
         if (db) {
-            await db.execute('ROLLBACK'); 
+            await db.execute('ROLLBACK');
             console.log("Transaction rolled back.");
         }
 
@@ -97,9 +116,9 @@ export async function POST(request: Request) {
             error: 'ไม่สามารถบันทึกข้อมูลได้',
             message: (error as Error).message
         }, { status: 500 });
-    }finally {
+    } finally {
         if (db) {
-            db.release(); 
+            db.release();
         }
     }
 }

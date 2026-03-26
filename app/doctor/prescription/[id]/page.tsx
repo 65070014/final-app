@@ -56,6 +56,7 @@ export default function PrescriptionPage() {
           <thead>
             <tr className="">
               <th className="border px-3 py-2 text-left">ชื่อยา</th>
+              <th className="border px-3 py-2 text-left">จำนวน</th>
               <th className="border px-3 py-2 text-left">วิธีใช้</th>
             </tr>
           </thead>
@@ -63,6 +64,7 @@ export default function PrescriptionPage() {
             {prescription.medicines.map((med: any, index: number) => (
               <tr key={index}>
                 <td className="border px-3 py-2">{med.name} {med.strength ? `(${med.strength})` : null}</td>
+                <td className="border px-3 py-2">{med.dosage}</td>
                 <td className="border px-3 py-2">{med.usage}</td>
               </tr>
             ))}

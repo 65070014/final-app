@@ -157,7 +157,6 @@ const CustomTooltip = ({ active, payload }: any) => {
                   <XAxis dataKey="timestamp" stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} dy={10} />
                   <YAxis stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} domain={[60, 180]} />
                   <Tooltip content={<CustomTooltip />} />
-                  <ReferenceLine y={targets.systolicMax} stroke="#DC2626" strokeDasharray="3 3" label={{ value: "เป้าหมาย Systolic", position: "insideTopLeft", fill: "#DC2626", fontSize: 12, fontWeight: 'bold' }} />
                   <Line type="monotone" dataKey="systolic" name="ตัวบน (Systolic)" stroke="#DC2626" strokeWidth={3} dot={{ fill: "#DC2626", strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
                   <Line type="monotone" dataKey="diastolic" name="ตัวล่าง (Diastolic)" stroke="#2563EB" strokeWidth={3} dot={{ fill: "#2563EB", strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
@@ -214,7 +213,6 @@ const CustomTooltip = ({ active, payload }: any) => {
                   <XAxis dataKey="timestamp" stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} dy={10} />
                   <YAxis stroke="#9CA3AF" fontSize={12} tickLine={false} axisLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
                   <Tooltip content={<CustomTooltip />} />
-                  <ReferenceLine y={targets.weightTarget} stroke="#10B981" strokeDasharray="3 3" label={{ value: "เป้าหมาย", position: "insideTopLeft", fill: "#10B981", fontSize: 12, fontWeight: 'bold' }} />
                   <Line type="monotone" dataKey="weight" name="น้ำหนัก" stroke="#475569" strokeWidth={3} dot={{ fill: "#475569", strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>

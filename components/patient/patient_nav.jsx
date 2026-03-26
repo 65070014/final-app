@@ -28,7 +28,7 @@ export function PatientNav() {
         
         /* --- PC (Sticky & Push) --- */
         /* พอถึงจอ xl ให้เปลี่ยนเป็น sticky เพื่อ "ดัน" เนื้อหา */
-        xl:sticky xl:top-0 xl:translate-x-0 xl:w-64 xl:z-0 xl:shadow-none
+        2xl:sticky 2xl:top-0 2xl:translate-x-0 2xl:w-64 2xl:z-0 2xl:shadow-none
 
         /* --- Logic การยืดหด (สำหรับ Mobile/iPad) --- */
         ${isOpen 

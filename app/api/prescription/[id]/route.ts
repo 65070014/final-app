@@ -17,6 +17,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 m.medicine_name AS name,
                 pm.usage,
                 pm.quantity,
+                pm.dosage,
                 CONCAT(mp.fname, ' ', mp.lname) AS doctor_name
             FROM Appointment a
             JOIN Patient p ON a.patient_id = p.patient_id
@@ -43,6 +44,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             medicines: results.map(row => ({
                 name: row.name,
                 usage: row.usage,
+                dosage: row.dosage,
                 quantity: row.quantity
             })).filter(med => med.name)
         };

@@ -34,11 +34,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             ORDER BY a.apdate ASC;`,
             [doctorId]
         );
-
         return NextResponse.json(rows);
 
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    }finally {
+        if (db) {
+            db.release();
+        }
     }
 }

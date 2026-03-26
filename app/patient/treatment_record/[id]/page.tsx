@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { FileText, Printer, ArrowLeft, Plus } from "lucide-react";
+import { FileText, Printer, ArrowLeft} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, use } from "react";
 import { TreatmentDetail } from "@/lib/types";
-import Link from "next/link";
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { PatientNav } from "@/components/patient/patient_nav"
@@ -145,36 +144,15 @@ export default function SingletreatmentPage({ params }: { params: Promise<{ id: 
               </CardHeader>
               <CardContent>
                 {treatment.medications.map((med, index) => (
-                  <div key={index} className="border-b border-gray-100 last:border-b-0 py-5 grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div key={index} className="border-b border-gray-100 last:border-b-0 py-5 grid grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="col-span-2 lg:col-span-4 font-bold text-[1.3rem] text-blue-700 pb-1">
                       {index + 1}. {med.medicine_name}
                     </div>
-                    <DetailItem label="ขนาด/ความแรง" value={med.dosage} />
+                    <DetailItem label="จำนวนที่จ่าย" value={med.dosage} />
                     <DetailItem label="วิธีการใช้" value={med.usage} />
-                    <DetailItem label="จำนวนที่จ่าย" value={med.quantity} />
                     <DetailItem label="เพิ่มเติม" value={med.note} />
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardHeader className="flex flex-row justify-between items-center">
-                <CardTitle className="text-[1.4rem] font-bold">บันทึกเพิ่มเติมและการติดตาม</CardTitle>
-                <Link href={`/patient/vitals_track/${treatment.appointment_id}`}>
-                  <Button variant="outline" size="sm" className="text-[1rem] py-5">
-                    <Plus className="h-5 w-5 mr-2" />
-                    เพิ่มบันทึก
-                  </Button>
-                </Link>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 pb-4">
-                  <p className="font-medium text-gray-500 text-[1.1rem]">สถานะการติดตามผู้ป่วย</p>
-                  <p className={`font-bold text-[1.3rem] ${treatment.monitoringStatus === "อยู่ระหว่างติดตาม" ? "text-yellow-600" : "text-green-600"}`}>
-                    {treatment.monitoringStatus}
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </div>
