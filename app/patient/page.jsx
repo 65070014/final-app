@@ -60,6 +60,33 @@ const PatientDashboard = () => {
     };
   };
 
+  const handleConfirm = async (record) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/appointments/${record}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ patient_status: 'Confirmed' }),
+      });
+
+      if (!response.ok) {
+        throw new Error('ยืนยันไม่สำเร็จ');
+      }
+      setAppointments(prevAppointments =>
+        prevAppointments.map(appt =>
+          appt.id === record
+            ? { ...appt, patient_status: "Confirmed" }
+            : appt
+        )
+      );
+
+    } catch (error) {
+      console.error('Confirm error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (status === 'loading') return;
 
@@ -72,8 +99,8 @@ const PatientDashboard = () => {
     const patientId = session.user.id;
 
     const fetchAppointments = async (isSilent = false) => {
-    if (!isSilent) setIsLoadingAppointments(true);
-      
+      if (!isSilent) setIsLoadingAppointments(true);
+
       try {
         const response = await fetch(`/api/appointments/patient/next/${patientId}`);
         if (!response.ok) throw new Error('ไม่สามารถดึงรายการนัดหมายได้');
@@ -237,7 +264,9 @@ const PatientDashboard = () => {
                   {isPending ? (
                     <>
                       <button className="flex-1 md:flex-none px-4 py-2 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 font-medium whitespace-nowrap">ขอยกเลิก</button>
-                      <button className="flex-1 md:flex-none px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap">ยืนยันนัด</button>
+                      <button 
+                      onClick={() => handleConfirm(nextAppt.id)}
+                      className="flex-1 md:flex-none px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium shadow-md transition-all whitespace-nowrap">ยืนยันนัด</button>
                     </>
                   ) : isNursePending ? (
                     null
