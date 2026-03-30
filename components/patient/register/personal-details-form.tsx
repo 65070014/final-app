@@ -15,7 +15,7 @@ export default function PersonalDetailsForm({ formData, handleChange, nextStep, 
     <form className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
       {/* Field: บัตรประชาชน */}
       <div className="col-span-full"> {/* ใช้ col-span-full เพื่อให้กินพื้นที่เต็ม Grid */}
-        <label htmlFor="id" className="block text-sm font-medium mb-1">หมายเลขบัตรประชาชน</label>
+        <label htmlFor="id" className="block text-sm font-medium mb-1">หมายเลขบัตรประชาชน/หมายเลขผู้ป่วย</label>
         <input type="text" id="id" name="id" value={formData.id} onChange={handleChange} className="w-full p-2 border rounded-md" placeholder="กรุณากรอกหมายเลขบัตรประชาชน 13 หลัก" />
         {errors.id && (<p className="mt-1 text-sm text-red-500">{errors.id}</p>)}
       </div>
