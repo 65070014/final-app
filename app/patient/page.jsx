@@ -61,7 +61,6 @@ const PatientDashboard = () => {
   };
 
   const handleConfirm = async (record) => {
-    setIsLoading(true);
     try {
       const response = await fetch(`/api/appointments/${record}`, {
         method: 'PATCH',
@@ -82,8 +81,6 @@ const PatientDashboard = () => {
 
     } catch (error) {
       console.error('Confirm error:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
