@@ -1,4 +1,3 @@
-// app/api/register-patient/route.ts
 
 import { NextResponse } from 'next/server';
 import { hashPassword } from '@/utils/security';

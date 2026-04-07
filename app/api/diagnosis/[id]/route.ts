@@ -5,7 +5,6 @@ import { RowDataPacket } from 'mysql2';
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-    // id ที่รับเข้ามาคือ diagnosis_id
     const { id: appointment_id } = await params;
     const dbPool = getDbPool();
     let db = null;
@@ -13,9 +12,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     try {
         db = await dbPool.getConnection();
 
-        // --- SQL Query ที่แก้ไขใหม่ ---
-        // เราทำการ JOIN ตาราง Diagnosis, Appointment, Patient, และ Medical_Personnel
-        // เพื่อดึงข้อมูลที่จำเป็นทั้งหมดในครั้งเดียว
         const sql = `
             SELECT
                 CONCAT(p.fname, ' ', p.lname) AS patient_name,
@@ -37,12 +33,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
         const [rows] = await db.query<RowDataPacket[]>(sql, [appointment_id]);
 
-        // ตรวจสอบว่ามีข้อมูลหรือไม่
         if (!rows || rows.length === 0) {
             return NextResponse.json({ error: "Diagnosis not found" }, { status: 404 });
         }
 
-        // คืนค่าข้อมูลแถวแรก (ซึ่งควรจะมีแค่แถวเดียว) เป็น object
         return NextResponse.json(rows[0]);
 
     } catch (error) {

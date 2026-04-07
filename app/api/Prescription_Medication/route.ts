@@ -20,7 +20,6 @@ export async function POST(request: Request) {
             note
         } = await request.json();
 
-        // --- Validate input ---
         if (!patientId || !medicalPersonnelId || !appointmentId || (!medicationId && !drugName) || !quantity) {
             return NextResponse.json({ error: 'ข้อมูลไม่ครบถ้วน' }, { status: 400 });
         }
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
             finalMedicationId = (medicationResult as ResultSetHeader).insertId;
         }
 
-        // 1. สร้างใบสั่งยา Prescription และ appointment_id
         const prescriptionSql = `
             INSERT INTO Prescription (patient_id, medical_personnel_id, appointment_id, prescription_date, note)
             VALUES (?, ?, ?, NOW(), ?)
@@ -43,14 +41,13 @@ export async function POST(request: Request) {
         const [prescriptionResult] = await db.execute(prescriptionSql, [patientId, medicalPersonnelId, appointmentId, note || null]);
         const newPrescriptionId = (prescriptionResult as ResultSetHeader).insertId;
 
-        // 2. บันทึกรายการยาลงในใบสั่งยา Prescription_Medication
         const presMedSql = `
             INSERT INTO Prescription_Medication (prescription_id, medication_id, dosage, \`usage\`, duration, quantity, note)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const dosageNumber = parseFloat(dosage); // แปลง string เป็นตัวเลข เช่น "1 เม็ด" → 1
-        const frequency = parseInt(usage.replace(/\D/g, "")) || 1; // ดึงตัวเลขจาก "วันละ 3 ครั้ง" → 3
+        const dosageNumber = parseFloat(dosage);
+        const frequency = parseInt(usage.replace(/\D/g, "")) || 1;
         const totalQuantity = dosageNumber * frequency * duration;
 
         await db.execute(presMedSql, [

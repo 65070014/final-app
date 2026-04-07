@@ -30,7 +30,7 @@ export function DiagnosisSection({ diagnosisNote, setDiagnosisNote }: DiagnosisS
       if (typeof fieldOrObject === 'string') {
         return {
           ...prev,
-          [fieldOrObject]: value ?? '', // ใช้ค่าที่ส่งมา
+          [fieldOrObject]: value ?? '',
         };
       } else {
         return {

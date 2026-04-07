@@ -2,7 +2,6 @@ import type { FormRegisterData,FormErrors } from "@/lib/types"
 
 export interface AddressDetailsFormProps {
   formData: FormRegisterData;
-  // ใช้ Type จาก React สำหรับ Event handler
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   nextStep: () => void;
   errors : FormErrors;

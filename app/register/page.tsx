@@ -42,7 +42,6 @@ export default function PatientForm() {
   };
 
   const goToStep = (stepNumber: SetStateAction<number>) => {
-    // ฟังก์ชันใหม่สำหรับเปลี่ยน Step โดยตรง
     setCurrentStep(stepNumber);
   };
 

@@ -56,7 +56,7 @@ export function DoctorActions({ patient }: DoctorActionsProps) {
       alert('บันทึกการติดตามผลสำเร็จ!');
       window.location.reload();
 
-      return successData.logId; // คืนค่า ID Log ที่สร้างใหม่
+      return successData.logId;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

@@ -5,7 +5,6 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const q = searchParams.get('q');
 
-    // ถ้าไม่มีการพิมพ์คำค้นหามา ให้ส่งอาร์เรย์ว่างกลับไปเลย
     if (!q || q.trim() === '') {
         return NextResponse.json([]);
     }

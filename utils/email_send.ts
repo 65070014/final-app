@@ -17,11 +17,10 @@ export async function createEmail(
             },
         });
 
-        // 2. จัดเตรียมรูปแบบอีเมล
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: to, // ส่งไปหาใคร
-            subject: subject, // หัวข้ออีเมล
+            to: to,
+            subject: subject,
             html: `
             <div style="font-family: sans-serif; padding: 20px;">
               <h2 style="color: #2e6c80;">🏥 ระบบ Telemedicine</h2>
@@ -32,7 +31,6 @@ export async function createEmail(
           `,
         };
 
-        // 3. สั่งส่งอีเมล
         await transporter.sendMail(mailOptions);
 
         return NextResponse.json({ success: true, message: 'ส่งอีเมลสำเร็จ!' });

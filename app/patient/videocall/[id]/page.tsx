@@ -110,17 +110,14 @@ export default function VideoCallPage() {
   useEffect(() => {
     if (!ROOM_ID) return;
 
-    // 🔒 สร้างตัวแปร Local เพื่อคุมการเกิด/ดับ ของ Effect รอบนี้โดยเฉพาะ
     const socket = io(SOCKET_URL);
     const pc = new RTCPeerConnection(peerConnectionConfig);
 
-    // อัปเดต Ref ให้คนอื่นใช้ (แต่เราจะไม่ใช้ Ref ในการ Cleanup)
     socketRef.current = socket;
     peerConnectionRef.current = pc;
 
     const initWebRTC = async () => {
       try {
-        // 1. Prepare Stream
         let stream = localStreamRef.current;
         if (!stream) {
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -134,22 +131,16 @@ export default function VideoCallPage() {
           localVideoRef.current.srcObject = stream;
         }
 
-        // ใส่ Stream เข้า PC
         stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-        // 2. Setup Events
-        socket.emit("join_room", ROOM_ID); // ใช้ตัวแปร socket local
+        socket.emit("join_room", ROOM_ID);
 
-        // ---------------- Events ----------------
 
-        // เมื่อมีคนอื่นเข้ามา -> เราเป็นคนโทร (Offerer)
         socket.on("user_joined", async (userId) => {
-          // 🛡️ กันตัวเอง: ถ้า userId คือตัวเราเอง ให้ข้าม (เผื่อ Server เอ๋อ)
           if (userId === socket.id) return;
 
           console.log("🔔 User Joined -> I am calling.");
 
-          // เช็คว่า PC พร้อมไหม
           if (pc.signalingState !== "stable") return;
 
           const offer = await pc.createOffer();
@@ -157,9 +148,7 @@ export default function VideoCallPage() {
           socket.emit("offer", { offer, roomId: ROOM_ID });
         });
 
-        // เมื่อได้รับ Offer -> เราเป็นคนรับ (Answerer)
         socket.on("offer", async (offer) => {
-          // 🛡️ ถ้าเราเป็นคนโทรออกเองอยู่แล้ว (Glare) ให้หยุด หรือ Reset
           if (pc.signalingState !== "stable") {
             console.warn("⚠️ Collision detected. Ignore/Reset.");
             return;
@@ -174,7 +163,7 @@ export default function VideoCallPage() {
 
         socket.on("answer", async (answer) => {
           console.log("✅ Received Answer");
-          if (pc.signalingState !== "stable") { // เช็คก่อน set
+          if (pc.signalingState !== "stable") {
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
           }
         });
@@ -185,7 +174,6 @@ export default function VideoCallPage() {
           }
         });
 
-        // PC Events
         pc.ontrack = (event) => {
           console.log("🎥 Stream Received");
           if (remoteVideoRef.current) {
@@ -207,16 +195,12 @@ export default function VideoCallPage() {
 
     initWebRTC();
 
-    // 🧹 CLEANUP (จุดสำคัญที่สุด!)
     return () => {
       console.log("🧹 Cleanup old connection...");
 
-      // สั่งปิดตัวแปร Local ที่สร้างในรอบนี้แน่ๆ
       socket.disconnect();
       pc.close();
 
-      // (Optional) ล้าง Ref
-      // socketRef.current = null;
     };
   }, [ROOM_ID]);
 
@@ -225,16 +209,13 @@ export default function VideoCallPage() {
       try {
 
         setIsLoading(true);
-        // เรียก API ที่เราเพิ่งสร้างไป (เปลี่ยน path ให้ตรงกับไฟล์ของคุณด้วยนะครับ)
         const res = await fetch(`/api/roomData/${ROOM_ID}`);
 
-        // ถ้า API ตอบกลับมาว่าพัง (เช่น 404 ไม่พบข้อมูล หรือ 500 error)
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.error || 'ไม่สามารถดึงข้อมูลได้');
         }
 
-        // ถ้าสำเร็จ เอาข้อมูลไปใส่ใน State
         const data = await res.json();
         setDoctor(data);
 
@@ -360,7 +341,6 @@ export default function VideoCallPage() {
   );
 }
 
-// Helper Components
 const ControlButton = ({ active, onClick, onIcon, offIcon, danger }) => (
   <Button
     variant={danger ? "destructive" : "secondary"}

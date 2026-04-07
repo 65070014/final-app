@@ -12,7 +12,6 @@ export async function PATCH(request: Request) {
     let db = null;
 
     try {
-        // 1. รับข้อมูลจาก Body
         const payload: MonitoringUpdatePayload = await request.json();
         const { appointmentId, isMonitoring, monitoringEndDate } = payload;
 

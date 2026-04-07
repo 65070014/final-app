@@ -37,11 +37,9 @@ export function PatientNav() {
         }
       `}>
         
-        {/* Logo Section + Menu Button Combined */}
         <div className="p-6 flex items-center gap-3 overflow-hidden">
           <button 
             onClick={toggleMenu}
-            // บน PC (xl) ให้ cursor เป็น default (ไม่ต้องกด)
             className={`flex-shrink-0 w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white transition-colors 
               hover:bg-blue-700 xl:hover:bg-blue-600 xl:cursor-default
             `}
@@ -54,7 +52,6 @@ export function PatientNav() {
              </span>
           </button>
 
-          {/* ข้อความ TeleHealth */}
           <span className={`text-xl font-bold text-gray-800 transition-opacity duration-300 whitespace-nowrap
             ${isOpen ? 'opacity-100' : 'opacity-0 xl:opacity-100 hidden xl:block'}
           `}>
@@ -62,7 +59,6 @@ export function PatientNav() {
           </span>
         </div>
 
-        {/* Navigation Items */}
         <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto overflow-x-hidden">
           <NavItem href="/patient" icon={<Home size={20} />} text="หน้าหลัก" isOpen={isOpen} />
           <NavItem href="/patient/appointment" icon={<Calendar size={20} />} text="นัดหมายแพทย์" isOpen={isOpen} />
@@ -71,7 +67,6 @@ export function PatientNav() {
           <NavItem href="/patient/health" icon={<HeartPulse size={20} />} text="ข้อมูลสุขภาพ" isOpen={isOpen} />
         </nav>
 
-        {/* Bottom Section */}
         <div className="p-4 border-t border-gray-200">
           <div className={`transition-all duration-300 mb-2 ${isOpen ? 'block' : 'hidden xl:block'}`}>
              <NotificationPopup role="Patient"/>

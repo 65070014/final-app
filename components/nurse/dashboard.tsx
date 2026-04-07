@@ -52,13 +52,11 @@ export default function NurseDashboard() {
   }, []);
 
   useEffect(() => {
-    // ถ้าช่องค้นหาว่างเปล่า ให้เคลียร์ผลลัพธ์ทิ้ง
     if (searchQuery.trim() === "") {
       setSearchResults([]);
       return;
     }
 
-    // หน่วงเวลา 300ms รอให้พิมพ์เสร็จก่อนค่อยยิง API
     const delayDebounceFn = setTimeout(async () => {
       setIsSearching(true);
       try {
@@ -75,7 +73,6 @@ export default function NurseDashboard() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
 
-  // เมื่อปิด Modal ให้ล้างค่าการค้นหาทิ้งด้วย
   const handleCloseModal = () => {
     setIsRecordModalOpen(false);
     setSearchQuery("");

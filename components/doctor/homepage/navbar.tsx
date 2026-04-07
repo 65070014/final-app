@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { Stethoscope, Menu } from 'lucide-react'; // เพิ่มไอคอนสำหรับโลโก้และอื่นๆ
-import { Button } from '@/components/ui/button'; // สมมติว่ามีการใช้ Button component จาก shadcn/ui
+import { Stethoscope, Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Navbar() {
   return (

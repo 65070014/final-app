@@ -30,7 +30,6 @@ export function PatientLoginForm() {
     if (result?.error) {
       setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     } else {
-      // Login สำเร็จ
       router.push("/patient");
     }
 

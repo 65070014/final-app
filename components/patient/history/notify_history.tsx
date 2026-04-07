@@ -78,7 +78,6 @@ export function NotificationPopup({ role }: { role: string }) {
           }))
         );
 
-        // 2. ยิง API ไปบอกหลังบ้าน
         await fetch('/api/notification', {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -90,7 +89,6 @@ export function NotificationPopup({ role }: { role: string }) {
 
       } catch (error) {
         console.error("Failed to mark as read:", error);
-        // ถ้า Error อาจจะเขียนโค้ดดึงข้อมูล GET /api/notifications ใหม่อีกรอบ เพื่อให้หน้าเว็บตรงกับ Database 
       }
     }
   };

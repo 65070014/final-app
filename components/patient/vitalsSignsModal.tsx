@@ -36,7 +36,6 @@ export function VitalsSignsModal({ appointmentId, onSuccess, isOpen, onClose, bu
   };
   const [formData, setFormData] = useState<VitalSign>(initialFormData);
 
-  // ✅ LOGIC เลือกโหมด: ถ้ามี isOpen ส่งมา ให้ใช้ค่าจากข้างนอก ถ้าไม่มี ให้ใช้ internalOpen
   const isControlled = isOpen !== undefined;
   const showModal = isControlled ? isOpen : internalOpen;
   const setShowModal = isControlled ? onClose : setInternalOpen;

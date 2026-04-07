@@ -25,7 +25,6 @@ export function SymptomLog({ vitalSigns }: SymptomLogProps) {
     symptom.notes
   );
 
-  // เรียงลำดับจากใหม่ไปเก่า (ล่าสุดขึ้นก่อน)
   const sortedSymptoms = [...filteredSymptoms].sort((a, b) =>
     b.timestamp.getTime() - a.timestamp.getTime()
   );

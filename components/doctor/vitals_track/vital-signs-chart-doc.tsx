@@ -35,13 +35,13 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
 
       const parsedWeight = vs.weight ? parseFloat(vs.weight as unknown as string) : undefined;
       const parsedTemp = vs.temp ? parseFloat(vs.temp as unknown as string) : undefined;
-      const parsedPr = vs.pr ? parseFloat(vs.pr as unknown as string) : undefined; // ดึงค่า PR
+      const parsedPr = vs.pr ? parseFloat(vs.pr as unknown as string) : undefined;
 
       return {
         timestamp: new Date(dateTimeString),
         systolic: vs.systolic,
         diastolic: vs.diastolic,
-        pr: parsedPr, // ค่า PR
+        pr: parsedPr,
         weight: parsedWeight,
         temp: parsedTemp,
       };
@@ -60,7 +60,6 @@ export function VitalSignsChart({ vitalSigns, targets }: VitalSignsChartProps) {
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }, [processedVitals, timeRange]);
 
-  // แยก Data ให้แต่ละกราฟ
   const bloodPressureData = useMemo(() => filteredData.filter(vs => vs.systolic !== undefined && vs.diastolic !== undefined).map(vs => ({ date: format(vs.timestamp, "dd/MM", { locale: th }), systolic: vs.systolic, diastolic: vs.diastolic, timestamp: vs.timestamp.getTime() })), [filteredData]);
   const pulseData = useMemo(() => filteredData.filter(vs => vs.pr !== undefined).map(vs => ({ date: format(vs.timestamp, "dd/MM", { locale: th }), pr: vs.pr, timestamp: vs.timestamp.getTime() })), [filteredData]);
   const weightData = useMemo(() => filteredData.filter(vs => vs.weight !== undefined).map(vs => ({ date: format(vs.timestamp, "dd/MM", { locale: th }), weight: vs.weight, timestamp: vs.timestamp.getTime() })), [filteredData]);

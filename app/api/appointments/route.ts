@@ -49,13 +49,11 @@ export async function GET(request: Request) {
         const whereClauses = [];
         const queryParams = [];
 
-        // ถ้ามีการส่ง date มาใน URL ให้เพิ่มเงื่อนไขการกรองวันที่
         if (startDate && endDate) {
             whereClauses.push("DATE(a.apdate) BETWEEN ? AND ?");
             queryParams.push(startDate, endDate);
         }
 
-        // ถ้ามีการส่ง doctorId มาใน URL ให้เพิ่มเงื่อนไขการกรองแพทย์
         if (doctorId) {
             whereClauses.push("a.medical_personnel_id = ?");
             queryParams.push(doctorId);
@@ -66,7 +64,6 @@ export async function GET(request: Request) {
             queryParams.push(patientId);
         }
 
-        // ถ้่ามีเงื่อนไขอย่างน้อย 1 ข้อ ให้เพิ่ม WHERE เข้าไปใน SQL
         if (whereClauses.length > 0) {
             sql += ` WHERE ${whereClauses.join(' AND ')}`;
         }
@@ -152,11 +149,9 @@ export async function POST(request: Request) {
         const sqlGetEmail = `SELECT email FROM Patient WHERE patient_id = ?`;
         const [patientRows] = await db.execute(sqlGetEmail, [appointmentData.patientId]) as [RowDataPacket[], any];
 
-        //เช็คก่อนว่าเจอข้อมูลคนไข้ไหม และเขามีอีเมลในระบบหรือเปล่า
         if (patientRows.length > 0 && patientRows[0].email) {
             const patientEmail = patientRows[0].email;
 
-            //ส่ง Email
             await createEmail(
                 patientEmail,
                 "🏥 แจ้งเตือนการนัดหมายใหม่ (Telemedicine)",
@@ -170,9 +165,6 @@ export async function POST(request: Request) {
         }
         const resultHeader = resultPrimary as ResultSetHeader;
         const patientId = resultHeader.insertId;
-
-
-
 
         return NextResponse.json({
             message: 'นัดหมายสำเร็จ',

@@ -2,7 +2,7 @@
 "use client";
 
 import { SetStateAction, useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation'; // 🌟 เพิ่ม useParams เพื่อดึง ID จาก URL
+import { useRouter, useParams } from 'next/navigation';
 import PersonalDetailsForm from '@/components/patient/register/personal-details-form';
 import AddressDetailsForm from '@/components/patient/register/address-details-form';
 import HealthDetailsForm from '@/components/patient/register/health-details-form';
@@ -15,7 +15,7 @@ const initialFormData: FormRegisterData = {
   houseno: '', road: '', tambon: '', ampur: '', changwat: '',
   village: '', emergency_phone_number: '', underlying_disease: '', drugallergy: '',
   weight: 0, height: 0,
-  password: '', confirm_password: '', // 💡 รหัสผ่านอาจจะเว้นว่างไว้ตอนแก้ไข
+  password: '', confirm_password: '',
 };
 
 export default function EditPatientForm() {

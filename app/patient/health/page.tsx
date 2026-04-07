@@ -18,7 +18,6 @@ export default function PatientHealthDashboard() {
   const [error, setError] = useState<string | null>(null)
   const { data: session, status } = useSession()
   
-  // 🌟 1. เพิ่ม State ตัวกระตุ้น เพื่อให้กราฟอัปเดตเองตอนบันทึกเสร็จ
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const targets = { systolicMax: 140, diastolicMax: 90, weightTarget: 75, tempMax: 37.5 }
@@ -50,7 +49,6 @@ export default function PatientHealthDashboard() {
       }
     }
     fetchMyVitals()
-  // 🌟 2. เอา refreshTrigger ใส่ใน [] เพื่อให้มันวิ่งไปดึงข้อมูลใหม่เวลาค่าเปลี่ยน
   }, [patientId, refreshTrigger])
 
   const latest = vitalSigns[0] || null
@@ -73,11 +71,10 @@ export default function PatientHealthDashboard() {
               </div>
             </div>
             
-            {/* 🌟 3. วางปุ่ม Modal ไว้ตรงนี้ (มุมขวาบน) */}
             <div>
               <VitalsSignsModal
-                appointmentId={""} // หรือส่ง ID อื่นๆ ถ้ามี
-                onSuccess={() => setRefreshTrigger(prev => prev + 1)} // 🌟 สั่งอัปเดตข้อมูลอัตโนมัติ
+                appointmentId={""}
+                onSuccess={() => setRefreshTrigger(prev => prev + 1)}
               />
             </div>
           </div>
